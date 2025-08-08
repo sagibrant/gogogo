@@ -1,33 +1,31 @@
-# Automator
+# Gogogo
 
-We are trying to implement a better automation tool which can be easily integrated and combined with the latest AI features.
+Gogogo enables reliable end-to-end automation on your machine. 
 
-## Architecture
+## Gogogo - extension
 
-There are 5 components for the Automator:
-* protocol
-    * The protocol component defines the communication protocol and the data format
-* client
-    * The client component defines the SDK and provide a friendly UI to record/replay/inspect on the applications
-* connector
-    * The connector component is the bridge for remote automation when the client and engine are not in the same machine
-* engine
-    * The engine component will maintain all the drivers and dispatching different automation request to different drivers
-* drivers
-    * The drivers component is the collection of all the automation drivers which provide the functionality to automate the application based on the technologies
-    * web driver
-        * selenium webdriver based (`webdriverhost <--> chromedriver`)
-        * web extension based (`nativemessaginghost <--> extension`)
-    * ai driver
-    * input driver
+Gogogo extension is a standalone solution for browser automation.
+It is a modern web extension available on Chrome, Edge, Firefox and Safari. 
+It is small, safe, fast, reliable and user friendly with AI assistence.
+It helps you to generate, execute the automation steps on your browser directly without installing any heavy local tools.
 
-* flow:
-```js
-client <--> connector <--> engine <--> drivers
-```
+## Gogogo - engine
 
-* chrome flow:
-```js
-client <--> connector <--> engine <--> chrome.nativemessaginghost <--> chrome extension
-```
+Gogogo engine is the end-to-end solution for machine level automation.
+It is a light-weighted local automation application on your machine. To enable different features, you can download, install the plugins by demonds.
+It can run in standalone, hub or node mode. 
+In standalone mode, the engine is a onprem automation tool.
+In hub mode, the engine can deliver the task to node machine to execute the automation tasks.
+In node mode, the engine will register itself to the hub machine, accept the task from hub machine and excute the automation tasks on the node machine.
 
+## Gogogo - store
+
+Gogogo store is a online store which allow users to submit, purchase, download automation tasks.
+
+----
+
+## Resources:
+* [Documentation](https://github.com/sagibrant/gogogo/docs)
+* [API reference](https://github.com/sagibrant/gogogo/docs/api)
+* [Contribution guide](https://github.com/sagibrant/gogogo/docs/contribution_guide)
+* [Changelog](https://github.com/sagibrant/gogogo/docs/changelog)
