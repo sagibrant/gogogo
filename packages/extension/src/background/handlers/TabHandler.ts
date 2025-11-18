@@ -897,9 +897,10 @@ export class TabHandler extends MsgDataHandlerBase {
   /** record the step with page & frame information */
   protected override async recordStep(step: RecordedStep): Promise<void> {
     step.pageScript = 'page';
-    if (step.elementRtid.frame !== this._contentId.frame) {
+    if (step.elementRtid && step.elementRtid.frame !== this._contentId.frame) {
+      const frameId = step.elementRtid.frame;
       const frames = await this.frames();
-      const index = frames.findIndex(f => f.frameId === step.elementRtid.frame);
+      const index = frames.findIndex(f => f.frameId === frameId);
       step.frameScript = `frame().nth(${index})`;
     }
     else {

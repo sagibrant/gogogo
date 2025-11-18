@@ -30,6 +30,7 @@ import { TabInfo, WindowInfo } from "../../common/BrowserWrapperTypes";
 import { MsgDataHandlerBase } from "@/common/Messaging/MsgDataHandler";
 import { BackgroundUtils } from "../BackgroundUtils";
 import { Cookie } from "@/types/types";
+import { SettingUtils } from "@/common/Settings";
 
 interface BrowserEvents {
   windowCreated: { window: WindowHandler };
@@ -312,6 +313,13 @@ export class BrowserHandler extends MsgDataHandlerBase<BrowserEvents> {
         return;
       }
       tab.updateFrameDetails(ev.frameId, { status: 'Committed', ev: ev });
+
+      if (SettingUtils.getRecordSettings().recordNavigation
+        && ev.transitionQualifiers && ev.transitionQualifiers.includes('from_address_bar')
+        && ev.url) {
+        const step = { pageScript: 'page', actionScript: `navigate('${ev.url}')` };
+        BackgroundUtils.dispatchEvent('stepRecorded', step);
+      }
     });
     this._browserAPI.webNavigationAPI.on('onDOMContentLoaded', (ev) => {
       const tab = this._tabs[ev.tabId];

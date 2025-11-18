@@ -359,8 +359,8 @@ export interface RecordedStep {
   elementScript?: string;
   actionScript?: string;
 
-  element: DOMElementDescription;
-  elementRtid: Rtid;
+  element?: DOMElementDescription;
+  elementRtid?: Rtid;
 }
 /** ==================================================================================================================== */
 /** =================================================== End of file ==================================================== */

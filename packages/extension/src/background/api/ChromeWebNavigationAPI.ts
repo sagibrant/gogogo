@@ -155,7 +155,8 @@ export class ChromeWebNavigationAPI extends EventEmitter<WebNavigationEvents> {
         frameType: details.frameType,
         documentId: details.documentId,
         parentDocumentId: details.parentDocumentId,
-        timeStamp: details.timeStamp
+        timeStamp: details.timeStamp,
+        transitionQualifiers: details.transitionQualifiers
       });
     });
     chrome.webNavigation.onDOMContentLoaded.addListener((details) => {
