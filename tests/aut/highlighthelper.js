@@ -10,7 +10,7 @@ class HighlightHelper {
   }
 
   /**
-   * draw the rectange based on the given HighlightItem
+   * draw the rectangle based on the given HighlightItem
    * @param {HighlightItem} textItem
    * @param {number} scrollX
    * @param {number} scrollY
@@ -30,7 +30,7 @@ class HighlightHelper {
     if (scrollHeight == null) {
       scrollHeight = document.documentElement.scrollHeight;
     }
-    let rect = this._adjustRectange(item.rect, scrollX, scrollY, scrollWidth, scrollHeight);
+    let rect = this._adjustRectangle(item.rect, scrollX, scrollY, scrollWidth, scrollHeight);
     if (rect.width < 0 || rect.height < 0) {
       // console.error('skip draw rect, because the rect exceeded the scroll section:', textItem, node, scrollX, scrollY, scrollWidth, scrollHeight);
       return;
@@ -63,7 +63,7 @@ class HighlightHelper {
     document.body.appendChild(rect_elem);
 
     // let updateRectangle = () => {
-    //     let rect = this._adjustRectange(item.rect, window.scrollX, window.scrollY, document.documentElement.scrollWidth, document.documentElement.scrollHeight);
+    //     let rect = this._adjustRectangle(item.rect, window.scrollX, window.scrollY, document.documentElement.scrollWidth, document.documentElement.scrollHeight);
     //     rect_elem.style.left = `${rect.left}px`;
     //     rect_elem.style.top = `${rect.top}px`;
     //     rect_elem.style.width = `${rect.width}px`;
@@ -135,7 +135,7 @@ class HighlightHelper {
   }
 
   /**
-   * adjust the rectange
+   * adjust the rectangle
    * @param {object} rect
    * @param {number} scrollX
    * @param {number} scrollY
@@ -143,7 +143,7 @@ class HighlightHelper {
    * @param {number} scrollHeight
    * @returns
    */
-  _adjustRectange(rect, scrollX, scrollY, scrollWidth, scrollHeight) {
+  _adjustRectangle(rect, scrollX, scrollY, scrollWidth, scrollHeight) {
     let adjustedRect = {};
     adjustedRect.left = scrollX + rect.left - 1;
     adjustedRect.top = scrollY + rect.top - 1;

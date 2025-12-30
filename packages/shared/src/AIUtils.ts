@@ -504,11 +504,11 @@ ${types}
   ) {
 
     let userPrompt = `Key Reminders (Align with System Rules):
-1. Return ONLY a valid JSON object in this structure: { script: string, answer: string }, no extra text, no exta styles, no Markdown, no code blocks outside the JSON. 
+1. Return ONLY a valid JSON object in this structure: { script: string, answer: string }, no extra text, no extra styles, no Markdown, no code blocks outside the JSON. 
 2. "script" must be PURE JavaScript (no TypeScript syntax like type annotations or interfaces) and strictly comply with the API types/interfaces defined in the system prompt's types.d.ts.
 3. "answer" (10-300 tokens) must include: (a) A summary of the user request and current situation; (b) How the script solves the problem.
 
-Based on the below informations, generate the full "script" according to the User Request to overwrite the existing script (even for 1-line changes). Ensure it is executable JavaScript code which compliant with the defined types (in the system prompt's types.d.ts), and exactly matches the user request.
+Based on the below information, generate the full "script" according to the User Request to overwrite the existing script (even for 1-line changes). Ensure it is executable JavaScript code which compliant with the defined types (in the system prompt's types.d.ts), and exactly matches the user request.
 
 ---
 

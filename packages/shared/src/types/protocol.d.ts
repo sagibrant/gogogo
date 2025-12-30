@@ -333,6 +333,7 @@ export interface DOMElementDescription {
   xPath?: string;
   fullXPath?: string;
   jsPath?: string;
+  scriptPath?: string;
 
   frameUrl?: string;
   isInSubFrame?: boolean;

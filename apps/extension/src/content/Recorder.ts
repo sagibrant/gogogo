@@ -27,7 +27,7 @@ export class Recorder {
   private readonly _logger: Logger;
   private readonly _recordingEvents: string[];
   private readonly _objMap: Map<EventTarget, RecordObject>;
-  private _hanleEventFunc?: (event: Event) => Promise<void>;
+  private _handleEventFunc?: (event: Event) => Promise<void>;
 
   constructor() {
     const prefix = Utils.isEmpty(this.constructor?.name) ? 'Recorder' : this.constructor?.name;
@@ -37,21 +37,21 @@ export class Recorder {
   }
 
   isRecording(): boolean {
-    return this._hanleEventFunc !== undefined;
+    return this._handleEventFunc !== undefined;
   }
 
   async startRecording(): Promise<void> {
     this._logger.debug('startRecording:: ===>');
-    if (!this._hanleEventFunc) {
-      this._hanleEventFunc = this.hanleEvent.bind(this);
+    if (!this._handleEventFunc) {
+      this._handleEventFunc = this.handleEvent.bind(this);
     }
     for (const event of this._recordingEvents) {
-      window.addEventListener(event, this._hanleEventFunc, true);
+      window.addEventListener(event, this._handleEventFunc, true);
     }
     const shadowRoots = ContentUtils.traverseGetAllShadowRoot(document);
     for (const shadowRoot of shadowRoots) {
       for (const event of this._recordingEvents) {
-        shadowRoot.addEventListener(event, this._hanleEventFunc, true);
+        shadowRoot.addEventListener(event, this._handleEventFunc, true);
       }
     }
     this._logger.debug('startRecording:: <===');
@@ -59,22 +59,22 @@ export class Recorder {
 
   async stopRecording(): Promise<void> {
     this._logger.debug('stopRecording:: ===>');
-    if (this._hanleEventFunc) {
+    if (this._handleEventFunc) {
       for (const event of this._recordingEvents) {
-        window.removeEventListener(event, this._hanleEventFunc, true);
+        window.removeEventListener(event, this._handleEventFunc, true);
       }
       const shadowRoots = ContentUtils.traverseGetAllShadowRoot(document);
       for (const shadowRoot of shadowRoots) {
         for (const event of this._recordingEvents) {
-          shadowRoot.removeEventListener(event, this._hanleEventFunc, true);
+          shadowRoot.removeEventListener(event, this._handleEventFunc, true);
         }
       }
     }
-    this._hanleEventFunc = undefined;
+    this._handleEventFunc = undefined;
     this._logger.debug('stopRecording:: <===');
   }
 
-  async hanleEvent(event: Event): Promise<void> {
+  async handleEvent(event: Event): Promise<void> {
     let target = event.target;
     if (event.composedPath) {
       const path = event.composedPath();

@@ -121,7 +121,7 @@ extension/
     C:\xxx\extension> npm run build::firefox -- --env version=2025.04.11.1 
 ```
 
-> build for `product` (should only triggered by pipleline as it will reserve the build number)
+> build for `product` (should only triggered by pipeline as it will reserve the build number)
 
 ```bat
     C:\xxx\extension> npm run build::product -- --env version=2025.04.11.1 

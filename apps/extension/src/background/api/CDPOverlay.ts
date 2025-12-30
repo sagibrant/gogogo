@@ -78,13 +78,13 @@ export class CDPOverlay {
   ): Promise<void> {
     // default color picked from chrome:
     // Formula for foreground color: 
-    // c_final = (1-a)*c_background + a*c_forground
+    // c_final = (1-a)*c_background + a*c_foreground
     // c_background = #FFFFFF = rgb(255, 255, 255)
-    // c_forground = (c_final - (1-a)*c_background)/a
-    // 1. inspected item:c_final = #A0C5E8 rgb(160, 197, 232), c_forground = rgba(18, 110, 198, 0.4)
-    // 2: padding: c_final = #C4DDB8 rgb(196, 221, 184), c_forground = rgba(108, 170, 78, 0.4)
-    // 3: border: c_final = #FFEDBC rgb(255, 237, 188) , c_forground = rgba(255, 210, 88, 0.4)
-    // 4: marging: c_final = #F9CB9D rgb(249, 203, 157), c_forground = rgba(240, 125, 10, 0.4)
+    // c_foreground = (c_final - (1-a)*c_background)/a
+    // 1. inspected item:c_final = #A0C5E8 rgb(160, 197, 232), c_foreground = rgba(18, 110, 198, 0.4)
+    // 2: padding: c_final = #C4DDB8 rgb(196, 221, 184), c_foreground = rgba(108, 170, 78, 0.4)
+    // 3: border: c_final = #FFEDBC rgb(255, 237, 188) , c_foreground = rgba(255, 210, 88, 0.4)
+    // 4: margin: c_final = #F9CB9D rgb(249, 203, 157), c_foreground = rgba(240, 125, 10, 0.4)
     const rectWithDefaults = {
       outlineColor: { r: 18, g: 110, b: 198, a: 0 },
       color: { r: 18, g: 110, b: 198, a: 0.4 },

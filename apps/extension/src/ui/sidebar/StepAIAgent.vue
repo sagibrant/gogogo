@@ -214,7 +214,7 @@ const identifyElementsWithVision = tool(
       content: [
         {
           type: "text",
-          text: prompt || "Analyze this image and identify all interactive elements (buttons, links, input fields, dropdowns, etc.). For each element, provide the coordinates (x, y) and dimensions (width, height) in the format: {x, y, width, height}. Return the information as a JSON array of elements with their properties."
+          text: prompt || "Analyze this image and identify all interactive elements (buttons, links, input fields, dropdowns, etc.). For each element, provide the type, the coordinates (x, y) and dimensions (width, height) in the format: {type, x, y, width, height}. Return the information as a JSON array of elements with their properties."
         },
         {
           type: "image_url",

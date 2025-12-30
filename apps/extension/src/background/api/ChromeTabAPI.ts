@@ -171,13 +171,13 @@ export class ChromeTabAPI extends EventEmitter<TabAPIEvents> {
   async activate(tabId: number): Promise<chrome.tabs.Tab> {
     let tab = await this.get(tabId);
     if (!tab.active) {
-      const newTab = await this.udpateTab(tabId, { active: true });
+      const newTab = await this.updateTab(tabId, { active: true });
       tab = newTab ? newTab : await this.get(tabId);
     }
     return tab;
   }
 
-  async udpateTab(tabId: number, updateInfo: chrome.tabs.UpdateProperties): Promise<chrome.tabs.Tab | undefined> {
+  async updateTab(tabId: number, updateInfo: chrome.tabs.UpdateProperties): Promise<chrome.tabs.Tab | undefined> {
     return new Promise((resolve, reject) => {
       chrome.tabs.update(tabId, updateInfo, (tab) => {
         const error = chrome.runtime.lastError;
@@ -192,7 +192,7 @@ export class ChromeTabAPI extends EventEmitter<TabAPIEvents> {
   }
 
   async navigate(tabId: number, url: string): Promise<chrome.tabs.Tab | undefined> {
-    const tab = await this.udpateTab(tabId, { url: url });
+    const tab = await this.updateTab(tabId, { url: url });
     return tab;
   }
 

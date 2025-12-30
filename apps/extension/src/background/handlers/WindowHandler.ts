@@ -58,8 +58,8 @@ export class WindowHandler extends MsgDataHandlerBase {
   async activeTab(): Promise<TabInfo | undefined> {
     const window = await this._browserAPI.windowAPI.get(this._windowId, true);
     const tabInfos = window.tabs?.map(t => Utils.deepClone(t)) || [];
-    const activedTab = tabInfos.find(t => t.active);
-    return activedTab;
+    const activeTab = tabInfos.find(t => t.active);
+    return activeTab;
   }
 
   /** ==================================================================================================================== **/
@@ -131,7 +131,7 @@ export class WindowHandler extends MsgDataHandlerBase {
         throw new Error('The window rect is not available.')
       }
       let rect = { left: window.left, top: window.top, width: window.width, height: window.height };
-      rect = Utils.fixRectange(rect);
+      rect = Utils.fixRectangle(rect);
       return rect;
     }
     else if (propName === 'screen_rect') {
@@ -149,7 +149,7 @@ export class WindowHandler extends MsgDataHandlerBase {
         width: window.width * deviceScaleFactor,
         height: window.height * deviceScaleFactor
       };
-      rect = Utils.fixRectange(rect);
+      rect = Utils.fixRectangle(rect);
       return rect;
     }
     else {
@@ -172,7 +172,7 @@ export class WindowHandler extends MsgDataHandlerBase {
       const tabs = await this._queryTabs(desc);
       return tabs;
     }
-    throw new Error(`Unkown description type - ${desc.type}`);
+    throw new Error(`Unknown description type - ${desc.type}`);
   }
 
   /**

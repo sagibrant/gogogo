@@ -196,7 +196,7 @@ export class ElementHandler extends NodeHandler {
   }
   getBoundingClientRect(): RectInfo {
     const rect = this._elem.getBoundingClientRect();
-    return Utils.fixRectange(rect);
+    return Utils.fixRectangle(rect);
   }
   checkValidity(): boolean {
     return !!(this._elem as HTMLSelectElement).checkValidity();

@@ -4,7 +4,7 @@
  * @license Apache-2.0
  * @file FrameInMAIN.ts
  * @description 
- * The Frame in MAIN Wrold
+ * The Frame in MAIN World
  * 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");

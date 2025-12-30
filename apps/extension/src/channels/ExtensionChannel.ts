@@ -141,7 +141,7 @@ export class ExtensionPortChannel extends ChannelBase {
 }
 
 /**
- * The connection client which connect to the extension background/another extension/native applicaton
+ * The connection client which connect to the extension background/another extension/native application
  */
 export class ExtensionChannelClient extends ChannelClient {
   /**
@@ -172,7 +172,7 @@ export class ExtensionChannelClient extends ChannelClient {
    */
   private _clientInfo?: ExtensionClientInfo;
   /**
-   * the channel wrappered the extension port
+   * the channel wrapped the extension port
    */
   private _channel?: ExtensionPortChannel;
 
@@ -460,7 +460,7 @@ export class ExtensionChannelHost extends ChannelHost {
     if ('onConnectExternal' in this._messagingService) {
       this._messagingService.onConnectExternal.addListener(this._onConnectListener);
     }
-    this.logger.debug(`start: listening for internal and exteranl extension connections. extension_id: ${this._extensionId}, manifestVersion: ${this._manifestVersion}`);
+    this.logger.debug(`start: listening for internal and external extension connections. extension_id: ${this._extensionId}, manifestVersion: ${this._manifestVersion}`);
   }
 
   stop(): void {
@@ -470,7 +470,7 @@ export class ExtensionChannelHost extends ChannelHost {
     if ('onConnectExternal' in this._messagingService) {
       this._messagingService.onConnectExternal.removeListener(this._onConnectListener);
     }
-    this.logger.debug(`stop: listening for internal and exteranl extension connections. extension_id: ${this._extensionId}, manifestVersion: ${this._manifestVersion}`);
+    this.logger.debug(`stop: listening for internal and external extension connections. extension_id: ${this._extensionId}, manifestVersion: ${this._manifestVersion}`);
   }
 
   private onConnected(port: chrome.runtime.Port): void {

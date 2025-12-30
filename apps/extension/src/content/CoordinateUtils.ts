@@ -22,7 +22,7 @@
 
 import { BrowserUtils, Utils, RectInfo } from "@gogogo/shared";
 
-export class CoodinateUtils {
+export class CoordinateUtils {
   /** the page's window offset x */
   static pageWindowOffsetX: number | undefined = undefined;
   /** the page's window offset y */
@@ -31,7 +31,7 @@ export class CoodinateUtils {
   static onResizeListener?: (ev: UIEvent) => void;
 
   static turnOnUserInteractiveMode(deviceScaleFactor: number): void {
-    CoodinateUtils.onMouseOverListener = (ev: MouseEvent) => {
+    CoordinateUtils.onMouseOverListener = (ev: MouseEvent) => {
       if (window.parent !== window) {
         return; // check if in page
       }
@@ -39,46 +39,46 @@ export class CoodinateUtils {
         typeof (ev.screenX) === "number" && typeof (ev.screenY) === "number" &&
         typeof (ev.clientX) === "number" && typeof (ev.clientY) === "number") {
         const devicePixelRatio = window.devicePixelRatio;
-        CoodinateUtils.pageWindowOffsetX = Math.floor(((ev.screenX - window.screenX) * deviceScaleFactor) - (ev.clientX * devicePixelRatio));
-        CoodinateUtils.pageWindowOffsetY = Math.floor(((ev.screenY - window.screenY) * deviceScaleFactor) - (ev.clientY * devicePixelRatio));
-        if (CoodinateUtils.pageWindowOffsetX < 0 || CoodinateUtils.pageWindowOffsetY < 0) {
-          CoodinateUtils.pageWindowOffsetX = undefined;
-          CoodinateUtils.pageWindowOffsetY = undefined;
+        CoordinateUtils.pageWindowOffsetX = Math.floor(((ev.screenX - window.screenX) * deviceScaleFactor) - (ev.clientX * devicePixelRatio));
+        CoordinateUtils.pageWindowOffsetY = Math.floor(((ev.screenY - window.screenY) * deviceScaleFactor) - (ev.clientY * devicePixelRatio));
+        if (CoordinateUtils.pageWindowOffsetX < 0 || CoordinateUtils.pageWindowOffsetY < 0) {
+          CoordinateUtils.pageWindowOffsetX = undefined;
+          CoordinateUtils.pageWindowOffsetY = undefined;
         }
       }
     };
-    CoodinateUtils.onResizeListener = (_ev: UIEvent) => {
+    CoordinateUtils.onResizeListener = (_ev: UIEvent) => {
       if (window.parent !== window) {
         return; // check if in page
       }
-      CoodinateUtils.pageWindowOffsetX = undefined;
-      CoodinateUtils.pageWindowOffsetY = undefined;
+      CoordinateUtils.pageWindowOffsetX = undefined;
+      CoordinateUtils.pageWindowOffsetY = undefined;
     };
-    window.addEventListener("mouseover", CoodinateUtils.onMouseOverListener, true);
-    window.addEventListener("resize", CoodinateUtils.onResizeListener, true);
+    window.addEventListener("mouseover", CoordinateUtils.onMouseOverListener, true);
+    window.addEventListener("resize", CoordinateUtils.onResizeListener, true);
   }
   static turnOffUserInteractiveMode() {
-    if (CoodinateUtils.onMouseOverListener) {
-      window.removeEventListener('mouseover', CoodinateUtils.onMouseOverListener);
+    if (CoordinateUtils.onMouseOverListener) {
+      window.removeEventListener('mouseover', CoordinateUtils.onMouseOverListener);
     }
-    CoodinateUtils.onResizeListener = undefined;
-    if (CoodinateUtils.onResizeListener) {
-      window.removeEventListener('resize', CoodinateUtils.onResizeListener);
+    CoordinateUtils.onResizeListener = undefined;
+    if (CoordinateUtils.onResizeListener) {
+      window.removeEventListener('resize', CoordinateUtils.onResizeListener);
     }
-    CoodinateUtils.onResizeListener = undefined;
+    CoordinateUtils.onResizeListener = undefined;
   }
 
   static getPageRectUsingUserInteractiveMode(pageZoomFactor: number): RectInfo {
     // user interactive mode: user action help us to fix the offset issue
-    if (Utils.isNullOrUndefined(CoodinateUtils.pageWindowOffsetX) || Utils.isNullOrUndefined(CoodinateUtils.pageWindowOffsetY)) {
+    if (Utils.isNullOrUndefined(CoordinateUtils.pageWindowOffsetX) || Utils.isNullOrUndefined(CoordinateUtils.pageWindowOffsetY)) {
       throw new Error('pageWindowOffsetX & pageWindowOffsetY is not valid');
     }
 
     const pageRect: Partial<RectInfo> = {};
     const devicePixelRatio = window.devicePixelRatio;
     const deviceScaleFactor = window.devicePixelRatio / pageZoomFactor;
-    pageRect.left = window.screenX * deviceScaleFactor + CoodinateUtils.pageWindowOffsetX;
-    pageRect.top = window.screenY * deviceScaleFactor + CoodinateUtils.pageWindowOffsetY;
+    pageRect.left = window.screenX * deviceScaleFactor + CoordinateUtils.pageWindowOffsetX;
+    pageRect.top = window.screenY * deviceScaleFactor + CoordinateUtils.pageWindowOffsetY;
 
     pageRect.right = pageRect.left + window.innerWidth * devicePixelRatio;
     pageRect.bottom = pageRect.top + window.innerHeight * devicePixelRatio;
@@ -88,7 +88,7 @@ export class CoodinateUtils {
     pageRect.right = Math.ceil(pageRect.right);
     pageRect.bottom = Math.ceil(pageRect.bottom);
 
-    return Utils.fixRectange(pageRect);
+    return Utils.fixRectangle(pageRect);
   }
 
   /** check if the page is in full screen mode */
@@ -109,7 +109,7 @@ export class CoodinateUtils {
   /** check if the page is maxmized, not very reliable */
   static isMaximized(tolerance = 0): boolean {
     // Skip check if in fullscreen (fullscreen is a separate state)
-    if (CoodinateUtils.isFullscreen()) return false;
+    if (CoordinateUtils.isFullscreen()) return false;
 
     // screenX and screenY may be affected by the system toolbar
     // (window.screenX === 0) && (window.screenY === 0)
@@ -157,7 +157,7 @@ export class CoodinateUtils {
   static calculatePagePadding(scale: number): number {
     const browserInfo = BrowserUtils.getBrowserInfo();
     if (browserInfo.name === 'edge') {
-      return CoodinateUtils.calculateEdgePagePadding(scale);
+      return CoordinateUtils.calculateEdgePagePadding(scale);
     }
     return 0;
   }
@@ -168,7 +168,7 @@ export class CoodinateUtils {
     }
     const scales = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
     const paddings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-    let padding = CoodinateUtils.calculateBound(scale, scales, paddings);
+    let padding = CoordinateUtils.calculateBound(scale, scales, paddings);
     return padding;
   };
 
@@ -178,7 +178,7 @@ export class CoodinateUtils {
     }
     const scales = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
     const borders = [4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23];
-    let border = CoodinateUtils.calculateBound(scale, scales, borders);
+    let border = CoordinateUtils.calculateBound(scale, scales, borders);
     return border;
   }
 
@@ -194,11 +194,11 @@ export class CoodinateUtils {
     desktopScaleFactor = desktopScaleFactor ?? deviceScaleFactor;
 
     if (isMaximized === undefined || isMaximized === null) {
-      isMaximized = CoodinateUtils.isMaximized();
+      isMaximized = CoordinateUtils.isMaximized();
     }
-    const paddingPixels = CoodinateUtils.calculatePagePadding(deviceScaleFactor);
-    const borderPixels = CoodinateUtils.calculatePageBorder(deviceScaleFactor);
-    const screenX_maximized_browser = 0 - CoodinateUtils.calculatePageBorder(desktopScaleFactor);
+    const paddingPixels = CoordinateUtils.calculatePagePadding(deviceScaleFactor);
+    const borderPixels = CoordinateUtils.calculatePageBorder(deviceScaleFactor);
+    const screenX_maximized_browser = 0 - CoordinateUtils.calculatePageBorder(desktopScaleFactor);
 
     if (isMaximized) {
       pageRect.left = screenX_maximized_browser + borderPixels + paddingPixels;
@@ -229,7 +229,7 @@ export class CoodinateUtils {
     pageRect.right = Math.ceil(pageRect.right);
     pageRect.bottom = Math.ceil(pageRect.bottom);
 
-    return Utils.fixRectange(pageRect);
+    return Utils.fixRectangle(pageRect);
   }
 
 }

@@ -244,11 +244,11 @@ export class Utils {
   }
 
   /**
-   * fix the rectange object (fullfill the width, height, right, bottom)
+   * fix the rectangle object (fullfill the width, height, right, bottom)
    * @param {Partial<RectInfo>} rect 
    * @returns {RectInfo}
    */
-  static fixRectange(rect: Partial<RectInfo>): RectInfo {
+  static fixRectangle(rect: Partial<RectInfo>): RectInfo {
     if (!rect) {
       return rect;
     }

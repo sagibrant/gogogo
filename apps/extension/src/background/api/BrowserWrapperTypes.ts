@@ -4,7 +4,7 @@
  * @license Apache-2.0
  * @file BrowserWrapperTypes.ts
  * @description 
- * Provide wrappered types based on types defined in chrome extension api 
+ * Provide wrapped types based on types defined in chrome extension api 
  * We wrapper the known types again so that we can use it crossing the browser types
  *
  * 

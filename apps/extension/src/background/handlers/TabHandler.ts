@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { BrowserUtils, MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, InvokeAction, QueryInfo, RecordedStep, Rtid, ClickOptions, Point, RectInfo, TextInputOptions, LocatorUtils, MsgDataHandlerBase, KeyDefinitionUtils} from "@gogogo/shared";
+import { BrowserUtils, MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, InvokeAction, QueryInfo, RecordedStep, Rtid, ClickOptions, Point, RectInfo, TextInputOptions, LocatorUtils, MsgDataHandlerBase, KeyDefinitionUtils, DOMElementDescription} from "@gogogo/shared";
 import { ChromeExtensionAPI } from "../api/ChromeExtensionAPI";
 import { FrameInfo, TabInfo, WindowInfo } from "../api/BrowserWrapperTypes";
 import { WebNavigationEventDetails } from "../api/ChromeWebNavigationAPI";
@@ -221,6 +221,12 @@ export class TabHandler extends MsgDataHandlerBase {
         this.logger.warn('stopRecording', frame, error);
       }
     }
+  }
+
+  async getElementFromPoint(x: number, y: number, width: number, height: number): Promise<DOMElementDescription | null> {
+    // must update frame infos first to make sure all frames registered
+    await this.updateFrameInfos();
+    return null;
   }
 
   /** ==================================================================================================================== **/

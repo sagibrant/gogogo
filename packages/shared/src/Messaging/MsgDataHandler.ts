@@ -313,7 +313,7 @@ export abstract class MsgDataHandlerBase<T extends EventMap = any> extends Event
   /**
    * invoke a function with name and arguments
    * @param funcName function name to invoke
-   * @param args function arguements
+   * @param args function arguments
    * @returns function call result
    */
   protected async invokeFunction(funcName: string, args?: unknown[]): Promise<unknown> {

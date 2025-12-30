@@ -116,7 +116,7 @@ export class EventSimulator {
   }
 
   /**
-   * conver the mouse button type string to enum type
+   * convert the mouse button type string to enum type
    * @param {MouseButton} [button='left' | 'right' | 'middle'] - The mouse button to simulate (e.g., left, right, middle)
    * @returns {MouseButton} 
    */
@@ -1030,7 +1030,7 @@ export class EventSimulator {
       }
     }
 
-    //  try simulateTypeText if not simple fill, or element type not supported, or customized ContentEditable elememt
+    //  try simulateTypeText if not simple fill, or element type not supported, or customized ContentEditable element
     await EventSimulator.simulateTypeText(target, text, options);
   }
 

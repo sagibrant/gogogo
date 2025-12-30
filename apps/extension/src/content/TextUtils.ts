@@ -70,7 +70,7 @@ export interface TextItem {
      */
     text: string;
     /**
-     * rectanges
+     * rectangles
      */
     rects: RectInfo[];
     /**
@@ -285,7 +285,7 @@ export class TextUtils {
         }
         // filter the invisible text
         let textRect = range.getBoundingClientRect();
-        if (!ContentUtils.isRectangeVisible(textRect)) {
+        if (!ContentUtils.isRectangleVisible(textRect)) {
             return null;
         }
         let rects = range.getClientRects();
@@ -332,7 +332,7 @@ export class TextUtils {
                 continue;
             }
             // skip the invisible rect (some text will be placed in the invisible areas/outside the visible viewport)
-            if (!ContentUtils.isRectangeVisible(rect)) {
+            if (!ContentUtils.isRectangleVisible(rect)) {
                 continue;
             }
 
@@ -453,7 +453,7 @@ export class TextUtils {
             return null;
         }
         let elemRect = elem.getBoundingClientRect();
-        if (!ContentUtils.isRectangeVisible(elemRect)) {
+        if (!ContentUtils.isRectangleVisible(elemRect)) {
             return null;
         }
         if (visibilityLevel !== 'none' && !ContentUtils.isVisibleUsingInspect(elem, elemRect)) {
@@ -517,8 +517,8 @@ export class TextUtils {
         rect.height = rect.bottom - rect.top;
         rect.x = rect.left;
         rect.y = rect.top;
-        const textRect = Utils.fixRectange(rect);
-        if (!ContentUtils.isRectangeVisible(textRect)) {
+        const textRect = Utils.fixRectangle(rect);
+        if (!ContentUtils.isRectangleVisible(textRect)) {
             return null;
         }
         item.rects = [textRect];

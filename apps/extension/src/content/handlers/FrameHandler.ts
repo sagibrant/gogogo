@@ -22,7 +22,7 @@
 
 import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, QueryInfo, Rtid, Selector, LocatorUtils, MsgDataHandlerBase, RectInfo } from "@gogogo/shared";
 import { ContentUtils } from "../ContentUtils";
-import { CoodinateUtils } from "../CoodinateUtils";
+import { CoordinateUtils } from "../CoordinateUtils";
 import { FrameInfo } from "../../background/api/BrowserWrapperTypes";
 import { Recorder } from "../Recorder";
 import { FrameInMAIN } from "../FrameInMAIN";
@@ -48,7 +48,7 @@ export class FrameHandler extends MsgDataHandlerBase {
       const data = Utils.deepClone(event.data);
       if (!(event.source && 'parent' in event.source && event.source.parent === window
         && !Utils.isNullOrUndefined((data as any).rtid) && RtidUtils.isRtid(data.rtid) && data.rtid.frame > 0)) {
-        this.logger.warn('Frame.init: receive unexpected message from other window', event);
+        this.logger.debug('Frame.init: receive unexpected message from other window', event);
         return;
       }
       const frames = ContentUtils.traverseSelectorAllFrames(document, []);
@@ -110,11 +110,11 @@ export class FrameHandler extends MsgDataHandlerBase {
       width: boundingClientRect.width,
       height: boundingClientRect.height,
     } as RectInfo;
-    return Utils.fixRectange(rect);
+    return Utils.fixRectangle(rect);
   }
 
   screenRect(pageZoomFactor: number, isMaximized?: boolean, desktopScaleFactor?: number): RectInfo {
-    return CoodinateUtils.getPageRect(pageZoomFactor, isMaximized, desktopScaleFactor);
+    return CoordinateUtils.getPageRect(pageZoomFactor, isMaximized, desktopScaleFactor);
   }
 
   windowRect(): RectInfo {
@@ -126,7 +126,7 @@ export class FrameHandler extends MsgDataHandlerBase {
       width: window.outerWidth,
       height: window.outerHeight
     } as RectInfo;
-    return Utils.fixRectange(rect);
+    return Utils.fixRectangle(rect);
   }
 
   windowScreenRect(pageZoomFactor: number): RectInfo {
@@ -137,7 +137,7 @@ export class FrameHandler extends MsgDataHandlerBase {
       right: Math.ceil((window.screenX + window.outerWidth) * deviceScaleFactor),
       bottom: Math.ceil((window.screenY + window.outerHeight) * deviceScaleFactor),
     } as RectInfo;
-    return Utils.fixRectange(rect);
+    return Utils.fixRectangle(rect);
   }
 
   querySelectorAll(selector: string): Rtid[] {
@@ -502,9 +502,9 @@ export class FrameHandler extends MsgDataHandlerBase {
     }
 
     if (candidates.length > 0) {
-      const frameElemens = candidates.filter(elem => ContentUtils.elemIsIframe(elem));
+      const frameElements = candidates.filter(elem => ContentUtils.elemIsIframe(elem));
       candidates.splice(0);
-      candidates.push(...frameElemens);
+      candidates.push(...frameElements);
     }
 
     if (cssSelector || xpathSelector) {

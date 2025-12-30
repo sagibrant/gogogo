@@ -288,7 +288,7 @@ export abstract class Locator<T extends AutomationObject> extends ChannelBase im
   }
 }
 
-// TODO: use proxy and Wrapped type to reduce the redudent codes
+// TODO: use proxy and Wrapped type to reduce the redundant codes
 // type Wrapped<T> = {
 //   [K in keyof T]:
 //   T[K] extends (...args: infer A) => infer R

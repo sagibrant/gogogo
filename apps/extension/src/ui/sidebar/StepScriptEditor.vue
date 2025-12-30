@@ -267,7 +267,7 @@ const createCompletionSource = () => {
     const nodeBefore = tree.resolveInner(pos, -1);
     if (!nodeBefore) return null;
     if (!nodeBefore.parent) return null;
-    // we only support the auto completion on one object. global varaible is not supported
+    // we only support the auto completion on one object. global variable is not supported
     // e.g.
     // expr: let elm = await page.frame().nth(0).element().nth(1).element().filter().nth(1).element('#id').cl
     // leftExpr: "page.frame().nth(0).element().nth(1).element().filter().nth(1).element('#id')"

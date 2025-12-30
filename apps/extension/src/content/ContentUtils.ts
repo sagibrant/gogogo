@@ -323,7 +323,7 @@ export class ContentUtils {
           const range = doc.createRange();
           range.selectNode(child);
           const rect = range.getBoundingClientRect();
-          if (ContentUtils.isRectangeVisible(rect)) {
+          if (ContentUtils.isRectangleVisible(rect)) {
             hasVisibleChild = true;
             break;
           }
@@ -349,11 +349,11 @@ export class ContentUtils {
               bottom: values[2],
               left: values[3],
             };
-            rect = Utils.fixRectange(tmp);
+            rect = Utils.fixRectangle(tmp);
           }
         }
       }
-      if (rect && !ContentUtils.isRectangeVisible(rect)) {
+      if (rect && !ContentUtils.isRectangleVisible(rect)) {
         return false;
       }
       rect = undefined
@@ -370,17 +370,17 @@ export class ContentUtils {
               bottom: values[2],
               left: values[3]
             };
-            rect = Utils.fixRectange(tmp);
+            rect = Utils.fixRectangle(tmp);
           }
         }
       }
-      if (rect && !ContentUtils.isRectangeVisible(rect)) {
+      if (rect && !ContentUtils.isRectangleVisible(rect)) {
         return false;
       }
     }
 
     let rect = elem.getBoundingClientRect();
-    if (!ContentUtils.isRectangeVisible(rect) && !style.overflow.includes('visible')) {
+    if (!ContentUtils.isRectangleVisible(rect) && !style.overflow.includes('visible')) {
       return false;
     }
 
@@ -430,7 +430,7 @@ export class ContentUtils {
     }
 
     const rect = elem.getBoundingClientRect();
-    if (!ContentUtils.isRectangeVisible(rect)) {
+    if (!ContentUtils.isRectangleVisible(rect)) {
       return false;
     }
 
@@ -438,7 +438,7 @@ export class ContentUtils {
   }
 
   /**
-   * check if the rectange area of the node is visible on the current viewport based on the inspect simulation
+   * check if the rectangle area of the node is visible on the current viewport based on the inspect simulation
    * @param {Node} node 
    * @param {RectInfo} rect 
    * @returns {boolean}
@@ -505,12 +505,12 @@ export class ContentUtils {
   }
 
   /**
-   * check if the rectange is visible
+   * check if the rectangle is visible
    * @param {object} rect 
    * @returns {boolean}
    */
-  static isRectangeVisible(rect: RectInfo): boolean {
-    const temp = Utils.fixRectange(rect);
+  static isRectangleVisible(rect: RectInfo): boolean {
+    const temp = Utils.fixRectangle(rect);
     if (!temp) {
       return false;
     }
@@ -524,7 +524,7 @@ export class ContentUtils {
   }
 
   /**
-   * check if the text is noise after trimed
+   * check if the text is noise after trimmed
    * @param {string} text 
    * @returns {boolean}
    */

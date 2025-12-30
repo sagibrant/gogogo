@@ -35,19 +35,19 @@ interface CDPEvents {
  * We wrapper the known apis again so that old version apis can be used with promise
  */
 export class ChromeDevToolsProtocol extends EventEmitter<CDPEvents> {
-  private _debbuggerEvents: Record<string, (source: DebuggerSession, method: string, params: unknown) => Promise<void>>;
+  private _debuggerEvents: Record<string, (source: DebuggerSession, method: string, params: unknown) => Promise<void>>;
   private _tabs: Record<number, CDPTabInfo>; // Key: tabId
 
   constructor() {
     super();
     this._tabs = {};
-    this._debbuggerEvents = this._initializeDebuggerEvents();
+    this._debuggerEvents = this._initializeDebuggerEvents();
 
     chrome.debugger.onEvent.addListener(async (source: chrome._debugger.DebuggerSession, method: string, params?: object) => {
-      await this._debbuggerEvent(source, method, params);
+      await this._debuggerEvent(source, method, params);
     });
     chrome.debugger.onDetach.addListener(async (source: chrome._debugger.Debuggee, reason: `${chrome._debugger.DetachReason}`) => {
-      await this._debbuggerDetached(source, reason);
+      await this._debuggerDetached(source, reason);
     });
   }
 
@@ -523,13 +523,13 @@ export class ChromeDevToolsProtocol extends EventEmitter<CDPEvents> {
    * @param method - Event method name
    * @param params - Event parameters
    */
-  private async _debbuggerEvent(source: DebuggerSession, method: string, params?: object): Promise<void> {
+  private async _debuggerEvent(source: DebuggerSession, method: string, params?: object): Promise<void> {
     if (method === "Runtime.consoleAPICalled" || method === "DOM.setChildNodes") {
       return;
     }
-    this.logger.debug("_debbuggerEvent", source, method, params);
-    if (this._debbuggerEvents[method]) {
-      await this._debbuggerEvents[method].call(this, source, method, params);
+    this.logger.debug("_debuggerEvent", source, method, params);
+    if (this._debuggerEvents[method]) {
+      await this._debuggerEvents[method].call(this, source, method, params);
     }
   }
 
@@ -752,14 +752,14 @@ export class ChromeDevToolsProtocol extends EventEmitter<CDPEvents> {
    * @param source - Session that was detached
    * @param reason - Reason for detachment (canceled_by_user | target_closed)
    */
-  private async _debbuggerDetached(source: Debuggee, reason: string): Promise<void> {
-    this.logger.debug("_debbuggerDetached: Debugger was detached from ", source, ": ", reason);
+  private async _debuggerDetached(source: Debuggee, reason: string): Promise<void> {
+    this.logger.debug("_debuggerDetached: Debugger was detached from ", source, ": ", reason);
 
     const tab = this.getTabInfo(source);
     if (!tab) return;
 
     if (!Utils.isNullOrUndefined(source.targetId) && source.targetId !== tab.targetId) {
-      this.logger.warn("_debbuggerDetached: Debugger was detached (not tab) from ", source, ": ", reason);
+      this.logger.warn("_debuggerDetached: Debugger was detached (not tab) from ", source, ": ", reason);
       return;
     }
 
@@ -769,7 +769,7 @@ export class ChromeDevToolsProtocol extends EventEmitter<CDPEvents> {
       try {
         await this.attachTab(tab.id);
       } catch (error) {
-        this.logger.warn(`_debbuggerDetached: Re-attachTab failed - ${tab.id}`, error);
+        this.logger.warn(`_debuggerDetached: Re-attachTab failed - ${tab.id}`, error);
       }
     }
   }

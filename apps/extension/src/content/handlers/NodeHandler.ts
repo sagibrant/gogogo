@@ -110,7 +110,7 @@ export class NodeHandler extends MsgDataHandlerBase {
       range.selectNodeContents(this._node);
       // filter the invisible text
       const rect = range.getBoundingClientRect();
-      return Utils.fixRectange(rect);
+      return Utils.fixRectangle(rect);
     }
     else {
       const elem = this.elem;
@@ -118,7 +118,7 @@ export class NodeHandler extends MsgDataHandlerBase {
         throw new Error('Not ready for getBoundingClientRect');
       }
       const rect = elem.getBoundingClientRect();
-      return Utils.fixRectange(rect);
+      return Utils.fixRectangle(rect);
     }
   }
 
@@ -152,7 +152,7 @@ export class NodeHandler extends MsgDataHandlerBase {
       elemRect.top = elemRect.top + client_rect.top + parseInt(style.paddingTop, 10);
       elemRect.right = elemRect.left + client_rect.width;
       elemRect.bottom = elemRect.top + client_rect.height;
-      return Utils.fixRectange(elemRect);
+      return Utils.fixRectangle(elemRect);
     }
   }
 

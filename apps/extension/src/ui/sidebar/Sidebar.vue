@@ -267,7 +267,7 @@ const editedStepDescription = ref('');
  * idle:
  *    menu buttons: enable
  *    task tree: enable
- *    task buttons: enbable
+ *    task buttons: enable
  *    script panel: normal or expanded
  * record:
  *    menu buttons: disabled

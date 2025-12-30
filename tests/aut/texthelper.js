@@ -105,7 +105,7 @@ class TextItem {
    */
   text;
   /**
-   * rectanges
+   * rectangles
    * @type {Array}
    */
   rects;
@@ -268,7 +268,7 @@ class TextHelper {
     }
     // filter the invisible text
     let textRect = range.getBoundingClientRect();
-    if (!this._isRectangeVisible(textRect)) {
+    if (!this._isRectangleVisible(textRect)) {
       return null;
     }
     let rects = range.getClientRects();
@@ -307,7 +307,7 @@ class TextHelper {
     let charIndex = 0;
     for (let rect of rects) {
       // skip the invisible rect (some text will be placed in the invisible areas/outside the visible viewport)
-      if (!this._isRectangeVisible(rect)) {
+      if (!this._isRectangleVisible(rect)) {
         continue;
       }
 
@@ -413,7 +413,7 @@ class TextHelper {
         return null;
       }
       let elemRect = elem.getBoundingClientRect();
-      if (!this._isRectangeVisible(elemRect)) {
+      if (!this._isRectangleVisible(elemRect)) {
         return null;
       }
       if (mode !== 'all' && !this._isVisibleOnViewPort(elem, elemRect)) {
@@ -482,7 +482,7 @@ class TextHelper {
     rect.height = rect.bottom - rect.top;
     rect.x = rect.left;
     rect.y = rect.top;
-    if (!this._isRectangeVisible(rect)) {
+    if (!this._isRectangleVisible(rect)) {
       return null;
     }
     item.rects = [rect];
@@ -610,7 +610,7 @@ class TextHelper {
     }
     let rect = elem.getBoundingClientRect();
 
-    if (!this._isRectangeVisible(rect) && style.overflow !== 'visible') {
+    if (!this._isRectangleVisible(rect) && style.overflow !== 'visible') {
       return false;
     }
 
@@ -633,7 +633,7 @@ class TextHelper {
           }
         }
       }
-      if (rect && !this._isRectangeVisible(rect)) {
+      if (rect && !this._isRectangleVisible(rect)) {
         return false;
       }
       rect = null;
@@ -655,7 +655,7 @@ class TextHelper {
           }
         }
       }
-      if (rect && !this._isRectangeVisible(rect)) {
+      if (rect && !this._isRectangleVisible(rect)) {
         return false;
       }
     }
@@ -663,7 +663,7 @@ class TextHelper {
   }
 
   /**
-   * check if the rectange area of the node is visible on the current viewport
+   * check if the rectangle area of the node is visible on the current viewport
    * @param {Node} node
    * @param {object} rect
    * @returns {boolean}
@@ -700,12 +700,12 @@ class TextHelper {
   }
 
   /**
-   * check if the rectange is visible
+   * check if the rectangle is visible
    * @param {object} rect
    * @returns {boolean}
    */
-  _isRectangeVisible(rect) {
-    rect = this._fixRectange(rect);
+  _isRectangleVisible(rect) {
+    rect = this._fixRectangle(rect);
     if (!rect) {
       return false;
     }
@@ -719,11 +719,11 @@ class TextHelper {
   }
 
   /**
-   * fix the rectange object (fullfill the width, height, right, bottom)
+   * fix the rectangle object (fullfill the width, height, right, bottom)
    * @param {object} rect
    * @returns {object}
    */
-  _fixRectange(rect) {
+  _fixRectangle(rect) {
     if (!rect) {
       return rect;
     }
@@ -755,7 +755,7 @@ class TextHelper {
   }
 
   /**
-   * check if the text is noise after trimed
+   * check if the text is noise after trimmed
    * @param {string} text
    * @returns {boolean}
    */

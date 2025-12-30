@@ -141,7 +141,7 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
     }
 
     if (mode === 'cdp') {
-      const { x, y } = await this.getBoudingPoint(this, options?.position);
+      const { x, y } = await this.getBoundingPoint(this, options?.position);
       const tabRtid = RtidUtils.getTabRtid(this._rtid.tab);
       await this.invokeFunction(tabRtid, 'mouseMove', [x, y]);
     }
@@ -162,7 +162,7 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
       }
     }
     if (mode === 'cdp') {
-      const { x, y } = await this.getBoudingPoint(this, options?.position);
+      const { x, y } = await this.getBoundingPoint(this, options?.position);
       const clickOption: api.ClickOptions = Utils.deepClone(options ?? {});
       clickOption.position = { x: x, y: y };
       const tabRtid = RtidUtils.getTabRtid(this._rtid.tab);
@@ -185,7 +185,7 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
       }
     }
     if (mode === 'cdp') {
-      const { x, y } = await this.getBoudingPoint(this, options?.position);
+      const { x, y } = await this.getBoundingPoint(this, options?.position);
       const clickOption: api.ClickOptions = Object.assign({}, options, { clickCount: 2 });
       clickOption.position = { x: x, y: y };
       const tabRtid = RtidUtils.getTabRtid(this._rtid.tab);
@@ -220,9 +220,9 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
     }
 
     if (mode === 'cdp') {
-      const startPoint = await this.getBoudingPoint(this, options?.sourcePosition);
+      const startPoint = await this.getBoundingPoint(this, options?.sourcePosition);
       const targetObj = target as any as Node;
-      const targetPoint = await this.getBoudingPoint(targetObj, options?.targetPosition);
+      const targetPoint = await this.getBoundingPoint(targetObj, options?.targetPosition);
       let steps = options?.steps ?? 10;
       // if (Utils.isNullOrUndefined(options?.steps)) {
       //   const dx = targetPoint.x - startPoint.x;
@@ -252,7 +252,7 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
     }
 
     if (mode === 'cdp') {
-      const { x, y } = await this.getBoudingPoint(this, options?.position);
+      const { x, y } = await this.getBoundingPoint(this, options?.position);
       const tabRtid = RtidUtils.getTabRtid(this._rtid.tab);
       await this.invokeFunction(tabRtid, 'touchscreenTap', [x, y, undefined]);
     }
@@ -297,7 +297,7 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
     }
 
     if (mode === 'cdp') {
-      const { x, y } = await this.getBoudingPoint(this);
+      const { x, y } = await this.getBoundingPoint(this);
       const tabRtid = RtidUtils.getTabRtid(this._rtid.tab);
       await this.invokeFunction(tabRtid, 'keyboardClearText', [x, y]);
       // cdp ControlOrMeta + Backspace does not work
@@ -322,7 +322,7 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
   /** ==================================================================================================================== */
   /** =================================================== help methods =================================================== */
   /** ==================================================================================================================== */
-  private async getBoudingPoint(obj: Node, offset?: api.Point): Promise<api.Point> {
+  private async getBoundingPoint(obj: Node, offset?: api.Point): Promise<api.Point> {
     const isConnected = await obj.isConnected();
     if (!isConnected) {
       throw new Error('Element is not connected to the DOM');
