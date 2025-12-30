@@ -9,11 +9,13 @@
     "test": "tests"
   },
   "scripts": {
-    "build::extension::clean": "npm --prefix apps/extension run build::clean",
-    "build::extension::edge": "npm --prefix apps/extension run build::edge::v3::unpacked --",
-    "build::extension::chrome": "npm --prefix apps/extension run build::chrome::v3::unpacked --",
-    "build::test": "npm --prefix tests/extension run build",
-    "build": "npm run build::test && npm run build::extension::clean && (npm run build::extension::edge & npm run build::extension::chrome & wait)",
+    "build:shared": "pnpm --prefix packages/shared build",
+    "build:web": "pnpm --prefix packages/web build",
+    "build:extension:clean": "npm --prefix apps/extension run build:clean",
+    "build:extension:edge": "npm --prefix apps/extension run build:edge:v3:unpacked --",
+    "build:extension:chrome": "npm --prefix apps/extension run build:chrome:v3:unpacked --",
+    "build:test": "npm --prefix tests/extension run build",
+    "build": "pnpm build:test && (pnpm build:shared && pnpm build:web) && pnpm build:extension:clean && (pnpm build:extension:edge & pnpm build:extension:chrome & wait)",
     "lint:prettier": "prettier --write \"**/*.{js, ts, mjs, cjs, json, tsx, css, less, scss, vue, html, md}\"",
     "lint:eslint": "eslint",
     "lint:spellcheck": "cspell lint \"(packages|apps)/**/*.{js,ts,mjs,cjs,json,css,less,scss,vue,html,md}\"",
