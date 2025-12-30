@@ -27,7 +27,8 @@
         </div>
       </Form>
     </Dialog>
-    <Dialog v-model:visible="isAIDialogVisible" modal :header="t('sidebar_btn_action_steps_ai_assistant_header')" :style="{ width: '20rem' }">
+    <Dialog v-model:visible="isAIDialogVisible" modal :header="t('sidebar_btn_action_steps_ai_assistant_header')"
+      :style="{ width: '20rem' }">
       <!-- TODO AI Agent -->
       <step-a-i-agent></step-a-i-agent>
     </Dialog>
@@ -1453,7 +1454,7 @@ const handleReplay = async () => {
 
   taskResult.steps = stepResults;
   taskResult.task_end_time = Date.now();
-  const lastErrorStep = stepResults.findLast(r => r.status === 'failed');
+  const lastErrorStep = [...stepResults].reverse().find(r => r.status === 'failed');
   if (lastErrorStep) {
     taskResult.status = 'failed';
     taskResult.last_error = lastErrorStep.error;
@@ -1540,7 +1541,7 @@ const handleReplayFromStep = async () => {
     }
   }
   taskResult.task_end_time = Date.now();
-  const lastErrorStep = stepResults.findLast(r => r.status === 'failed');
+  const lastErrorStep = [...stepResults].reverse().find(r => r.status === 'failed');
   if (lastErrorStep) {
     taskResult.status = 'failed';
     taskResult.last_error = lastErrorStep.error;
