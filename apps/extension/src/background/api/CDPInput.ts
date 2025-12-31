@@ -166,7 +166,7 @@ export class CDPKeyboard {
     return modifiers;
   }
 
-  async down(key: string): Promise<void> {
+  async down(key: string, commands?: string[]): Promise<void> {
     if (Utils.isNullOrUndefined(key)) {
       throw new Error('Invalid key argument.');
     }
@@ -190,12 +190,13 @@ export class CDPKeyboard {
       unmodifiedText: description.text,
       autoRepeat: autoRepeat,
       location: description.location,
-      isKeypad: description.location === 3
+      isKeypad: description.location === 3,
+      commands
     };
     await this._cdp.sendCommand(this._tabId, "Input.dispatchKeyEvent", eventOptions);
   }
 
-  async up(key: string): Promise<void> {
+  async up(key: string, commands?: string[]): Promise<void> {
     if (Utils.isNullOrUndefined(key)) {
       throw new Error('Invalid key argument.');
     }
@@ -213,9 +214,23 @@ export class CDPKeyboard {
       key: description.key,
       windowsVirtualKeyCode: description.keyCodeWithoutLocation,
       code: description.code,
-      location: description.location
+      location: description.location,
+      commands
     };
     await this._cdp.sendCommand(this._tabId, "Input.dispatchKeyEvent", eventOptions);
+  }
+
+  async selectAll(): Promise<void> {
+    const downEventOptions: CDPKeyEventOption = {
+      type: "keyDown",
+      commands: ["selectAll"]
+    };
+    await this._cdp.sendCommand(this._tabId, "Input.dispatchKeyEvent", downEventOptions);
+    const upEventOptions: CDPKeyEventOption = {
+      type: "keyUp",
+      commands: ["selectAll"]
+    };
+    await this._cdp.sendCommand(this._tabId, "Input.dispatchKeyEvent", upEventOptions);
   }
 
   async insertText(text: string): Promise<void> {

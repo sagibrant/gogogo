@@ -21,7 +21,7 @@
  */
 
 import * as api from "@gogogo/shared";
-import { Rtid, BrowserUtils, RtidUtils, Utils, SettingUtils } from "@gogogo/shared";
+import { Rtid, RtidUtils, Utils, SettingUtils } from "@gogogo/shared";
 import { AutomationObject } from "./AutomationObject";
 
 export class Node extends AutomationObject implements api.MouseActions, api.KeyboardActions, api.TouchActions {
@@ -300,10 +300,10 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
       const { x, y } = await this.getBoundingPoint(this);
       const tabRtid = RtidUtils.getTabRtid(this._rtid.tab);
       await this.invokeFunction(tabRtid, 'keyboardClearText', [x, y]);
-      // cdp ControlOrMeta + Backspace does not work
-      if (BrowserUtils.isMacOS()) {
-        await this.invokeFunction(this._rtid, 'fill', ['']);
-      }
+      // cdp ControlOrMeta + Backspace does not work, use selectAll command
+      // if (BrowserUtils.isMacOS()) {
+      //   await this.invokeFunction(this._rtid, 'fill', ['']);
+      // }
     }
     else {
       await this.invokeFunction(this._rtid, 'fill', ['']);

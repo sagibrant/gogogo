@@ -1,6 +1,7 @@
 {
 	"name": "Gogogo",
 	"version": "2025.4.8.1",
+	"version_name": "0.1.0",
 	"description": "Automate your browser with AI assistance",
 	"manifest_version": 3,
 	"minimum_chrome_version": "95",

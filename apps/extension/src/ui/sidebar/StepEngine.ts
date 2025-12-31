@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, DOMElementDescription, InvokeAction, Rtid, Logger, SettingUtils } from "@gogogo/shared";
+import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, InvokeAction, Rtid, Logger, SettingUtils, ElementInfo } from "@gogogo/shared";
 import { SidebarDispatcher } from "./SidebarDispatcher";
 
 export class StepEngine {
@@ -95,10 +95,10 @@ export class StepEngine {
     return base64ImgString as string;
   }
 
-  async getElementFromPoint(x: number, y: number, width: number, height: number): Promise<DOMElementDescription> {
+  async getElementFromPoint(x: number, y: number, width?: number, height?: number): Promise<ElementInfo> {
     const tabRtid = await this.activePageRtid();
     const result = await this.invokeFunction(tabRtid, 'getElementFromPoint', [x, y, width, height]);
-    return result as DOMElementDescription;
+    return result as ElementInfo;
   }
 
   async toggleInspectMode(): Promise<void> {

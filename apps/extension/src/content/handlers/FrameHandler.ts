@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, QueryInfo, Rtid, Selector, LocatorUtils, MsgDataHandlerBase, RectInfo } from "@gogogo/shared";
+import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, QueryInfo, Rtid, Selector, LocatorUtils, MsgDataHandlerBase, RectInfo, ElementInfo } from "@gogogo/shared";
 import { ContentUtils } from "../ContentUtils";
 import { CoordinateUtils } from "../CoordinateUtils";
 import { FrameInfo } from "../../background/api/BrowserWrapperTypes";
@@ -247,6 +247,73 @@ export class FrameHandler extends MsgDataHandlerBase {
 
   async stopRecording(): Promise<void> {
     await this._recorder.stopRecording();
+  }
+
+  async getElementFromPoint(x: number, y: number, width?: number, height?: number, doc: Document | ShadowRoot = document): Promise<ElementInfo | null> {
+    const elems = doc.elementsFromPoint(x, y);
+    if (elems.length <= 0) {
+      return null;
+    }
+    const candidates: { elemInfo: ElementInfo, offsetX: number, offsetY: number }[] = [];
+    for (const elem of elems) {
+      // skip Pseudo-elements
+      if (elem.nodeType !== Node.ELEMENT_NODE || elem.nodeName.startsWith(':')) {
+        continue;
+      }
+      // getElementFromPoint in frame
+      if (ContentUtils.elemIsIframe(elem)) {
+        const frameElement = elem;
+        if ('rtid' in frameElement && RtidUtils.isRtid(frameElement.rtid)) {
+          const rtid = frameElement.rtid as Rtid;
+          const clientRect = ContentUtils.getContentClientRect(frameElement);
+          const clientX = x - clientRect.x;
+          const clientY = y - clientRect.y;
+          try {
+            const result = await this._invokeMethod(rtid, "getElementFromPoint", [clientX, clientY, width, height]);
+            if (result) {
+              return result as ElementInfo;
+            }
+          }
+          catch { }
+        }
+      }
+      // getElementFromPoint in shadowRoot
+      const shadowRoot = ContentUtils.getShadowRoot(elem);
+      if (shadowRoot) {
+        if (shadowRoot === doc) {
+          break;
+        }
+        const result = await this.getElementFromPoint(x, y, width, height, shadowRoot);
+        if (result) {
+          return result;
+        }
+      }
+      // check width & height
+      const elemInfo = await ContentUtils.getElementInfo(elem);
+      if (!elemInfo) {
+        continue;
+      }
+      if (!Utils.isNullOrUndefined(width) && !Utils.isNullOrUndefined(height)) {
+        const rect = elem.getBoundingClientRect();
+        const offsetX = rect.width - width;
+        const offsetY = rect.height - height;
+        if (Math.abs(offsetX) < 20 && Math.abs(offsetY) < 20) {
+          candidates.push({ elemInfo, offsetX, offsetY });
+        }
+      }
+      else {
+        candidates.push({ elemInfo, offsetX: 0, offsetY: 0 });
+      }
+    }
+    if (candidates.length <= 0) {
+      return null;
+    }
+    const elem = candidates.reduce((pre, cur) => {
+      const pre_offset = pre.offsetX ** 2 + pre.offsetY ** 2;
+      const cur_offset = cur.offsetX ** 2 + cur.offsetY ** 2;
+      return pre_offset > cur_offset ? cur : pre;
+    }, candidates[0]);
+    return elem.elemInfo;
   }
 
   /** ==================================================================================================================== **/
@@ -572,6 +639,11 @@ export class FrameHandler extends MsgDataHandlerBase {
 
   protected async _invokeTabMethod(funcName: string, args?: any[]): Promise<unknown> {
     const rtid = RtidUtils.getTabRtid(this.rtid.tab, -1);
+    const result = await this._invokeMethod(rtid, funcName, args);
+    return result;
+  }
+
+  protected async _invokeMethod(rtid: Rtid, funcName: string, args?: any[]): Promise<unknown> {
     const reqMsgData = MsgUtils.createMessageData('command', rtid, {
       name: 'invoke',
       params: {
@@ -584,7 +656,7 @@ export class FrameHandler extends MsgDataHandlerBase {
       return resMsgData.result;
     }
     else {
-      throw new Error(resMsgData.error || '_invokeTabMethod failed');
+      throw new Error(resMsgData.error || '_invokeMethod failed');
     }
   }
 

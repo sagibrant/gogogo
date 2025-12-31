@@ -134,25 +134,7 @@ export class NodeHandler extends MsgDataHandlerBase {
       if (!elem) {
         throw new Error('Not ready for getContentClientRect');
       }
-      const boundingClientRect = elem.getBoundingClientRect();
-      const elemRect: Partial<RectInfo> = {};
-      elemRect.left = boundingClientRect.left;
-      elemRect.top = boundingClientRect.top;
-      elemRect.right = boundingClientRect.right;
-      elemRect.bottom = boundingClientRect.bottom;
-      // border offset
-      const client_rect: Partial<RectInfo> = {};
-      client_rect.left = elem.clientLeft;
-      client_rect.top = elem.clientTop;
-      client_rect.width = elem.clientWidth;
-      client_rect.height = elem.clientHeight;
-      // padding offset
-      var style = window.getComputedStyle(elem);
-      elemRect.left = elemRect.left + client_rect.left + parseInt(style.paddingLeft, 10);
-      elemRect.top = elemRect.top + client_rect.top + parseInt(style.paddingTop, 10);
-      elemRect.right = elemRect.left + client_rect.width;
-      elemRect.bottom = elemRect.top + client_rect.height;
-      return Utils.fixRectangle(elemRect);
+      return ContentUtils.getContentClientRect(elem);
     }
   }
 

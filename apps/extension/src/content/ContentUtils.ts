@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { Utils, LocatorUtils, RectInfo, MessageData, Selector, Dispatcher } from "@gogogo/shared";
+import { Utils, LocatorUtils, RectInfo, MessageData, Selector, Dispatcher, DOMElementDescription, AODesc, MsgUtils, AO, RtidUtils, DOMPathUtils, ElementInfo } from "@gogogo/shared";
 import { ObjectRepository } from "./ObjectRepository";
 import { FrameHandler } from "./handlers/FrameHandler";
 
@@ -283,6 +283,232 @@ export class ContentUtils {
       }
     }
     return document;
+  }
+
+  /**
+   * get the element info
+   * @param elem dom element
+   * @returns 
+   */
+  static async getElementInfo(elem: Element): Promise<ElementInfo | null> {
+    const details = DOMPathUtils.getDOMNodeDetails(elem);
+    const aoDesc = await ContentUtils.generateAODesc(elem, details);
+    if (!aoDesc) return null;
+    const scripts = await ContentUtils.generateElementScript(aoDesc);
+    const ao = ContentUtils.repo.getAOByElement(elem);
+    const elemInfo: ElementInfo = {
+      element: details,
+      elementRtid: ao.rtid,
+      elementScript: scripts
+    };
+    return elemInfo;
+  }
+
+  /**
+   * generate the AO Description
+   * @param elem dom element
+   * @param desc dom element description
+   * @returns 
+   */
+  static async generateAODesc(elem: Element, desc: DOMElementDescription): Promise<AODesc | null> {
+    const ao = ContentUtils.repo.getAOByElement(elem);
+    const aoDesc: AODesc = { type: 'element' };
+    aoDesc.queryInfo = {};
+
+    const matchAO = async (aoDesc: AODesc, ordinal: boolean = true): Promise<boolean> => {
+      aoDesc.queryInfo = aoDesc.queryInfo || {};
+      let aos = await ContentUtils.queryObjects(aoDesc);
+      if (aos.length === 1 && RtidUtils.isRtidEqual(aos[0].rtid, ao.rtid)) {
+        return true;
+      }
+      else if (aos.length > 1 && ordinal && Utils.isNullOrUndefined(aoDesc.queryInfo.ordinal)) {
+        const index = aos.findIndex(a => RtidUtils.isRtidEqual(a.rtid, ao.rtid));
+        if (index >= 0) {
+          aoDesc.queryInfo.ordinal = { type: 'default', index: index, reverse: false };
+          aos = await this.queryObjects(aoDesc);
+          if (aos.length === 1 && RtidUtils.isRtidEqual(aos[0].rtid, ao.rtid)) {
+            return true;
+          }
+        }
+        aoDesc.queryInfo.ordinal = undefined;
+      }
+      return false;
+    };
+
+    // if in the shadow DOM, use mandatory selector + nth
+    // if not in the shadow DOM, use primary css selector + nth
+    if (desc.isInShadowRoot !== true) {
+      // try with css selector
+      aoDesc.queryInfo.primary = [{ name: '#css', value: desc.selector, type: 'property', match: 'exact' }];
+      let matched = await matchAO(aoDesc);
+      if (matched) {
+        return aoDesc;
+      }
+      // try with xpath
+      aoDesc.queryInfo.primary = [{ name: '#xpath', value: desc.xPath, type: 'property', match: 'exact' }];
+      matched = await matchAO(aoDesc);
+      if (matched) {
+        return aoDesc;
+      }
+      // remove primary if not found
+      aoDesc.queryInfo.primary = undefined;
+    }
+
+    // try mandatory selectors
+    const mandatorySelectors: Selector[] = [];
+    {
+      if (desc.tagName) {
+        mandatorySelectors.push({ name: 'tagName', value: desc.tagName, type: 'property', match: 'exact' });
+      }
+      if (desc.nodeValue) {
+        mandatorySelectors.push({ name: 'nodeValue', value: desc.nodeValue, type: 'property', match: 'exact' });
+      }
+      if (desc.textContent) {
+        mandatorySelectors.push({ name: 'textContent', value: desc.textContent, type: 'property', match: 'exact' });
+      }
+      if (desc.attributes && desc.attributes.length > 0) {
+        const attrs = Object.entries(desc.attributes);
+        for (const [name, value] of attrs) {
+          mandatorySelectors.push({ name: name, value: value, type: 'attribute', match: 'exact' });
+        }
+      }
+
+      for (let i = 1; i <= mandatorySelectors.length; i++) {
+        const combinations = Utils.getCombinations(mandatorySelectors, i);
+        for (const combo of combinations) {
+          aoDesc.queryInfo.mandatory = combo;
+          let matched = await matchAO(aoDesc);
+          if (matched) {
+            return aoDesc;
+          }
+        }
+      }
+      aoDesc.queryInfo.mandatory = undefined;
+    }
+
+    // last try with tagName only
+    if (desc.tagName) {
+      aoDesc.queryInfo.mandatory = [{ name: 'tagName', value: desc.tagName, type: 'property', match: 'exact' }];
+      let matched = await matchAO(aoDesc);
+      if (matched) {
+        return aoDesc;
+      }
+    }
+
+    if (mandatorySelectors.length > 0) {
+      aoDesc.queryInfo.assistive = mandatorySelectors;
+      let matched = await matchAO(aoDesc, false);
+      if (matched) {
+        return aoDesc;
+      }
+    }
+
+    // Fail to generate unique AODesc for element
+    return null;
+  }
+
+  /**
+   * query the AO in this frame
+   * @param desc AO Description
+   * @returns 
+   */
+  static async queryObjects(desc: AODesc): Promise<AO[]> {
+    const frameRtid = ContentUtils.frame.rtid;
+    const reqMsgData = MsgUtils.createMessageData('query', frameRtid, { name: 'query_objects' }, desc);
+    const resMsgData = await ContentUtils.sendRequest(reqMsgData);
+    if (resMsgData.status === 'OK' && resMsgData.objects) {
+      return resMsgData.objects;
+    }
+    else {
+      return [];
+    }
+  }
+
+  /**
+   * generate the element script like element('#id').first()
+   * @param aoDesc AO Description
+   * @returns 
+   */
+  static async generateElementScript(aoDesc: AODesc): Promise<string> {
+    let scripts: string[] = [];
+    if (aoDesc.queryInfo && aoDesc.queryInfo.primary && aoDesc.queryInfo.primary.length === 1) {
+      const primary = aoDesc.queryInfo.primary[0];
+      if (primary.name === '#css') {
+        scripts.push(`element('${primary.value}')`);
+      }
+      else if (primary.name === '#xpath') {
+        scripts.push(`element({ xpath: '${primary.value}'})`);
+      }
+      else {
+        scripts.push(`element()`);
+      }
+    }
+    if (scripts.length === 0) {
+      scripts.push(`element()`);
+    }
+    if (aoDesc.queryInfo && aoDesc.queryInfo.mandatory && aoDesc.queryInfo.mandatory.length > 0) {
+      const filters: object[] = [];
+      for (const selector of aoDesc.queryInfo.mandatory) {
+        const filterObj = Object.assign({},
+          { name: selector.name, value: selector.value },
+          selector.type === 'property' ? {} : { type: selector.type },
+          selector.match === 'exact' ? {} : { match: selector.match },
+        );
+        filters.push(filterObj);
+      }
+      scripts.push(`filter(${JSON.stringify(filters)})`);
+    }
+    if (aoDesc.queryInfo && aoDesc.queryInfo.assistive && aoDesc.queryInfo.assistive.length > 0) {
+      const filters: object[] = [];
+      for (const selector of aoDesc.queryInfo.assistive) {
+        const filterObj = Object.assign({},
+          { name: selector.name, value: selector.value },
+          selector.type === 'property' ? {} : { type: selector.type },
+          selector.match === 'exact' ? {} : { match: selector.match },
+        );
+        filters.push(filterObj);
+      }
+      scripts.push(`prefer(${JSON.stringify(filters)})`);
+    }
+    if (aoDesc.queryInfo && aoDesc.queryInfo.ordinal) {
+      if (aoDesc.queryInfo.ordinal.index === 0 && aoDesc.queryInfo.ordinal.reverse === false) {
+        scripts.push(`first()`);
+      }
+      else if (aoDesc.queryInfo.ordinal.index === 0 && aoDesc.queryInfo.ordinal.reverse === true) {
+        scripts.push(`last()`);
+      }
+      else {
+        scripts.push(`nth(${aoDesc.queryInfo.ordinal.index})`);
+      }
+    }
+    return scripts.join('.');
+  }
+
+  /**
+   * get the client rect of the element content
+   * @param elem dom element
+   * @returns 
+   */
+  static getContentClientRect(elem: Element): RectInfo {
+    const boundingClientRect = elem.getBoundingClientRect();
+    const elemRect: Partial<RectInfo> = {};
+    elemRect.left = boundingClientRect.left;
+    elemRect.top = boundingClientRect.top;
+    elemRect.right = boundingClientRect.right;
+    elemRect.bottom = boundingClientRect.bottom;
+    // border offset
+    const client_rect: Partial<RectInfo> = {};
+    client_rect.left = elem.clientLeft;
+    client_rect.top = elem.clientTop;
+    client_rect.width = elem.clientWidth;
+    client_rect.height = elem.clientHeight;
+    // padding offset
+    var style = window.getComputedStyle(elem);
+    elemRect.left = elemRect.left + client_rect.left + parseInt(style.paddingLeft, 10);
+    elemRect.top = elemRect.top + client_rect.top + parseInt(style.paddingTop, 10);
+    elemRect.right = elemRect.left + client_rect.width;
+    elemRect.bottom = elemRect.top + client_rect.height;
+    return Utils.fixRectangle(elemRect);
   }
 
   /**

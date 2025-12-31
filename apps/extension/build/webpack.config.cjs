@@ -288,8 +288,13 @@ module.exports = (env) => {
             noErrorOnMissing: true,
           },
           {
-            from: path.resolve(rootDir, 'src/types'),
-            to: 'types/',
+            from: path.resolve(rootDir, '../../docs/README.md'),
+            to: 'assets/docs/',
+            noErrorOnMissing: true,
+          },
+          {
+            from: path.resolve(rootDir, '../../packages/shared/src/types/types.d.ts'),
+            to: 'assets/types/',
             noErrorOnMissing: true,
           },
           // {

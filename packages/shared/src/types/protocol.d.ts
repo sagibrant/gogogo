@@ -352,6 +352,19 @@ export interface TabDescription {
 }
 
 /**
+ * Defines the element info with locator scripts
+ */
+export interface ElementInfo {
+  browserScript?: string;
+  pageScript?: string;
+  frameScript?: string;
+  elementScript?: string;
+
+  element?: DOMElementDescription;
+  elementRtid?: Rtid;
+}
+
+/**
  * Defines the recorded step
  */
 export interface RecordedStep {

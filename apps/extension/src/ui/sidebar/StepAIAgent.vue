@@ -101,8 +101,8 @@ const selectedModel = ref('auto'); // Default to auto model
 
 // Options
 const agentModes = ref([
+  { label: 'Agent', value: 'agent' },
   { label: 'Chat', value: 'chat' },
-  { label: 'Agent', value: 'agent' }
 ]);
 const modelOptions = ref<{ name: string; value: string }[]>([
   { name: 'Auto', value: 'auto' }
@@ -114,9 +114,36 @@ const chatMessages = ref<BaseMessage[]>([]);
 const inputTextArea = ref<HTMLTextAreaElement | null>(null);
 
 // // tool functions
-const handleInspect = () => {
+const handleInspect = async () => {
   console.log('Inspect functionality triggered');
-  // Mock inspect functionality
+  // test
+  // 1. get api docs
+  {
+    console.log("loadAPIDocument", await loadAPIDocument());
+    console.log("loadAPIDefinition", await loadAPIDefinition());
+  }
+  {
+    const url = await SidebarUtils.engine.getPageUrl();
+    const title = await SidebarUtils.engine.getPageTitle();
+    const status = await SidebarUtils.engine.getPageStatus();
+    console.log('getPageInfo', { url, title, status });
+  }
+  {
+    const base64ImgString = await SidebarUtils.engine.capturePage();
+    console.log('capturePage', base64ImgString);
+  }
+  {
+    const elem = await SidebarUtils.engine.getElementFromPoint(115.5, 331.375, 153, 21);
+    console.log("getElementFromPoint(115.5, 331.375, 153, 21)", elem);
+  }
+  {
+    const elem = await SidebarUtils.engine.getElementFromPoint(415, 355.875);
+    console.log("getElementFromPoint(415, 355.875, 64, 64)", elem);
+  }
+  {
+    const result = await SidebarUtils.engine.runScript("let a = 1; console.log('debug log', a); return 100;");
+    console.log('runScript', result);
+  }
 };
 
 // const handleVoiceInput = () => {
@@ -127,7 +154,7 @@ const handleInspect = () => {
 const checkpointer = new MemorySaver();
 
 const loadAPIDocument = async () => {
-  const docURL = chrome.runtime.getURL('types/README.md');
+  const docURL = chrome.runtime.getURL('assets/docs/README.md');
   const response = await fetch(docURL);
   if (!response.ok) {
     throw new Error(`resource error: status - ${response.status}`);
@@ -137,7 +164,7 @@ const loadAPIDocument = async () => {
 }
 
 const loadAPIDefinition = async () => {
-  const apiURL = chrome.runtime.getURL('types/types.d.ts');
+  const apiURL = chrome.runtime.getURL('assets/types/types.d.ts');
   const response = await fetch(apiURL);
   if (!response.ok) {
     throw new Error(`resource error: status - ${response.status}`);
@@ -178,13 +205,13 @@ const getPageInfo = tool(
     const url = await SidebarUtils.engine.getPageUrl();
     const title = await SidebarUtils.engine.getPageTitle();
     const status = await SidebarUtils.engine.getPageStatus();
-    const content = `The page information: URL=${url}, Title=${title}, Status=${status}`;
-    console.log('getPageInfo', {});
+    const content = `The page information: url=${url}, title=${title}, status=${status}`;
+    console.log('getPageInfo', { url, title, status });
     return [content, { url, title, status }];
   },
   {
     name: "get_page_info",
-    description: "Get the information of the current page",
+    description: "Get the information of the current page { url, title, status }",
     responseFormat: 'content_and_artifact'
   }
 );
@@ -202,7 +229,6 @@ const capturePage = tool(
     responseFormat: 'content_and_artifact'
   }
 );
-
 
 const identifyElementsWithVision = tool(
   async ({ base64Image, prompt }) => {

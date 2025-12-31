@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { BrowserUtils, MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, InvokeAction, QueryInfo, RecordedStep, Rtid, ClickOptions, Point, RectInfo, TextInputOptions, LocatorUtils, MsgDataHandlerBase, KeyDefinitionUtils, DOMElementDescription} from "@gogogo/shared";
+import { BrowserUtils, MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, InvokeAction, QueryInfo, RecordedStep, Rtid, ClickOptions, Point, RectInfo, TextInputOptions, LocatorUtils, MsgDataHandlerBase, KeyDefinitionUtils, ElementInfo } from "@gogogo/shared";
 import { ChromeExtensionAPI } from "../api/ChromeExtensionAPI";
 import { FrameInfo, TabInfo, WindowInfo } from "../api/BrowserWrapperTypes";
 import { WebNavigationEventDetails } from "../api/ChromeWebNavigationAPI";
@@ -223,10 +223,26 @@ export class TabHandler extends MsgDataHandlerBase {
     }
   }
 
-  async getElementFromPoint(x: number, y: number, width: number, height: number): Promise<DOMElementDescription | null> {
+  async getElementFromPoint(x: number, y: number, width?: number, height?: number): Promise<ElementInfo | null> {
     // must update frame infos first to make sure all frames registered
     await this.updateFrameInfos();
-    return null;
+    // send to content to find the element from point
+    const result = await this._invokeContentFunction("getElementFromPoint", [x, y, width, height]);
+    if (!result) {
+      return null;
+    }
+    const elemInfo = result as ElementInfo;
+    elemInfo.pageScript = 'page';
+    if (elemInfo.elementRtid && elemInfo.elementRtid.frame !== this._contentId.frame) {
+      const frameId = elemInfo.elementRtid.frame;
+      const frames = await this.frames();
+      const index = frames.findIndex(f => f.frameId === frameId);
+      elemInfo.frameScript = `frame().nth(${index})`;
+    }
+    else {
+      elemInfo.frameScript = undefined;
+    }
+    return elemInfo;
   }
 
   /** ==================================================================================================================== **/
@@ -570,7 +586,9 @@ export class TabHandler extends MsgDataHandlerBase {
   }
   async keyboardClearText(x: number, y: number): Promise<void> {
     await this.mouseClick({ position: { x, y } });
-    await this.keyboardPress(['ControlOrMeta', 'a']);
+    // await this.keyboardPress(['ControlOrMeta', 'a']);
+    await this._cdpKeyboard.selectAll();
+    await Utils.wait(200);
     await this.keyboardPress('Backspace');
   }
   /** ==================================================================================================================== **/

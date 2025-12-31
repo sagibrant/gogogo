@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, Utils, Logger, DOMPathUtils, AO, AODesc, DOMElementDescription, RecordedStep, Selector } from "@gogogo/shared";
+import { MsgUtils, RtidUtils, Utils, Logger, DOMPathUtils, RecordedStep } from "@gogogo/shared";
 import { ContentUtils } from "./ContentUtils";
 
 export class Recorder {
@@ -181,9 +181,9 @@ class RecordObject {
     const actionScript = `click()`;
     const ao = ContentUtils.repo.getAOByElement(elem as Element);
     const details = DOMPathUtils.getDOMNodeDetails(elem);
-    const aoDesc = await this.generateAODesc(elem, details);
-    if (!aoDesc.queryInfo) return;
-    const scripts = await this.generateElementScript(aoDesc);
+    const aoDesc = await ContentUtils.generateAODesc(elem, details);
+    if (!aoDesc) return;
+    const scripts = await ContentUtils.generateElementScript(aoDesc);
     const recordedStep: RecordedStep = {
       await: true,
       elementRtid: ao.rtid,
@@ -265,9 +265,9 @@ class RecordObject {
 
     const ao = ContentUtils.repo.getAOByElement(elem as Element);
     const details = DOMPathUtils.getDOMNodeDetails(elem);
-    const aoDesc = await this.generateAODesc(elem, details);
-    if (!aoDesc.queryInfo) return;
-    const scripts = await this.generateElementScript(aoDesc);
+    const aoDesc = await ContentUtils.generateAODesc(elem, details);
+    if (!aoDesc) return;
+    const scripts = await ContentUtils.generateElementScript(aoDesc);
     const recordedStep: RecordedStep = {
       await: true,
       elementRtid: ao.rtid,
@@ -385,172 +385,6 @@ class RecordObject {
     }
 
     return false;
-  }
-
-  private async generateAODesc(node: Node, desc: DOMElementDescription): Promise<AODesc> {
-    const ao = ContentUtils.repo.getAOByElement(node as Element);
-    const aoDesc: AODesc = { type: 'element' };
-    aoDesc.queryInfo = {};
-
-    const matchAO = async (aoDesc: AODesc, ordinal: boolean = true): Promise<boolean> => {
-      aoDesc.queryInfo = aoDesc.queryInfo || {};
-      let aos = await this.queryObjects(aoDesc);
-      if (aos.length === 1 && RtidUtils.isRtidEqual(aos[0].rtid, ao.rtid)) {
-        return true;
-      }
-      else if (aos.length > 1 && ordinal && Utils.isNullOrUndefined(aoDesc.queryInfo.ordinal)) {
-        const index = aos.findIndex(a => RtidUtils.isRtidEqual(a.rtid, ao.rtid));
-        if (index >= 0) {
-          aoDesc.queryInfo.ordinal = { type: 'default', index: index, reverse: false };
-          aos = await this.queryObjects(aoDesc);
-          if (aos.length === 1 && RtidUtils.isRtidEqual(aos[0].rtid, ao.rtid)) {
-            return true;
-          }
-        }
-        aoDesc.queryInfo.ordinal = undefined;
-      }
-      return false;
-    };
-
-    // if in the shadow DOM, use mandatory selector + nth
-    // if not in the shadow DOM, use primary css selector + nth
-    if (desc.isInShadowRoot !== true) {
-      // try with css selector
-      aoDesc.queryInfo.primary = [{ name: '#css', value: desc.selector, type: 'property', match: 'exact' }];
-      let matched = await matchAO(aoDesc);
-      if (matched) {
-        return aoDesc;
-      }
-      // try with xpath
-      aoDesc.queryInfo.primary = [{ name: '#xpath', value: desc.xPath, type: 'property', match: 'exact' }];
-      matched = await matchAO(aoDesc);
-      if (matched) {
-        return aoDesc;
-      }
-      // remove primary if not found
-      aoDesc.queryInfo.primary = undefined;
-    }
-
-    // try mandatory selectors
-    const mandatorySelectors: Selector[] = [];
-    {
-      if (desc.tagName) {
-        mandatorySelectors.push({ name: 'tagName', value: desc.tagName, type: 'property', match: 'exact' });
-      }
-      if (desc.nodeValue) {
-        mandatorySelectors.push({ name: 'nodeValue', value: desc.nodeValue, type: 'property', match: 'exact' });
-      }
-      if (desc.textContent) {
-        mandatorySelectors.push({ name: 'textContent', value: desc.textContent, type: 'property', match: 'exact' });
-      }
-      if (desc.attributes && desc.attributes.length > 0) {
-        const attrs = Object.entries(desc.attributes);
-        for (const [name, value] of attrs) {
-          mandatorySelectors.push({ name: name, value: value, type: 'attribute', match: 'exact' });
-        }
-      }
-
-      for (let i = 1; i <= mandatorySelectors.length; i++) {
-        const combinations = Utils.getCombinations(mandatorySelectors, i);
-        for (const combo of combinations) {
-          aoDesc.queryInfo.mandatory = combo;
-          let matched = await matchAO(aoDesc);
-          if (matched) {
-            return aoDesc;
-          }
-        }
-      }
-      aoDesc.queryInfo.mandatory = undefined;
-    }
-
-
-    // last try with tagName only
-    if (desc.tagName) {
-      aoDesc.queryInfo.mandatory = [{ name: 'tagName', value: desc.tagName, type: 'property', match: 'exact' }];
-      let matched = await matchAO(aoDesc);
-      if (matched) {
-        return aoDesc;
-      }
-    }
-
-    if (mandatorySelectors.length > 0) {
-      aoDesc.queryInfo.assistive = mandatorySelectors;
-      let matched = await matchAO(aoDesc, false);
-      if (matched) {
-        return aoDesc;
-      }
-    }
-
-    this._logger.warn(`Fail to generate unique AODesc for element:`, desc);
-    aoDesc.queryInfo = undefined;
-    return aoDesc;
-  }
-
-  private async queryObjects(desc: AODesc): Promise<AO[]> {
-    const frameRtid = ContentUtils.frame.rtid;
-    const reqMsgData = MsgUtils.createMessageData('query', frameRtid, { name: 'query_objects' }, desc);
-    const resMsgData = await ContentUtils.sendRequest(reqMsgData);
-    if (resMsgData.status === 'OK' && resMsgData.objects) {
-      return resMsgData.objects;
-    }
-    else {
-      return [];
-    }
-  }
-
-  private async generateElementScript(aoDesc: AODesc): Promise<string> {
-    let scripts: string[] = [];
-    if (aoDesc.queryInfo && aoDesc.queryInfo.primary && aoDesc.queryInfo.primary.length === 1) {
-      const primary = aoDesc.queryInfo.primary[0];
-      if (primary.name === '#css') {
-        scripts.push(`element('${primary.value}')`);
-      }
-      else if (primary.name === '#xpath') {
-        scripts.push(`element({ xpath: '${primary.value}'})`);
-      }
-      else {
-        scripts.push(`element()`);
-      }
-    }
-    if (scripts.length === 0) {
-      scripts.push(`element()`);
-    }
-    if (aoDesc.queryInfo && aoDesc.queryInfo.mandatory && aoDesc.queryInfo.mandatory.length > 0) {
-      const filters: object[] = [];
-      for (const selector of aoDesc.queryInfo.mandatory) {
-        const filterObj = Object.assign({},
-          { name: selector.name, value: selector.value },
-          selector.type === 'property' ? {} : { type: selector.type },
-          selector.match === 'exact' ? {} : { match: selector.match },
-        );
-        filters.push(filterObj);
-      }
-      scripts.push(`filter(${JSON.stringify(filters)})`);
-    }
-    if (aoDesc.queryInfo && aoDesc.queryInfo.assistive && aoDesc.queryInfo.assistive.length > 0) {
-      const filters: object[] = [];
-      for (const selector of aoDesc.queryInfo.assistive) {
-        const filterObj = Object.assign({},
-          { name: selector.name, value: selector.value },
-          selector.type === 'property' ? {} : { type: selector.type },
-          selector.match === 'exact' ? {} : { match: selector.match },
-        );
-        filters.push(filterObj);
-      }
-      scripts.push(`prefer(${JSON.stringify(filters)})`);
-    }
-    if (aoDesc.queryInfo && aoDesc.queryInfo.ordinal) {
-      if (aoDesc.queryInfo.ordinal.index === 0 && aoDesc.queryInfo.ordinal.reverse === false) {
-        scripts.push(`first()`);
-      }
-      else if (aoDesc.queryInfo.ordinal.index === 0 && aoDesc.queryInfo.ordinal.reverse === true) {
-        scripts.push(`last()`);
-      }
-      else {
-        scripts.push(`nth(${aoDesc.queryInfo.ordinal.index})`);
-      }
-    }
-    return scripts.join('.');
   }
 
   private async sendRecordedStep(step: RecordedStep): Promise<void> {

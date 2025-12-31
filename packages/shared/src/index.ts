@@ -25,7 +25,7 @@ export * from './Messaging/Dispatcher';
 export * from './Messaging/MsgDataHandler';
 
 // Export types
-export type { 
+export type {
   LocatorOptions,
   LocatorFilterOption,
   Expect,
@@ -111,5 +111,6 @@ export type {
   OrdinalSelector,
   DOMElementDescription,
   TabDescription,
+  ElementInfo,
   RecordedStep
 } from './types/protocol';
