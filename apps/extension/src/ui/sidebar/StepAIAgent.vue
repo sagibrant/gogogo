@@ -82,7 +82,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { createAgent, createMiddleware, tool, ToolMessage, HumanMessage, SystemMessage, BaseMessage, summarizationMiddleware } from "langchain";
 import { MemorySaver } from "@langchain/langgraph";
 // import { createAgent, createMiddleware, tool, ToolMessage, HumanMessage, SystemMessage, BaseMessage } from "@langchain/langgraph/web";
-import * as z from "zod";
+import * as z from "zod/v3";
 import { AIUtils } from "@gogogo/shared";
 import { SidebarUtils } from './SidebarUtils';
 /**
@@ -197,32 +197,25 @@ const identifyElementsWithVisionModel = async (userPrompt?: string) => {
 You are an AI assistant that helps identify UI elements.
 
 ## Objective:
-- Identify elements in screenshots that match the user's description.
+- Analyzes and summary the main topic of the screenshot
+- Identify elements in screenshot that match the user's description.
 - Provide the coordinates of the element that matches the user's description.
-
-## Coordinate System:
-- ALL coordinates (x, y, width, height) MUST be relative to the provided screenshot image
-- The screenshot dimensions are: width=${jimpImage.width}, height=${jimpImage.height}
-- x must be between 0 and ${jimpImage.width - 1}
-- y must be between 0 and ${jimpImage.height - 1}
-- width must be positive and x + width must not exceed ${jimpImage.width}
-- height must be positive and y + height must not exceed ${jimpImage.height}
-- NEVER return coordinates outside these bounds
 
 ## Output Requirements:
 - Return a maximum of 20 elements. If more elements exist, prioritize the most significant and relevant ones
 - Ensure bounding boxes accurately encompass the entire element
+- Do not change the scale of the screenshot and make sure the coordinates of the elements are accurate.
 
 ## Output Format:
 \`\`\`json
 {
+  "summary": string,
+  "width": number,
+  "height": number,
   "elements": {
     "type": string,
     "description": string,
-    "x": number,
-    "y": number,
-    "width": number,
-    "height": number
+    "bbox": [number, number, number, number], // 2d bounding box for the element, should be [xmin, ymin, xmax, ymax]
   }[], 
   "errors"?: string[]
 }
@@ -230,32 +223,29 @@ You are an AI assistant that helps identify UI elements.
 
 
 Fields:
-* \`elements\`: Array of UI elements found in the screenshot that match the user's description (maximum 30 items)
-* \`type\`: The type of the element (e.g., button, input, link, checkbox, dropdown, image, etc.)
-* \`description\`: A concise description of the element's purpose or content
-* \`x\`: The left coordinate of the element's bounding box.
-* \`y\`: The top coordinate of the element's bounding box.
-* \`width\`: The width of the element's bounding box.
-* \`height\`: The height of the element's bounding box.
-* \`errors\` is an optional array of error messages (if any)
+* \`summary\`: The summary of the main topic of the screenshot (maximum 50 words)
+* \`width\`: The width of the screenshot
+* \`height\`: The height of the screenshot
+* \`elements\`: Array of UI elements found in the screenshot that match the user's description (maximum 20 items)
+* \`errors\`: Optional array of error messages (if any)
+* \`element.type\`: The type of the element (e.g., button, input, link, checkbox, dropdown, image, etc.)
+* \`element.description\`: A concise description of the element's purpose or content
+* \`element.bbox\`: The bounding box of the element that matches the user's description
 
 For example, when an element is found:
 \`\`\`json
 {
+  "summary": "The login page",
+  "width": 1024,
+  "height": 1080,
   "elements": [{
     "type": "button"
     "description": "Login button"
-    "x": 50,
-    "y": 100,
-    "width": 100,
-    "height": 30
+    "bbox": [50, 100, 100, 120]
   },{
       "type": "input",
       "description": "Email input field",
-      "x": 50,
-      "y": 140,
-      "width": 200,
-      "height": 35
+      "bbox": [50, 140, 100, 160]
   }],
   "errors": []
 }
@@ -264,23 +254,26 @@ For example, when an element is found:
 When no element is found:
 \`\`\`json
 {
+  "summary": "The login page",
+  "width": 1024,
+  "height": 1080,
   "elements": [],
   "errors": ["I can see ..., but {some element} is not found"]
 }
 \`\`\`
 `;
     const UIElement = z.object({
-      type: z.string().describe("The type of the element (button, editor, link, image, movie, etc)."),
-      description: z.string().describe("The description of the element."),
-      x: z.number().describe("The left of the element bounding box"),
-      y: z.number().describe("The top of the element bounding box"),
-      width: z.number().describe("The width of the element bounding box"),
-      height: z.number().describe("The width of the element bounding box"),
+      type: z.string().describe("The type of the element (e.g., button, input, link, checkbox, dropdown, image, etc.)"),
+      description: z.string().describe("A concise description of the element's purpose or content."),
+      bbox: z.array(z.number()).length(4).describe("The bounding box of the element [xmin, ymin, xmax, ymax]")
     });
 
-    const UIElementDetails = z.object({
-      elements: z.array(UIElement).describe("array of the elements"),
-      errors: z.array(z.string()).describe("array of error messages")
+    const UIPageDetails = z.object({
+      summary: z.string().describe("The summary of the main topic of the screenshot (maximum 50 words)"),
+      width: z.number().describe("The width of the screenshot"),
+      height: z.number().describe("The height of the screenshot"),
+      elements: z.array(UIElement).describe("Array of UI elements found in the screenshot that match the user's description (maximum 20 items)"),
+      errors: z.array(z.string()).describe("Optional array of error messages (if any)")
     });
 
     const messages = [{
@@ -290,49 +283,59 @@ When no element is found:
       role: "user",
       content: [
         {
-          type: "text", text: userPrompt
-            || `This is the screenshot (dimensions: ${jimpImage.width}x${jimpImage.height}).
-Please identify all clickable and editable UI elements. 
-Return the results in the specified JSON schema format, limiting to the 20 most significant elements.` },
+          type: "text", text: `This is the screenshot.
+Please summary the page screenshot's purpose and identify the UI elements. 
+Return the results in the specified JSON schema format, limiting to the 20 most significant elements.`
+        },
         {
           type: "image_url",
           image_url: {
-            url: base64Image
+            url: base64Image,
+            detail: 'high'
           }
         }
       ]
     }];
 
     console.log("visionModel.invoke ==>", messages);
-    const response = await visionModel.withStructuredOutput(UIElementDetails).invoke(messages);
+    const response = await visionModel.withStructuredOutput(UIPageDetails).invoke(messages);
     console.log("visionModel.invoke <==", response);
 
     if (response && response.elements) {
-      response.elements = response.elements.map(elem => {
-        let { x, y, width, height } = elem;
+      const scale_x = response.width / jimpImage.width;
+      const scale_y = response.height / jimpImage.height;
+      console.log('scale_x', scale_x, 'scale_y', scale_y);
+      // response.elements = response.elements.map(elem => {
+      //   let { bbox } = elem;
 
-        if (x >= jimpImage.width || y >= jimpImage.height) {
-          console.warn(`Element coordinates out of bounds: x=${x}, y=${y}, image size=${jimpImage.width}x${jimpImage.height}`);
-          x = Math.min(x, jimpImage.width - 1);
-          y = Math.min(y, jimpImage.height - 1);
-        }
+      //   if (bbox >= jimpImage.width || y >= jimpImage.height) {
+      //     console.warn(`Element coordinates out of bounds: x=${x}, y=${y}, image size=${jimpImage.width}x${jimpImage.height}`);
+      //     x = Math.min(x, jimpImage.width - 1);
+      //     y = Math.min(y, jimpImage.height - 1);
+      //   }
 
-        if (x + width > jimpImage.width) {
-          width = jimpImage.width - x;
-        }
+      //   if (x + width > jimpImage.width) {
+      //     width = jimpImage.width - x;
+      //   }
 
-        if (y + height > jimpImage.height) {
-          height = jimpImage.height - y;
-        }
+      //   if (y + height > jimpImage.height) {
+      //     height = jimpImage.height - y;
+      //   }
 
-        return { ...elem, x, y, width, height };
-      });
+      //   return { ...elem, x, y, width, height };
+      // });
     }
 
     return response;
-  } catch (error: any) {
-    console.error('Error in identifyElementsWithVision:', error);
-    return null;
+  } catch (err) {
+    console.error('Error in identifyElementsWithVision:', err);
+    return {
+      "summary": "",
+      "width": 0,
+      "height": 0,
+      "elements": [],
+      "errors": [err instanceof Error ? err.message : String(err)]
+    };
   }
 }
 
