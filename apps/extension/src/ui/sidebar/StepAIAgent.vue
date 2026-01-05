@@ -215,7 +215,7 @@ You are an AI assistant that helps identify UI elements.
   "elements": {
     "type": string,
     "description": string,
-    "bbox": [number, number, number, number], // 2d bounding box for the element, should be [xmin, ymin, xmax, ymax]
+    "bbox": [number, number, number, number] // 2d bounding box for the element, should be [xmin, ymin, xmax, ymax]
   }[], 
   "errors"?: string[]
 }
@@ -265,7 +265,7 @@ When no element is found:
     const UIElement = z.object({
       type: z.string().describe("The type of the element (e.g., button, input, link, checkbox, dropdown, image, etc.)"),
       description: z.string().describe("A concise description of the element's purpose or content."),
-      bbox: z.array(z.number()).length(4).describe("The bounding box of the element [xmin, ymin, xmax, ymax]")
+      bbox: z.array(z.number()).describe("The bounding box of the element [xmin, ymin, xmax, ymax]")
     });
 
     const UIPageDetails = z.object({
@@ -302,28 +302,18 @@ Return the results in the specified JSON schema format, limiting to the 20 most 
     console.log("visionModel.invoke <==", response);
 
     if (response && response.elements) {
-      const scale_x = response.width / jimpImage.width;
-      const scale_y = response.height / jimpImage.height;
-      console.log('scale_x', scale_x, 'scale_y', scale_y);
-      // response.elements = response.elements.map(elem => {
-      //   let { bbox } = elem;
-
-      //   if (bbox >= jimpImage.width || y >= jimpImage.height) {
-      //     console.warn(`Element coordinates out of bounds: x=${x}, y=${y}, image size=${jimpImage.width}x${jimpImage.height}`);
-      //     x = Math.min(x, jimpImage.width - 1);
-      //     y = Math.min(y, jimpImage.height - 1);
-      //   }
-
-      //   if (x + width > jimpImage.width) {
-      //     width = jimpImage.width - x;
-      //   }
-
-      //   if (y + height > jimpImage.height) {
-      //     height = jimpImage.height - y;
-      //   }
-
-      //   return { ...elem, x, y, width, height };
-      // });
+      const width = jimpImage.width;
+      const height = jimpImage.height;
+      response.elements = response.elements.map(elem => {
+        // x1, y1, x2, y2 -> 0-1000
+        const bbox = [
+          Math.round((elem.bbox[0] * width) / 1000),
+          Math.round((elem.bbox[1] * height) / 1000),
+          Math.round((elem.bbox[2] * width) / 1000),
+          Math.round((elem.bbox[3] * height) / 1000)
+        ];
+        return { ...elem, bbox };
+      });
     }
 
     return response;
