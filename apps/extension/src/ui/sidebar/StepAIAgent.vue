@@ -692,7 +692,7 @@ const getModelForTask = async (task: 'general' | 'vision' = 'general') => {
       },
       temperature: task === 'vision' ? 0 : 0.5, // Lower temperature for vision tasks for more consistent results
       topP: 0.8,
-      maxTokens: 4096,
+      maxTokens: 40960,
       streaming: task === 'general', // Enable streaming only for general chat model, keep vision model with full response
     });
   } catch (error) {
@@ -714,8 +714,8 @@ const initializeAgent = async () => {
       tools: [getPageInfo, analyzePageWithVision, getElementFromPoint, getGogogoAPIDocument, getGogogoAPI, runGogogoScript],
       middleware: [handleToolErrors, summarizationMiddleware({
         model: baseModel,
-        maxTokensBeforeSummary: 4000,
-        messagesToKeep: 20,
+        trigger: { tokens: 40000 }, // Updated from maxTokensBeforeSummary
+        keep: { messages: 20 }, // Updated from messagesToKeep
       })] as const,
       checkpointer,
       systemPrompt: systemPrompt
