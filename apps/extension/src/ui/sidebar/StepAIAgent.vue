@@ -256,10 +256,11 @@ const UIElement = z.object({
 
 const UIPageDetails = z.object({
   summary: z.string().describe("The summary of the main topic of the screenshot (maximum 50 words)"),
+  answer: z.optional(z.string()).describe("The answer to the user's question based on the content of the screenshot (if any, optional)"),
   width: z.number().describe("The width of the screenshot"),
   height: z.number().describe("The height of the screenshot"),
   elements: z.array(UIElement).describe("Array of UI elements found in the screenshot that match the user's description (maximum 20 items)"),
-  errors: z.array(z.string()).describe("Optional array of error messages (if any)")
+  errors: z.optional(z.array(z.string())).describe("Optional array of error messages (if any, optional, such as no matching elements found, screenshot not related to the user's query or image processing issues)")
 });
 
 // type UIElementType = z.infer<typeof UIElement>;
@@ -348,7 +349,7 @@ Fields:
 * \`width\`: The width of the screenshot
 * \`height\`: The height of the screenshot
 * \`elements\`: Array of UI elements found in the screenshot that match the user's description (maximum 20 items)
-* \`errors\`: Optional array of error messages (if any)
+* \`errors\`: Optional array of error messages (if any, optional, such as no matching elements found, screenshot not related to the user's query or image processing issues)
 * \`element.type\`: The type of the element (e.g., button, input, link, checkbox, dropdown, image, text, etc.)
 * \`element.description\`: A concise description of the element's purpose or content
 * \`element.bbox\`: The bounding box of the element that matches the user's description
