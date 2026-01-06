@@ -1,17 +1,32 @@
 <template>
   <div class="ai-agent-container flex flex-col h-full bg-transparent">
     <!-- Chat Messages Area -->
-    <div class="chat-messages flex-1 overflow-y-auto p-2 space-y-4">
+    <div ref="chatContainerRef" class="chat-messages flex-1 overflow-y-auto p-2 space-y-4">
       <!-- Example messages -->
-      <div v-for="(message, index) in chatMessages" :key="index" class="message mb-4"
-        :class="message.type === 'human' ? 'user-message flex justify-end' : 'ai-message flex justify-start'">
+      <div v-for="(message, index) in chatMessages" :key="index" class="message mb-4" :class="[
+        message.type === 'human' ? 'user-message flex justify-end' :
+          message.messageType === 'tool' ? 'tool-message flex justify-start' :
+            message.messageType === 'think' ? 'think-message flex justify-start' :
+              'ai-message flex justify-start'
+      ]">
         <div :class="[
           'rounded-2xl px-4 py-2 max-w-[85%]',
           message.type === 'human'
             ? 'bg-blue-500 text-white rounded-br-none'
-            : 'bg-gray-200 text-gray-800 rounded-bl-none'
+            : message.messageType === 'tool'
+              ? 'bg-purple-100 text-purple-800 rounded-bl-none border border-purple-200'
+              : message.messageType === 'think'
+                ? 'bg-yellow-50 text-yellow-800 rounded-bl-none border border-yellow-200 italic'
+                : 'bg-gray-200 text-gray-800 rounded-bl-none'
         ]">
           <p>{{ message.content }}</p>
+        </div>
+      </div>
+      <!-- Loading indicator -->
+      <div v-if="isLoading" class="ai-message flex justify-start">
+        <div class="bg-gray-200 text-gray-800 rounded-2xl px-4 py-2 rounded-bl-none flex items-center space-x-2">
+          <span class="loading-spinner animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></span>
+          <span>Thinking...</span>
         </div>
       </div>
     </div>
@@ -58,13 +73,10 @@
             <Button icon="pi pi-search" size="small" variant="text" rounded severity="secondary" @click="handleInspect"
               title="Inspect elements on the page" />
 
-            <!-- Voice Button -->
-            <!-- <Button icon="pi pi-microphone" rounded text severity="secondary" @click="handleVoiceInput"
-              title="Voice input" class="w-8 h-8" /> -->
-
             <!-- Send Button -->
             <Button icon="pi pi-send" size="small" rounded @click="handleSend"
-              title="Send message (Enter to send, Shift+Enter for new line)" />
+              title="Send message (Enter to send, Shift+Enter for new line)" :disabled="isLoading"
+              :loading="isLoading" />
           </div>
         </div>
       </div>
@@ -73,15 +85,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, watchEffect } from 'vue';
 import { Jimp } from "jimp";
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import FloatLabel from 'primevue/floatlabel';
 import { ChatOpenAI } from '@langchain/openai';
-import { createAgent, createMiddleware, tool, ToolMessage, HumanMessage, SystemMessage, BaseMessage, summarizationMiddleware } from "langchain";
+import { createAgent, createMiddleware, tool, ToolMessage, HumanMessage, SystemMessage, BaseMessage, summarizationMiddleware, ReactAgent, AIMessage } from "langchain";
 import { MemorySaver } from "@langchain/langgraph";
-// import { createAgent, createMiddleware, tool, ToolMessage, HumanMessage, SystemMessage, BaseMessage } from "@langchain/langgraph/web";
 import * as z from "zod/v3";
 import { AIUtils } from "@gogogo/shared";
 import { SidebarUtils } from './SidebarUtils';
@@ -98,6 +109,7 @@ import { SidebarUtils } from './SidebarUtils';
 const userInput = ref('');
 const chatModel = ref('auto'); // Default to auto model
 const visionModel = ref('auto'); // Default to auto model
+const isLoading = ref(false); // Loading state for AI processing
 
 // Options
 const chatModelOptions = ref<{ name: string; value: string }[]>([
@@ -107,10 +119,14 @@ const visionModelOptions = ref<{ name: string; value: string }[]>([
   { name: 'Auto', value: 'auto' }
 ]);
 
-const chatMessages = ref<BaseMessage[]>([]);
-const inputTextArea = ref<HTMLTextAreaElement | null>(null);
+interface ChatMessage extends BaseMessage {
+  messageType?: 'think' | 'tool' | 'final';
+}
 
-// // tool functions
+const chatMessages = ref<ChatMessage[]>([]);
+const inputTextArea = ref<HTMLTextAreaElement | null>(null);
+const chatContainerRef = ref<HTMLElement | null>(null);
+
 const handleInspect = async () => {
   console.log('Inspect functionality triggered');
   // test
@@ -157,6 +173,76 @@ const handleInspect = async () => {
   }
 };
 
+const formatChatMessage = (step: string, messages: BaseMessage[]): ChatMessage | null => {
+  try {
+    if (!messages || messages.length === 0) {
+      throw new Error('No messages provided');
+    }
+    const lastMessage = messages[messages.length - 1];
+
+    if (lastMessage.type === 'ai') {
+      // call tool
+      const aiMessage = lastMessage as AIMessage;
+      if (aiMessage.tool_calls && aiMessage.tool_calls.length > 0) {
+        const toolCalls = aiMessage.tool_calls;
+        const toolDict: Record<string, string> = {
+          'get_gogogo_api_document': 'Get Gogogo API Document',
+          'get_gogogo_api': 'Get Gogogo API Definition',
+          'run_gogogo_script': 'Run Script',
+          'get_page_info': 'Get Page Info',
+          'analyze_page_with_vision': 'Analyze Page with Vision',
+          'get_element_from_point': 'Get Element from Point'
+        };
+        const toolNames = toolCalls.map((tc) => tc.name in toolDict ? toolDict[tc.name] as string : tc.name).join(', ');
+        const chatMessage = new AIMessage(`🔧 Calling tools: ${toolNames}`) as ChatMessage;
+        chatMessage.messageType = 'think';
+        return chatMessage;
+      }
+      else if (aiMessage.content) {
+        const content = typeof aiMessage.content === 'string' ? aiMessage.content
+          : aiMessage.content.map((block) => block.type === 'text' ? block.text : JSON.stringify(block, null, 2)).join('\n');
+        if (aiMessage.response_metadata && aiMessage.response_metadata.finish_reason === 'stop') {
+          const chatMessage = new AIMessage(content) as ChatMessage;
+          chatMessage.messageType = 'final';
+          return chatMessage;
+        }
+        else {
+          const chatMessage = new AIMessage(`💭 Thinking: ${content}`) as ChatMessage;
+          chatMessage.messageType = 'think';
+          return chatMessage;
+        }
+      }
+    }
+    else if (lastMessage.type === 'tool') {
+      const toolMessage = lastMessage as ToolMessage;
+      if (toolMessage.content) {
+        const toolName = toolMessage.name || 'tool';
+        const content = typeof toolMessage.content === 'string' ? toolMessage.content
+          : toolMessage.content.map((block) => block.type === 'text' ? block.text : JSON.stringify(block, null, 2)).join('\n');
+        const chatMessage = new AIMessage(`🔧 Tool Result (${toolName}):\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`) as ChatMessage;
+        chatMessage.messageType = 'tool';
+        return chatMessage;
+      }
+      else {
+        const chatMessage = new AIMessage(`🔧 Tool executed successfully`) as ChatMessage;
+        chatMessage.messageType = 'tool';
+        return chatMessage;
+      }
+    }
+    else if (lastMessage.content) {
+      const content = typeof lastMessage.content === 'string' ? lastMessage.content
+        : lastMessage.content.map((block) => block.type === 'text' ? block.text : JSON.stringify(block, null, 2)).join('\n');
+      const chatMessage = new AIMessage(`${step}: :\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`) as ChatMessage;
+      chatMessage.messageType = 'final';
+      return chatMessage;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error formatting chat message:', error);
+    return null;
+  }
+};
+
 // const handleVoiceInput = () => {
 //   console.log('Voice input functionality triggered');
 //   // Mock voice input functionality
@@ -179,23 +265,33 @@ const UIPageDetails = z.object({
 // type UIElementType = z.infer<typeof UIElement>;
 
 const loadAPIDocument = async () => {
-  const docURL = chrome.runtime.getURL('assets/docs/README.md');
-  const response = await fetch(docURL);
-  if (!response.ok) {
-    throw new Error(`resource error: status - ${response.status}`);
+  try {
+    const docURL = chrome.runtime.getURL('assets/docs/README.md');
+    const response = await fetch(docURL);
+    if (!response.ok) {
+      throw new Error(`Failed to load API document: HTTP ${response.status}`);
+    }
+    const doc = await response.text();
+    return doc;
+  } catch (error) {
+    console.error('Error loading API document:', error);
+    throw new Error(`Error loading API document: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  const doc = await response.text();
-  return doc;
 }
 
 const loadAPIDefinition = async () => {
-  const apiURL = chrome.runtime.getURL('assets/types/types.d.ts');
-  const response = await fetch(apiURL);
-  if (!response.ok) {
-    throw new Error(`resource error: status - ${response.status}`);
+  try {
+    const apiURL = chrome.runtime.getURL('assets/types/types.d.ts');
+    const response = await fetch(apiURL);
+    if (!response.ok) {
+      throw new Error(`Failed to load API definition: HTTP ${response.status}`);
+    }
+    const doc = await response.text();
+    return doc;
+  } catch (error) {
+    console.error('Error loading API definition:', error);
+    throw new Error(`Error loading API definition: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  const doc = await response.text();
-  return doc;
 }
 
 const analyzePageWithVisionModel = async (userPrompt?: string) => {
@@ -253,7 +349,7 @@ Fields:
 * \`height\`: The height of the screenshot
 * \`elements\`: Array of UI elements found in the screenshot that match the user's description (maximum 20 items)
 * \`errors\`: Optional array of error messages (if any)
-* \`element.type\`: The type of the element (e.g., button, input, link, checkbox, dropdown, image, etc.)
+* \`element.type\`: The type of the element (e.g., button, input, link, checkbox, dropdown, image, text, etc.)
 * \`element.description\`: A concise description of the element's purpose or content
 * \`element.bbox\`: The bounding box of the element that matches the user's description
 
@@ -287,7 +383,7 @@ Fields:
 
 * Scenario 2: Weather forecast scenario
   * When the user message is 
-  "I want know what is the weather today according to this page."
+  "What is the weather today according to this page?"
   * Then the response could be:
   \`\`\`json
   {
@@ -339,9 +435,7 @@ Return the results in the specified JSON schema format, limiting to the 20 most 
       ]
     }];
 
-    console.log("visionModel.invoke ==>", messages);
     const response = await visionModel.withStructuredOutput(UIPageDetails).invoke(messages);
-    console.log("visionModel.invoke <==", response);
 
     if (response && response.elements) {
       const width = jimpImage.width;
@@ -379,7 +473,6 @@ Return the results in the specified JSON schema format, limiting to the 20 most 
 const getGogogoAPIDocument = tool(
   async () => {
     const doc = await loadAPIDocument() || '';
-    console.log('getGogogoAPIDocument ===', doc);
     return doc;
   },
   {
@@ -391,7 +484,6 @@ const getGogogoAPIDocument = tool(
 const getGogogoAPI = tool(
   async () => {
     const doc = await loadAPIDefinition() || '';
-    console.log('getGogogoAPI ===', doc);
     return doc;
   },
   {
@@ -402,26 +494,17 @@ const getGogogoAPI = tool(
 
 const runGogogoScript = tool(
   async ({ script }) => {
-    try {
-      console.log('runScript ==>', script);
-      const result = await SidebarUtils.engine.runScript(script);
-      console.log('runScript <==', result);
-      let content = 'The script run completed';
-      if (result !== undefined && result !== null) {
-        let resultStr = typeof result === 'object' ? `
+    const result = await SidebarUtils.engine.runScript(script);
+    let content = 'The script run completed';
+    if (result !== undefined && result !== null) {
+      let resultStr = typeof result === 'object' ? `
 \`\`\`json
 ${JSON.stringify(result)}
 \`\`\`
 `: String(result);
-        content = `The script run completed with result: ${resultStr}`;
-      }
-      return [content, result];
+      content = `The script run completed with result: ${resultStr}`;
     }
-    catch (err) {
-      console.error('runScript error', err);
-      const content = `The script run completed with error: ${err instanceof Error ? err.message : String(err)}`;
-      return [content, err];
-    }
+    return [content, result];
   },
   {
     name: "run_gogogo_script",
@@ -439,7 +522,6 @@ const getPageInfo = tool(
     const title = await SidebarUtils.engine.getPageTitle();
     const status = await SidebarUtils.engine.getPageStatus();
     const content = `The page information: url=${url}, title=${title}, status=${status}`;
-    console.log('getPageInfo', { url, title, status });
     return [content, { url, title, status }];
   },
   {
@@ -451,31 +533,26 @@ const getPageInfo = tool(
 
 const analyzePageWithVision = tool(
   async ({ userPrompt }) => {
-    try {
-      const result = await analyzePageWithVisionModel(userPrompt);
-      const content = `The analyze result for this page: 
+    const result = await analyzePageWithVisionModel(userPrompt);
+    const content = `The analyze result for this page: 
 \`\`\`json
 ${JSON.stringify(result)}
 \`\`\`
 `;
-      return [content, result];
-    } catch (error: any) {
-      console.error('Error in identifyElementsWithVision:', error);
-      return [`Error analyzing image: ${error.message}`, { error: error.message }];
-    }
+    return [content, result];
   },
   {
     name: "analyze_page_with_vision",
-    description: "Analyze a page screenshot using computer vision and return the identified UI elements based on the user's description",
+    description: "Analyze a page screenshot using computer vision and return the answer of user's question or find the identified UI elements based on the user's description",
     responseFormat: 'content_and_artifact',
     schema: z.object({
-      userPrompt: z.string().optional().describe("User's question or description for analyzing the page. e.g., 'Find the login button and input fields'")
+      userPrompt: z.string().optional().describe("User's question or description for analyzing the page. e.g., 'What is the weather today according to this page?' or 'Find the login button and input fields in this page.'")
     })
   }
 );
 
 const getElementFromPoint = tool(
-  async ({ type, description, bbox }) => {
+  async ({ bbox }) => {
     const x = (bbox[0] + bbox[2]) / 2;
     const y = (bbox[1] + bbox[3]) / 2;
     const elem = await SidebarUtils.engine.getElementFromPoint(x, y);
@@ -506,7 +583,6 @@ await browser.detachDebugger();
 
 \`\`\`
 `;
-    console.log('getElementFromPoint', elem, type, description, bbox);
     return [content, elem];
   },
   {
@@ -549,6 +625,8 @@ You are a versatile professional in web testing and automation. Your outstanding
 * You can run the Gogogo scripts using tool run_gogogo_script.
 * You can identify the page elements using tool analyze_page_with_vision.
 * You can get the element using the tool get_element_from_point based on the returned result from tool analyze_page_with_vision.
+* You can try to get some answer directly on the page using tool analyze_page_with_vision if you failed to get result by running the Gogogo scripts with tool run_gogogo_script. e.g.: call tool analyze_page_with_vision with userPrompt "What is the weather today according to this page?".
+* You should use the same language as the user's instruction.
 
 ## Script Guidelines:
 * Use Gogogo API to interact with the page and browser, make sure write safe and correct javascript code
@@ -581,76 +659,162 @@ ${api_doc}
 
 // Helper function to get an appropriate model for a specific task
 const getModelForTask = async (task: 'general' | 'vision' = 'general') => {
-  if (task === 'general' && chatModel.value.length <= 1) {
-    throw new Error('No valid model');
-  }
-  if (task === 'vision' && visionModelOptions.value.length <= 1) {
-    throw new Error('No valid model');
-  }
-
-  const settings = task === 'vision' ? await AIUtils.getAIVisionSettings() : await AIUtils.getAISettings();
-  let modelName = task === 'vision' ? visionModel.value : chatModel.value;
-  if (modelName === 'auto') {
-    const options = (task === 'vision' ? visionModelOptions.value : chatModelOptions.value).filter(m => m.value !== 'auto');
-    if (options.length > 0) {
-      modelName = options[0].value;
+  try {
+    if (task === 'general' && chatModel.value.length <= 1) {
+      throw new Error('No valid chat model configured');
     }
+    if (task === 'vision' && visionModelOptions.value.length <= 1) {
+      throw new Error('No valid vision model configured');
+    }
+
+    const settings = task === 'vision' ? await AIUtils.getAIVisionSettings() : await AIUtils.getAISettings();
+    let modelName = task === 'vision' ? visionModel.value : chatModel.value;
+    if (modelName === 'auto') {
+      const options = (task === 'vision' ? visionModelOptions.value : chatModelOptions.value).filter(m => m.value !== 'auto');
+      if (options.length > 0) {
+        modelName = options[0].value;
+      } else {
+        throw new Error(`No valid ${task} model available for auto-selection`);
+      }
+    }
+
+    if (!settings.apiKey) {
+      throw new Error('API key not configured');
+    }
+
+    return new ChatOpenAI({
+      model: modelName,
+      configuration: {
+        baseURL: settings.baseURL,
+        apiKey: settings.apiKey,
+        dangerouslyAllowBrowser: true,
+      },
+      temperature: task === 'vision' ? 0 : 0.5, // Lower temperature for vision tasks for more consistent results
+      topP: 0.8,
+      maxTokens: 4096,
+      streaming: task === 'general', // Enable streaming only for general chat model, keep vision model with full response
+    });
+  } catch (error) {
+    console.error(`Error getting ${task} model:`, error);
+    throw new Error(`Failed to initialize ${task} model: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  return new ChatOpenAI({
-    model: modelName,
-    configuration: {
-      baseURL: settings.baseURL,
-      apiKey: settings.apiKey,
-      dangerouslyAllowBrowser: true,
-    },
-    temperature: task === 'vision' ? 0 : 0.5, // Lower temperature for vision tasks for more consistent results
-    topP: 0.8,
-    maxTokens: 4096,
-    streaming: false,
-  });
 };
 
 const checkpointer = new MemorySaver();
+const agentInstance = ref<ReactAgent | null>(null); // Cache for the agent instance
+const lastUsedModels = ref({ chat: '', vision: '' }); // Track last used models
+
+const initializeAgent = async () => {
+  try {
+    const baseModel = await getModelForTask();
+    const systemPrompt = await getSystemPrompt();
+    const agent = createAgent({
+      model: baseModel,
+      tools: [getPageInfo, analyzePageWithVision, getElementFromPoint, getGogogoAPIDocument, getGogogoAPI, runGogogoScript],
+      middleware: [handleToolErrors, summarizationMiddleware({
+        model: baseModel,
+        maxTokensBeforeSummary: 4000,
+        messagesToKeep: 20,
+      })] as const,
+      checkpointer,
+      systemPrompt: systemPrompt
+    });
+    agentInstance.value = agent;
+    // Update last used models
+    lastUsedModels.value = { chat: chatModel.value, vision: visionModel.value };
+    return agent;
+  } catch (error) {
+    console.error('Error initializing agent:', error);
+    throw error;
+  }
+};
 
 const handleSend = async () => {
-  if (!userInput.value.trim()) {
+  if (!userInput.value.trim() || isLoading.value) {
     return;
   }
   const userInputValue = userInput.value.trim();
   const userMessage = new HumanMessage(userInputValue);
   chatMessages.value.push(userMessage);
   console.log('Sending message:', chatMessages.value);
-  const baseModel = await getModelForTask();
-  const systemPrompt = await getSystemPrompt();
-  const agent = createAgent({
-    model: baseModel,
-    tools: [getPageInfo, analyzePageWithVision, getElementFromPoint, getGogogoAPIDocument, getGogogoAPI, runGogogoScript],
-    middleware: [handleToolErrors, summarizationMiddleware({
-      model: baseModel,
-      maxTokensBeforeSummary: 4000,
-      messagesToKeep: 20,
-    })] as const,
-    checkpointer,
-    systemPrompt: systemPrompt
-  });
-  userInput.value = '';
-  const result = await agent.invoke({
-    messages: userInputValue
-  }, {
-    configurable: { thread_id: "1" }
-  });
-  chatMessages.value = result.messages;
-  console.log("result", result);
-  nextTick(() => {
-    const chatContainer = document.querySelector('.chat-messages');
-    if (chatContainer) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-  });
 
-  // Focus back to the input area after sending
-  if (inputTextArea.value) {
-    inputTextArea.value.focus();
+  // Set loading state
+  isLoading.value = true;
+
+  try {
+    // Check if model has changed since last use
+    const modelChanged = lastUsedModels.value.chat !== chatModel.value ||
+      lastUsedModels.value.vision !== visionModel.value;
+
+    // Use cached agent instance if available and model hasn't changed, otherwise initialize a new one
+    const agent = (!modelChanged && agentInstance.value) ? agentInstance.value : await initializeAgent();
+    userInput.value = '';
+
+    // Use stream to get real-time updates with streamMode: "updates"
+    let useStreaming = true;
+
+    try {
+      // Check if agent has stream method
+      if (typeof agent.stream !== 'function') {
+        console.warn('Agent does not support streaming, falling back to regular invoke');
+        useStreaming = false;
+      }
+    } catch (streamError) {
+      console.warn('Stream check failed, falling back to regular invoke:', streamError);
+      useStreaming = false;
+    }
+
+    if (useStreaming) {
+      try {
+        // Process the stream with streamMode: "updates"
+        for await (const chunk of await agent.stream(
+          { messages: [userMessage] },
+          { configurable: { thread_id: "1" }, streamMode: "updates" }
+        )) {
+          const [step, content] = Object.entries(chunk)[0];
+          console.log(`step: ${step}`);
+          console.log(`content:`, content);
+          if (!step || !content || step === 'SummarizationMiddleware.before_model') {
+            continue;
+          }
+          // Create formatted message based on step type
+          const chatMessage = formatChatMessage(step, content.messages);
+
+          // Set message type based on step
+          if (!chatMessage) {
+            continue;
+          }
+          chatMessages.value.push(chatMessage);
+        }
+      } catch (streamError) {
+        console.warn('Stream error, falling back to regular invoke:', streamError);
+        useStreaming = false;
+      }
+    }
+
+    if (!useStreaming) {
+      // Fallback to regular invoke if streaming is not supported
+      const result = await agent.invoke(
+        { messages: [userMessage] },
+        { configurable: { thread_id: "1" } }
+      );
+      chatMessages.value = result.messages;
+      console.log("result", result);
+    }
+
+    console.log("Stream completed");
+
+    // Focus back to the input area after sending
+    if (inputTextArea.value) {
+      inputTextArea.value.focus();
+    }
+  } catch (error) {
+    console.error('Error in AI agent processing:', error);
+    // Add error message to chat
+    chatMessages.value.push(new SystemMessage(`Error: ${error instanceof Error ? error.message : 'An unexpected error occurred'}`));
+  } finally {
+    // Reset loading state
+    isLoading.value = false;
   }
 };
 
@@ -661,6 +825,15 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
   // Shift + Enter for new line is handled by default behavior
 };
+
+// Auto-scroll to bottom when messages change
+watchEffect(() => {
+  nextTick(() => {
+    if (chatContainerRef.value) {
+      chatContainerRef.value.scrollTop = chatContainerRef.value.scrollHeight;
+    }
+  });
+});
 
 onMounted(async () => {
   const chatAISettings = await AIUtils.getAISettings();
