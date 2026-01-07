@@ -72,6 +72,51 @@ const { v4: uuidv4 } = require('uuid');
 const rootDir = path.resolve(__dirname, '..'); // Project root = extension folder
 const timestamp = () => new Date().toISOString().replace(/T/, '-').replace(/:/g, '-').split('.')[0] + '-' + Date.now() % 1000;
 
+// Function to get key content, only using environment variables for security
+const getKeyContent = (keyType, browser) => {
+  // Environment variable format: EXTENSION_{BROWSER}_{KEYTYPE}
+  // Example: EXTENSION_CHROME_PRIVATEKEY
+  const envKey = `EXTENSION_${browser.toUpperCase()}_${keyType.toUpperCase()}`;
+  const envContent = process.env[envKey];
+  
+  if (envContent) {
+    console.log(`${timestamp()} webpack.config.cjs:: using environment variable for ${keyType}: ${envKey}`);
+    return envContent;
+  }
+  
+  console.warn(`${timestamp()} webpack.config.cjs:: key not found: ${keyType} for ${browser}`);
+  return null;
+};
+
+// Function to get key path (for plugins that require file paths)
+const getKeyPath = (keyType, browser) => {
+  // Check if we have environment variable for this key
+  const envKey = `EXTENSION_${browser.toUpperCase()}_${keyType.toUpperCase()}`;
+  if (process.env[envKey]) {
+    // Create temporary key file if using environment variable
+    const tempKeyDir = path.resolve(rootDir, `build/temp/keys`);
+    if (!fs.existsSync(tempKeyDir)) {
+      fs.mkdirSync(tempKeyDir, { recursive: true });
+    }
+    
+    const keyFileMap = {
+      privateKey: 'privateKey.pem',
+      publicKey: 'publicKey.txt',
+      apiKey: 'apiKey.txt',
+      apiSecret: 'apiSecret.txt'
+    };
+    
+    const keyFileName = keyFileMap[keyType];
+    const tempKeyPath = path.resolve(tempKeyDir, `${browser}_${keyFileName}`);
+    
+    fs.writeFileSync(tempKeyPath, process.env[envKey], 'utf8');
+    console.log(`${timestamp()} webpack.config.cjs:: created temporary key file: ${tempKeyPath}`);
+    return tempKeyPath;
+  }
+  
+  return null;
+};
+
 // Generate default version: year.month.day.0
 const now = new Date();
 const defaultVersion = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}.${now.getHours()}`;
@@ -85,7 +130,6 @@ module.exports = (env) => {
   const manifestVersion = env.manifestVersion; // 'v2', 'v3'
   const target = env.target; // 'unpacked', 'packed', 'store'
   const version = env.version || defaultVersion; // Use provided version or dynamic default
-  const keyVersion = version.split('.')[0]; // e.g., '2025'
   const outputPath = path.resolve(rootDir, `dist/${browser}/${manifestVersion}`); // Base directory
   const tempDir = path.resolve(rootDir, `dist/${browser}/${manifestVersion}/temp-${uuidv4()}`); // Unique temp folder
 
@@ -95,10 +139,10 @@ module.exports = (env) => {
     fse.removeSync(tempDir);
   }
 
-  console.log(`${timestamp()} webpack.config.cjs:: configuring - browser: ${browser}, manifestVersion: ${manifestVersion}, target: ${target}, version: ${version}, keyVersion: ${keyVersion}, outputPath: ${outputPath}, tempDir: ${tempDir}`);
+  console.log(`${timestamp()} webpack.config.cjs:: configuring - browser: ${browser}, manifestVersion: ${manifestVersion}, target: ${target}, version: ${version}, outputPath: ${outputPath}, tempDir: ${tempDir}`);
 
-  const publicKeyPath = browser !== 'firefox' ? path.resolve(rootDir, `build/${browser}/version/${keyVersion}/publicKey.txt`) : null;
-  const privateKeyPath = browser !== 'firefox' ? path.resolve(rootDir, `build/${browser}/version/${keyVersion}/privateKey.pem`) : null;
+  const publicKeyPath = browser !== 'firefox' ? getKeyPath('publicKey', browser) : null;
+  const privateKeyPath = browser !== 'firefox' ? getKeyPath('privateKey', browser) : null;
   console.log(`${timestamp()} webpack.config.cjs:: key paths - publicKeyPath: ${publicKeyPath || 'none'}, privateKeyPath: ${privateKeyPath || 'none'}`);
 
   const config = {
@@ -358,12 +402,12 @@ module.exports = (env) => {
           ...(target === 'packed'
             ? [
               console.log(`${timestamp()} webpack.config.cjs:: adding CrxPackPlugin`),
-              new CrxPackPlugin({ browser, manifestVersion, keyVersion, outputPath, keyPath: privateKeyPath, tempDir }),
+              new CrxPackPlugin({ browser, manifestVersion, outputPath, keyPath: privateKeyPath, tempDir }),
             ]
             : target === 'store'
               ? [
                 console.log(`${timestamp()} webpack.config.cjs:: adding ZipStorePlugin for store`),
-                new ZipStorePlugin({ browser, manifestVersion, keyVersion, outputPath, privateKeyPath, tempDir }),
+                new ZipStorePlugin({ browser, manifestVersion, outputPath, privateKeyPath, tempDir }),
               ]
               : []),
         ]
@@ -372,15 +416,15 @@ module.exports = (env) => {
             console.log(`${timestamp()} webpack.config.cjs:: adding XpiPackPlugin`),
             new XpiPackPlugin({
               outputPath,
-              apiKeyPath: path.resolve(rootDir, `build/firefox/version/${keyVersion}/apiKey.txt`),
-              apiSecretPath: path.resolve(rootDir, `build/firefox/version/${keyVersion}/apiSecret.txt`),
+              apiKeyPath: getKeyPath('apiKey', 'firefox'),
+              apiSecretPath: getKeyPath('apiSecret', 'firefox'),
               tempDir,
             }),
           ]
           : browser === 'firefox' && target === 'store'
             ? [
               console.log(`${timestamp()} webpack.config.cjs:: adding ZipStorePlugin for store (Firefox)`),
-              new ZipStorePlugin({ browser, manifestVersion, keyVersion, outputPath, tempDir }),
+              new ZipStorePlugin({ browser, manifestVersion, outputPath, tempDir }),
             ]
             : []),
     ],

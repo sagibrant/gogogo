@@ -18,3 +18,9 @@ tsconfig.tsbuildinfo
 
 # IDE
 .vscode
+
+# Local secret keys directory
+.secret/
+
+# Temporary keys directory
+build/temp/
