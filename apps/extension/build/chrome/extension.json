@@ -1,15 +1,11 @@
 {
     "browser": "Chrome",
-    "extensions": [{
-            "id": "kpohfimcpcmbcihhpgnjcomihmcnfpna",
-            "packed": "v2/Extension.crx",
-            "unpacked": "v2/Extension",
-            "minVersion": 31
-        },
+    "extensions": [
         {
             "id": "kpohfimcpcmbcihhpgnjcomihmcnfpna",
-            "packed": "v3/Extension.crx",
-            "unpacked": "v3/Extension",
+            "packed": "v3/packed/Extension.crx",
+            "store": "v3/store/Extension.zip",
+            "unpacked": "v3/unpacked/Extension",
             "minVersion": 96
         }
     ]

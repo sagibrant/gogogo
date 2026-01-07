@@ -1,13 +1,11 @@
 {
     "browser": "Edge",
-    "extensions": [{
-            "id": "ilcdijkgbkkllhojpgbiajmnbdiadppj",
-            "unpacked": "v2/Extension",
-            "minVersion": 79
-        },
+    "extensions": [
         {
             "id": "ilcdijkgbkkllhojpgbiajmnbdiadppj",
-            "unpacked": "v3/Extension",
+            "packed": "v3/packed/Extension.crx",
+            "store": "v3/store/Extension.zip",
+            "unpacked": "v3/unpacked/Extension",
             "minVersion": 96
         }
     ]

@@ -34,15 +34,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
-    strategy:
-      matrix:
-        browser: [chrome, edge, firefox]
-        manifestVersion: [v3]
-        target: [unpacked, packed, store]
-        exclude:
-          # Firefox doesn't support all targets
-          - browser: firefox
-            target: packed
+    # strategy:
+    #   matrix:
+    #     browser: [chrome, edge, firefox]
+    #     manifestVersion: [v3]
+    #     target: [unpacked, packed, store]
+    #     exclude:
+    #       # Firefox doesn't support all targets
+    #       - browser: firefox
+    #         target: packed
 
     steps:
       - name: Checkout repository
@@ -75,20 +75,22 @@ jobs:
           EXTENSION_FIREFOX_APIKEY: ${{ secrets.EXTENSION_FIREFOX_APIKEY }}
           EXTENSION_FIREFOX_APISECRET: ${{ secrets.EXTENSION_FIREFOX_APISECRET }}
         run: |
-          cd apps/extension
+          # cd apps/extension
           # Run appropriate build command based on matrix
-          if [ "${{ matrix.browser }}" = "firefox" ] && [ "${{ matrix.target }}" = "packed" ]; then
-            echo "Skipping Firefox packed build (not supported)"
-          else
-            pnpm build:${{ matrix.browser }}:${{ matrix.manifestVersion }}:${{ matrix.target }} --env version=${{ env.BUILD_VERSION }}
-          fi
+          # if [ "${{ matrix.browser }}" = "firefox" ] && [ "${{ matrix.target }}" = "packed" ]; then
+          #   echo "Skipping Firefox packed build (not supported)"
+          # else
+          #   pnpm build:${{ matrix.browser }}:${{ matrix.manifestVersion }}:${{ matrix.target }} --env version=${{ env.BUILD_VERSION }}
+          # fi
+          pnpm build --env version=${{ env.BUILD_VERSION }}
 
       - name: Upload build artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: extension-${{ matrix.browser }}-${{ matrix.manifestVersion }}-${{ matrix.target }}
-          path: apps/extension/dist/${{ matrix.browser }}/${{ matrix.manifestVersion }}/
+          # name: extension-${{ matrix.browser }}-${{ matrix.manifestVersion }}-${{ matrix.target }}
+          name: extension-${{ env.BUILD_VERSION }}
+          path: apps/extension/dist/
           retention-days: 14
 
   build-summary:
