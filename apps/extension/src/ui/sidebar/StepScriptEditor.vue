@@ -62,7 +62,8 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed, PropType, watch, nextTick } from 'vue';
-import { Utils, AIMessage, AIMessageContent, AIUtils } from "@gogogo/shared";
+import { Utils } from "@gogogo/shared";
+import { AIMessage, AIMessageContent, AIUtils } from "./AIUtils";
 import { Codemirror } from 'vue-codemirror';
 import { placeholder, EditorView } from '@codemirror/view';
 import { javascript } from '@codemirror/lang-javascript';

@@ -20,8 +20,8 @@
  * limitations under the License.
  */
 
-import { SettingUtils } from "./Settings";
-import { CryptoUtil } from "./CryptoUtil";
+import { SettingUtils } from "../../../../../packages/shared/src/Settings";
+import { CryptoUtil } from "../../../../../packages/shared/src/CryptoUtil";
 
 export interface AIMessage {
   role: 'system' | 'user' | 'assistant';

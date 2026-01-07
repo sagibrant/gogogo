@@ -12,7 +12,6 @@ export * from './Common';
 export * from './Storage';
 export * from './Settings';
 export * from './Logger';
-export * from './AIUtils';
 export * from './CryptoUtil';
 export * from './DOMPath';
 export * from './EventEmitter';

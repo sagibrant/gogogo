@@ -94,7 +94,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { createAgent, createMiddleware, tool, ToolMessage, HumanMessage, SystemMessage, BaseMessage, summarizationMiddleware, ReactAgent, AIMessage } from "langchain";
 import { MemorySaver } from "@langchain/langgraph";
 import * as z from "zod/v3";
-import { AIUtils } from "@gogogo/shared";
+import { AIUtils } from "./AIUtils";
 import { SidebarUtils } from './SidebarUtils';
 /**
  * Get localized text by key

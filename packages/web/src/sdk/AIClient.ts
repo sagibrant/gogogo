@@ -21,7 +21,7 @@
  */
 
 import * as api from "@gogogo/shared";
-import { Utils, AIUtils } from "@gogogo/shared";
+import { Utils } from "@gogogo/shared";
 import { ChannelBase } from "./Channel";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
@@ -61,7 +61,7 @@ export class AIClient extends ChannelBase implements api.AIClient {
   }
 
   async chat(message: string, role: 'user' | 'assistant' | 'system' = 'user'): Promise<string | null> {
-    const settings = await AIUtils.getAISettings();
+    const settings = await api.SettingUtils.getSettings().aiSettings;
     if (!this._openai) {
       if (!settings.baseURL) {
         throw new Error('Invalid baseURL');
