@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, Utils, Dispatcher, InvokeAction, MessageData } from "@gogogo/shared";
+import { MsgUtils, RtidUtils, Utils, Dispatcher, InvokeAction, MessageData, Rtid } from "@gogogo/shared";
 import { AgentHandler } from "./handlers/AgentHandler";
 import { BrowserHandler } from "./handlers/BrowserHandler";
 
@@ -40,12 +40,28 @@ export class BackgroundUtils {
         args: [event, data]
       }
     } as InvokeAction);
-
+    // event to sidebar
     await BackgroundUtils.sendEvent(msgData);
+    // event to all content MAIN worlds in case @gogogo/web is used there
+    await BackgroundUtils.broadcastEvent(msgData);
   }
 
   static async sendEvent(msgData: MessageData, timeout?: number): Promise<void> {
     await BackgroundUtils.dispatcher.sendEvent(msgData, timeout);
+  }
+
+  static async broadcastEvent(msgData: MessageData, timeout?: number): Promise<void> {
+    const browser = BackgroundUtils.browser;
+    const pageContentMainRtids: Rtid[] = browser.tabs.map(tab => ({ ...tab.contentId, context: 'MAIN', object: 0 }));
+    for (const rtid of pageContentMainRtids) {
+      const broadcastMsgData = Utils.deepClone(msgData);
+      broadcastMsgData.dest = rtid;
+      try {
+        // some page does not have content MAIN world, ignore errors
+        await BackgroundUtils.dispatcher.sendEvent(broadcastMsgData, timeout);
+      }
+      catch { }
+    }
   }
 
   static async sendRequest(msgData: MessageData, timeout?: number): Promise<MessageData> {

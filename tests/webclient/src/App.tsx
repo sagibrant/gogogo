@@ -9,6 +9,7 @@ import { syntaxTree } from '@codemirror/language';
 import { JSHINT } from 'jshint';
 import { ayuLight, coolGlow } from 'thememirror';
 import { StepScriptEditorHelper } from './StepScriptEditorHelper';
+import { GogogoUtils } from './GogogoUtils';
 
 function App() {
   const [url, setUrl] = useState('');
@@ -126,12 +127,12 @@ ${codeContent}
             changes: { from, to, insert: insertText },
             selection: paramsStr
               ? {
-                  anchor: from + method.name.length + 1,
-                  head: from + insertText.length - 1
-                }
+                anchor: from + method.name.length + 1,
+                head: from + insertText.length - 1
+              }
               : {
-                  anchor: from + insertText.length
-                }
+                anchor: from + insertText.length
+              }
           });
         }
       };
@@ -254,7 +255,7 @@ ${codeContent}
     const userAgent = navigator.userAgent;
     const isChrome = /Chrome\//.test(userAgent) && !/Edg\//.test(userAgent);
     const isEdge = /Edg\//.test(userAgent);
-    
+
     // Open extension installation interface based on browser
     let extensionUrl = '';
     if (isChrome) {
@@ -265,21 +266,27 @@ ${codeContent}
       // Default to Chrome extension store for other browsers
       extensionUrl = 'https://chromewebstore.google.com/detail/gogogo/kpohfimcpcmbcihhpgnjcomihmcnfpna';
     }
-    
+
     window.open(extensionUrl, '_blank');
   };
 
   // Handle run script button click
-  const handleRunScript = () => {
+  const handleRunScript = async () => {
     // Implement script execution logic here
     console.log('Running script:', scriptContent);
-    alert('Script execution initiated! Check console for details.');
+    const result = await GogogoUtils.runScript(scriptContent, url);
+    if (result) {
+      console.log('Script result:', result);
+    }
+    else {
+      console.log('Script executed with no result.');
+    }
   };
 
   return (
     <div className="workflow-container">
       <h1 className="workflow-title">Web Automation Workflow</h1>
-      
+
       {/* Step 1: Prepare */}
       <div className="workflow-step">
         <div className="step-header">

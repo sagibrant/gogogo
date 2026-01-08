@@ -20,14 +20,17 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, Utils, IChannel, Dispatcher, Message, Rtid} from "@gogogo/shared";
+import { MsgUtils, RtidUtils, Utils, IChannel, Dispatcher, Message, Rtid, MessageData, SettingUtils } from "@gogogo/shared";
 import { ExtensionRuntimeChannel } from "../channels/ExtensionRuntimeChannel";
 import { ContentUtils } from "./ContentUtils";
+import { CustomEventChannel } from "../channels/CustomEventChannel";
 
 class ContentToBackgroundChannel extends ExtensionRuntimeChannel { }
+class ContentToMainChannel extends CustomEventChannel { }
 
 export class ContentDispatcher extends Dispatcher {
   private readonly _contentToBackgroundChannel: ContentToBackgroundChannel;
+  private readonly _contentToMainChannel: ContentToMainChannel;
   private _frameSenderInfo: unknown;
 
   constructor() {
@@ -36,6 +39,7 @@ export class ContentDispatcher extends Dispatcher {
     // id : "ilcdijkgbkkllhojpgbiajmnbdiadppj"
     // origin: "chrome-extension://ilcdijkgbkkllhojpgbiajmnbdiadppj"
     // bg url: 'chrome-extension://ilcdijkgbkkllhojpgbiajmnbdiadppj/background.js'
+    // even edge is using the prefix of "chrome-extension://"
     const extensionId = chrome.runtime.id;
     const extensionOrigin = `chrome-extension://${extensionId}`;
     const backgroundUrl = `chrome-extension://${extensionId}/background.js`
@@ -51,12 +55,47 @@ export class ContentDispatcher extends Dispatcher {
         return;
       }
       const frameRtid = Utils.deepClone(msg.data.dest);
+      frameRtid.context = 'content';
       frameRtid.object = -1;
       if ((msg.type === 'event' || msg.type === 'request') && !RtidUtils.isRtidEqual(frameRtid, ContentUtils.frame.rtid)) {
         this.logger.error('Invalid message dest: msg:', msg, ' sender:', sender, ' frameRtid:', ContentUtils.frame.rtid);
         return;
       }
+      this.onMessage(msg, sender, responseCallback);
+    });
 
+    this._contentToMainChannel = new ContentToMainChannel();
+    this._contentToMainChannel.on('message', ({ msg, sender, responseCallback }) => {
+      if (!MsgUtils.isMessage(msg)) {
+        this.logger.error('Invalid message format: msg:', msg, ' sender:', sender);
+        return;
+      }
+      // register message from MAIN world
+      if (msg.type === 'request' && msg.data.type === 'config' && msg.data.action.name === 'get') {
+        if (msg.data.action.params && 'frameRtid' in msg.data.action.params && 'settings' in msg.data.action.params && responseCallback) {
+          const resData: MessageData = {
+            ...Utils.deepClone(msg.data),
+            status: 'OK',
+            result: { frameRtid: ContentUtils.frame.rtid, settings: SettingUtils.getSettings() }
+          };
+          const response = MsgUtils.createResponse(resData, msg.syncId!, msg.correlationId);
+          responseCallback(response);
+          return;
+        }
+        this.logger.error('Invalid config get request message: msg:', msg, ' sender:', sender);
+        if (responseCallback) {
+          const resData: MessageData = {
+            ...Utils.deepClone(msg.data),
+            status: 'ERROR',
+            error: 'Invalid config get request message'
+          };
+          const response = MsgUtils.createResponse(resData, msg.syncId!, msg.correlationId);
+          responseCallback(response);
+        }
+        return;
+      }
+
+      console.log('ContentDispatcher: message from MAIN world:', msg, ' sender:', sender);
       this.onMessage(msg, sender, responseCallback);
     });
   }
@@ -72,6 +111,7 @@ export class ContentDispatcher extends Dispatcher {
       await ContentUtils.frame.startRecording();
     }
     this._contentToBackgroundChannel.startListening(true, false);
+    this._contentToMainChannel.startListening();
   }
 
   async getConfig(rtid: Rtid, propName: string, timeout?: number): Promise<any> {
@@ -93,7 +133,7 @@ export class ContentDispatcher extends Dispatcher {
       return this._contentToBackgroundChannel;
     }
     else {
-      throw new Error(`Unsupported context type ${contextType}`);
+      return this._contentToMainChannel;
     }
   }
 }

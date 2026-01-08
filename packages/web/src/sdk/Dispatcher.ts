@@ -19,7 +19,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AODesc, AutomationObject, ChannelBase, ChannelStatus, Dispatcher, IChannel, Message, MsgDataHandlerBase, MsgUtils, RtidUtils, Settings, SettingUtils, Utils } from "@gogogo/shared";
+import { AODesc, AutomationObject, ChannelBase, ChannelStatus, Dispatcher, IChannel, Message, MessageData, MsgDataHandlerBase, MsgUtils, Rtid, RtidUtils, Settings, SettingUtils, Utils } from "@gogogo/shared";
 import { RuntimeUtils } from "./RuntimeUtils";
 
 /**
@@ -121,8 +121,7 @@ class GogogoEventHandler extends MsgDataHandlerBase {
 
   constructor() {
     const rtid = RtidUtils.getAgentRtid();
-    rtid.context = 'external';
-    rtid.external = 'script-runtime-context';
+    rtid.context = 'MAIN';
     super(rtid);
   }
 
@@ -215,21 +214,55 @@ class GogogoEventHandler extends MsgDataHandlerBase {
   }
 }
 
-
 export class MainToContentDispatcher extends Dispatcher {
   private readonly _mainToContentChannel: MainToContentChannel;
+  private readonly _handler: GogogoEventHandler;
 
   constructor() {
     super('main-to-content-dispatcher');
 
-    const handler = new GogogoEventHandler();
-    this.addHandler(handler);
+    this._handler = new GogogoEventHandler();
+    this.addHandler(this._handler);
 
     this._mainToContentChannel = new MainToContentChannel();
     this._mainToContentChannel.on('message', async ({ msg, sender, responseCallback }) => {
       this.onMessage(msg, sender, responseCallback);
     });
     this._mainToContentChannel.startListening();
+  }
+
+  async registerToContentScript(sendRequest: (data: MessageData, timeout?: number) => Promise<MessageData>): Promise<void> {
+    const reqMsgData = MsgUtils.createMessageData('config', RtidUtils.getAgentRtid(), { name: 'get', params: { frameRtid: undefined, settings: undefined } });
+    const resMsgData = await sendRequest(reqMsgData);
+    if (resMsgData.status === 'OK') {
+      const frameRtid = Utils.getItem('frameRtid', resMsgData.result as any) as Rtid;
+      this._handler.rtid.context = 'MAIN';
+      this._handler.rtid.browser = frameRtid.browser;
+      this._handler.rtid.window = -1;
+      this._handler.rtid.tab = frameRtid.tab;
+      this._handler.rtid.frame = frameRtid.frame;
+      this._handler.rtid.object = 0;
+      const settings = Utils.getItem('settings', resMsgData.result as any) as Settings;
+      await this._handler.updateSettings(settings);
+      this.logger.debug('registerToContentScript: MAIN frame rtid are updated to', this._handler.rtid);
+    }
+  }
+
+  override async sendEvent(data: MessageData, timeout?: number): Promise<void> {
+    if (this._handler.rtid.tab === -1) {
+      throw new Error('sendEvent: failed to send event because frameRtid is not initialized');
+    }
+    return await super.sendEvent(data, timeout);
+  }
+
+  override async sendRequest(data: MessageData, timeout?: number): Promise<MessageData> {
+    if (this._handler.rtid.tab === -1) {
+      await this.registerToContentScript(super.sendRequest.bind(this));
+    }
+    if (this._handler.rtid.tab === -1) {
+      throw new Error('sendRequest: failed to send request because frameRtid is not initialized');
+    }
+    return await super.sendRequest(data, timeout);
   }
 
   protected override getChannel(_msg: Message): IChannel {
