@@ -10,6 +10,7 @@ import { JSHINT } from 'jshint';
 import { ayuLight, coolGlow } from 'thememirror';
 import { StepScriptEditorHelper } from './StepScriptEditorHelper';
 import { GogogoUtils } from './GogogoUtils';
+import { toast, Toaster } from 'sonner';
 
 function App() {
   const [url, setUrl] = useState('');
@@ -274,80 +275,95 @@ ${codeContent}
   const handleRunScript = async () => {
     // Implement script execution logic here
     console.log('Running script:', scriptContent);
-    const result = await GogogoUtils.runScript(scriptContent, url);
-    if (result) {
-      console.log('Script result:', result);
-    }
-    else {
-      console.log('Script executed with no result.');
+    try {
+      const result = await GogogoUtils.runScript(scriptContent, url);
+      if (result) {
+        console.log('Script result:', result);
+        toast.success('Script Executed Successfully', {
+          description: `Your automation script has been executed successfully with result ${typeof result === 'object' ? JSON.stringify(result) : String(result)}`
+        });
+      } else {
+        console.log('Script executed with no result.');
+        toast.success('Script Executed', {
+          description: 'Your automation script has been executed successfully.'
+        });
+      }
+    } catch (error) {
+      console.error('Error running script:', error);
+      toast.error('Script Execution Failed', {
+        description: error instanceof Error ? error.stack || error.message : 'An unexpected error occurred.'
+      });
     }
   };
 
   return (
-    <div className="workflow-container">
-      <h1 className="workflow-title">Web Automation Workflow</h1>
+    <>
+      <div className="workflow-container">
+        <h1 className="workflow-title">Web Automation Workflow</h1>
 
-      {/* Step 1: Prepare */}
-      <div className="workflow-step">
-        <div className="step-header">
-          <div className="step-number">1</div>
-          <h2 className="step-title">Prepare</h2>
-        </div>
-        <div className="step-content">
-          <button className="install-btn" onClick={handleInstallExtension}>
-            Install extension
-          </button>
-          <p className="step-description">Click the button above to install the required browser extension.</p>
-        </div>
-      </div>
-
-      {/* Step 2: URL */}
-      <div className="workflow-step">
-        <div className="step-header">
-          <div className="step-number">2</div>
-          <h2 className="step-title">Your URL</h2>
-        </div>
-        <div className="step-content">
-          <div className="url-input-container">
-            <input
-              type="url"
-              id="url-input"
-              className="url-input"
-              placeholder="https://example.com"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
+        {/* Step 1: Prepare */}
+        <div className="workflow-step">
+          <div className="step-header">
+            <div className="step-number">1</div>
+            <h2 className="step-title">Prepare</h2>
           </div>
-          <p className="step-description">Enter the URL of the page you want to automate.</p>
+          <div className="step-content">
+            <button className="install-btn" onClick={handleInstallExtension}>
+              Install extension
+            </button>
+            <p className="step-description">Click the button above to install the required browser extension.</p>
+          </div>
         </div>
-      </div>
 
-      {/* Step 3: Code */}
-      <div className="workflow-step">
-        <div className="step-header">
-          <div className="step-number">3</div>
-          <h2 className="step-title">Script</h2>
+        {/* Step 2: URL */}
+        <div className="workflow-step">
+          <div className="step-header">
+            <div className="step-number">2</div>
+            <h2 className="step-title">Your URL</h2>
+          </div>
+          <div className="step-content">
+            <div className="url-input-container">
+              <input
+                type="url"
+                id="url-input"
+                className="url-input"
+                placeholder="https://example.com"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+            </div>
+            <p className="step-description">Enter the URL of the page you want to automate.</p>
+          </div>
         </div>
-        <div className="step-content">
-          <div className="editor-container" ref={editorRef}></div>
-          <p className="step-description">Write your automation script using the CodeMirror editor.</p>
-        </div>
-      </div>
 
-      {/* Step 4: Execute */}
-      <div className="workflow-step">
-        <div className="step-header">
-          <div className="step-number">4</div>
-          <h2 className="step-title">Execute</h2>
+        {/* Step 3: Code */}
+        <div className="workflow-step">
+          <div className="step-header">
+            <div className="step-number">3</div>
+            <h2 className="step-title">Script</h2>
+          </div>
+          <div className="step-content">
+            <div className="editor-container" ref={editorRef}></div>
+            <p className="step-description">Write your automation script using the CodeMirror editor.</p>
+          </div>
         </div>
-        <div className="step-content">
-          <button className="run-btn" onClick={handleRunScript}>
-            Run
-          </button>
-          <p className="step-description">Click the button above to execute your automation script.</p>
+
+        {/* Step 4: Execute */}
+        <div className="workflow-step">
+          <div className="step-header">
+            <div className="step-number">4</div>
+            <h2 className="step-title">Execute</h2>
+          </div>
+          <div className="step-content">
+            <button className="run-btn" onClick={handleRunScript}>
+              Run
+            </button>
+            <p className="step-description">Click the button above to execute your automation script.</p>
+          </div>
         </div>
       </div>
-    </div>
+      <Toaster />
+    </>
   );
 }
 
