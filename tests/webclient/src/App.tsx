@@ -5,6 +5,7 @@ import { EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { autocompletion, type Completion } from '@codemirror/autocomplete';
 import { type Diagnostic, linter, lintGutter } from '@codemirror/lint';
+import { syntaxTree } from '@codemirror/language';
 import { JSHINT } from 'jshint';
 import { ayuLight, coolGlow } from 'thememirror';
 import { StepScriptEditorHelper } from './StepScriptEditorHelper';
@@ -141,18 +142,33 @@ ${codeContent}
   const createCompletionSource = () => {
     return (context: { state: EditorState; pos: number }) => {
       const { state, pos } = context;
-      const textBefore = state.sliceDoc(0, pos);
-      const lastDotIndex = textBefore.lastIndexOf('.');
-      const openParenIndex = textBefore.lastIndexOf('(');
-      const closeParenIndex = textBefore.lastIndexOf(')');
+      const tree = syntaxTree(state);
+      const nodeBefore = tree.resolveInner(pos, -1);
+      if (!nodeBefore) return null;
+      if (!nodeBefore.parent) return null;
+      // we only support the auto completion on one object. global variable is not supported
+      // e.g.
+      // expr: let elm = await page.frame().nth(0).element().nth(1).element().filter().nth(1).element('#id').cl
+      // leftExpr: "page.frame().nth(0).element().nth(1).element().filter().nth(1).element('#id')"
+      // methodPrefix: cl
 
-      // Check if we're after a dot
-      if (lastDotIndex === -1 || (openParenIndex > lastDotIndex && closeParenIndex < openParenIndex)) {
+      // try to find the dot '.'
+      const textBefore = state.sliceDoc(nodeBefore.from, nodeBefore.to).trim();
+      let dotPos = -1;
+      if (textBefore === ".") {
+        dotPos = nodeBefore.from;
+      }
+      else if (nodeBefore.from > 0) {
+        const dotText = state.sliceDoc(nodeBefore.from - 1, nodeBefore.from).trim();
+        if (dotText === '.') {
+          dotPos = nodeBefore.from - 1;
+        }
+      }
+      if (dotPos < 0) {
         return null;
       }
-
-      const methodPrefix = textBefore.slice(lastDotIndex + 1).trim();
-      const leftExpr = textBefore.slice(0, lastDotIndex).trim();
+      const methodPrefix = state.sliceDoc(dotPos + 1, nodeBefore.to).trim();
+      const leftExpr = state.sliceDoc(nodeBefore.parent.from, dotPos).trim();
       if (!leftExpr) return null;
 
       const type = StepScriptEditorHelper.getExpressionType(leftExpr, variableTypes.current);
@@ -162,12 +178,11 @@ ${codeContent}
 
       if (methodPrefix) {
         completions = completions.filter(completion =>
-          completion.label.toLowerCase().startsWith(methodPrefix.toLowerCase())
+          completion.label.toLowerCase().startsWith(methodPrefix)
         );
       }
-
       return {
-        from: methodPrefix ? lastDotIndex + 1 : pos,
+        from: methodPrefix ? dotPos + 1 : pos,
         options: completions
       };
     };
@@ -203,16 +218,6 @@ ${codeContent}
             const newContent = update.state.doc.toString();
             setScriptContent(newContent);
             updateVariableTypes(update.state);
-          }
-        }),
-        EditorView.theme({
-          "&": {
-            height: "100%",
-            fontSize: "14px"
-          },
-          ".cm-scroller": {
-            overflow: "auto",
-            maxHeight: "400px"
           }
         })
       ]
