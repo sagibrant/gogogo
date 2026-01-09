@@ -74,9 +74,8 @@
               title="Inspect elements on the page" />
 
             <!-- Send Button -->
-            <Button icon="pi pi-send" size="small" rounded @click="handleSend"
-              title="Send message (Enter to send, Shift+Enter for new line)" :disabled="isLoading"
-              :loading="isLoading" />
+            <Button icon="pi pi-send" size="small" rounded @click="handleSend" title="Send message"
+              :disabled="isLoading" :loading="isLoading" />
           </div>
         </div>
       </div>
@@ -183,7 +182,7 @@ const formatChatMessage = (step: string, messages: BaseMessage[]): ChatMessage[]
       const content = typeof msg.content === 'string' ? msg.content
         : msg.content.map((block) => block.type === 'text' ? block.text : JSON.stringify(block, null, 2)).join('\n');
 
-      return content.length > 100 ? content.substring(0, 100) + '...' : content;
+      return content.length > 2000 ? content.substring(0, 2000) + '...' : content;
     };
 
     const lastMessage = messages[messages.length - 1];
@@ -331,11 +330,11 @@ const UIElement = z.object({
 
 const UIPageDetails = z.object({
   summary: z.string().describe("The summary of the main topic of the screenshot (maximum 50 words)"),
-  answer: z.optional(z.string()).describe("The answer to the user's question based on the content of the screenshot (if any, optional)"),
+  answer: z.optional(z.nullable(z.string())).describe("The answer to the user's question based on the content of the screenshot (if any, optional)"),
   width: z.number().describe("The width of the screenshot"),
   height: z.number().describe("The height of the screenshot"),
   elements: z.array(UIElement).describe("Array of UI elements found in the screenshot that match the user's description (maximum 20 items)"),
-  errors: z.optional(z.array(z.string())).describe("Optional array of error messages (if any, optional, such as no matching elements found, screenshot not related to the user's query or image processing issues)")
+  errors: z.optional(z.nullable(z.array(z.string()))).describe("Optional array of error messages (if any, optional, such as no matching elements found, screenshot not related to the user's query or image processing issues)")
 });
 
 // type UIElementType = z.infer<typeof UIElement>;
@@ -895,11 +894,8 @@ const handleSend = async () => {
 };
 
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    handleSend();
-  }
-  // Shift + Enter for new line is handled by default behavior
+  // Enter key for new line, handled by default behavior
+  // Shift + Enter also for new line, handled by default behavior
 };
 
 // Auto-scroll to bottom when messages change
