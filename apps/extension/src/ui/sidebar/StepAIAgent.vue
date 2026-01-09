@@ -198,31 +198,31 @@ const formatChatMessage = (step: string, messages: BaseMessage[]): ChatMessage[]
           let toolCallMsg = '';
           switch (toolCall.name) {
             case 'get_gogogo_api_document': {
-              toolCallMsg = 'Trying to load the Gogogo API Document';
+              toolCallMsg = 'Loading Gogogo API Documentation';
               break;
             }
             case 'get_gogogo_api': {
-              toolCallMsg = 'Trying to load the Gogogo API Definition';
+              toolCallMsg = 'Loading Gogogo API Definition';
               break;
             }
             case 'run_gogogo_script': {
-              toolCallMsg = `Trying to run script\n${toolCall.args?.script?.length > 100 ? toolCall.args?.script.substring(0, 100) + '...' : toolCall.args?.script}`;
+              toolCallMsg = `Running script\n${toolCall.args?.script?.length > 100 ? toolCall.args?.script.substring(0, 100) + '...' : toolCall.args?.script}`;
               break;
             }
             case 'get_page_info': {
-              toolCallMsg = 'Trying to load the page information';
+              toolCallMsg = 'Retrieving page information';
               break;
             }
             case 'analyze_page_with_vision': {
-              toolCallMsg = 'Trying to analyze the page with vision model';
+              toolCallMsg = 'Analyzing page with vision model';
               break;
             }
             case 'get_element_from_point': {
-              toolCallMsg = 'Trying to get element from point';
+              toolCallMsg = 'Getting element from coordinates';
               break;
             }
             default:
-              toolCallMsg = `Warning: Unrecognized tool call: ${toolCall.name}`;
+              toolCallMsg = `Unrecognized tool call: ${toolCall.name}`;
           }
           const chatMessage = new AIMessage(`🔧 ${toolCallMsg}`) as ChatMessage;
           chatMessage.messageType = 'tool';
@@ -249,55 +249,55 @@ const formatChatMessage = (step: string, messages: BaseMessage[]): ChatMessage[]
       let toolCallResultMsg = '';
       switch (toolMessage.name) {
         case 'get_gogogo_api_document': {
-          toolCallResultMsg = 'The Gogogo API Document is loaded.';
+          toolCallResultMsg = 'Gogogo API Documentation loaded successfully';
           break;
         }
         case 'get_gogogo_api': {
-          toolCallResultMsg = 'The Gogogo API Definition is loaded.';
+          toolCallResultMsg = 'Gogogo API Definition loaded successfully';
           break;
         }
         case 'run_gogogo_script': {
           if (toolMessage.artifact) {
             const jsonArtifact = JSON.stringify(toolMessage.artifact);
-            toolCallResultMsg = `The script run completed with result: ${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
+            toolCallResultMsg = `Script executed successfully\nResult: ${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
           }
           else {
-            toolCallResultMsg = `The script run completed.`;
+            toolCallResultMsg = 'Script executed successfully';
           }
           break;
         }
         case 'get_page_info': {
           if (toolMessage.artifact) {
             const jsonArtifact = JSON.stringify(toolMessage.artifact);
-            toolCallResultMsg = `The page information: ${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
+            toolCallResultMsg = `Page information retrieved:\n${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
           }
           else {
-            toolCallResultMsg = `The page information is loaded.`;
+            toolCallResultMsg = 'Page information retrieved successfully';
           }
           break;
         }
         case 'analyze_page_with_vision': {
           if (toolMessage.artifact) {
             const jsonArtifact = JSON.stringify(toolMessage.artifact);
-            toolCallResultMsg = `The page analyze result: ${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
+            toolCallResultMsg = `Page analysis complete:\n${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
           }
           else {
-            toolCallResultMsg = `The page analyze is completed.`;
+            toolCallResultMsg = 'Page analysis complete';
           }
           break;
         }
         case 'get_element_from_point': {
           if (toolMessage.artifact) {
             const jsonArtifact = JSON.stringify(toolMessage.artifact);
-            toolCallResultMsg = `The element from point is: ${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
+            toolCallResultMsg = `Element retrieved from coordinates:\n${jsonArtifact.length > 100 ? jsonArtifact.substring(0, 100) + '...' : jsonArtifact}`;
           }
           else {
-            toolCallResultMsg = `The element is retrieved from the point.`;
+            toolCallResultMsg = 'Element retrieved from coordinates';
           }
           break;
         }
         default: {
-          const content = getMsgContent(toolMessage) || `Tool executed completely.`;
+          const content = getMsgContent(toolMessage) || 'Tool execution completed';
           toolCallResultMsg = content;
         }
       }
@@ -307,7 +307,7 @@ const formatChatMessage = (step: string, messages: BaseMessage[]): ChatMessage[]
     }
     else if (lastMessage.content) {
       const content = getMsgContent(lastMessage);
-      const chatMessage = new AIMessage(`${step}: :\n${content}`) as ChatMessage;
+      const chatMessage = new AIMessage(`${step}:\n${content}`) as ChatMessage;
       chatMessage.messageType = 'final';
       return [chatMessage];
     }
