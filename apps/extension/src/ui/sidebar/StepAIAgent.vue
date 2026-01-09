@@ -581,7 +581,7 @@ const getGogogoAPI = tool(
 
 const runGogogoScript = tool(
   async ({ script }) => {
-    const result = await SidebarUtils.engine.runScript(script);
+    const result = await props.runScriptWithNewStep(script);
     let content = 'The script run completed';
     if (result !== undefined && result !== null) {
       let resultStr = typeof result === 'object' ? `
