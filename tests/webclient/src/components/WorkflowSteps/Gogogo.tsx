@@ -92,14 +92,14 @@ const Gogogo: React.FC<GogogoProps> = ({
     <div className="workflow-step">
       <div className="step-header">
         <div className="step-number">{stepNumber}</div>
-        <h2 className="step-title">{'Go Go Go'}</h2>
+        <h2 className="step-title">{'Gogogo'}</h2>
       </div>
       <div className="step-content">
         <button
           className="run-btn"
           onClick={isAIMode ? handleRunAI : handleRunScript}
         >
-          {'Go Go Go'}
+          {'Go'}
         </button>
         <p className="step-description">
           {isAIMode

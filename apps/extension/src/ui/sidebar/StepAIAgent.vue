@@ -95,6 +95,17 @@ import { MemorySaver } from "@langchain/langgraph";
 import * as z from "zod/v3";
 import { AIUtils } from "./AIUtils";
 import { SidebarUtils } from './SidebarUtils';
+
+// Define component props with type annotations
+const props = defineProps({
+  /** The node data to be rendered */
+  runScriptWithNewStep: {
+    type: Function,
+    required: true,
+    validator: (value) => typeof value === 'function' // Validate it's a function
+  }
+});
+
 /**
  * Get localized text by key
  * @param key - The key of the text to localize
@@ -145,8 +156,8 @@ const handleInspect = async () => {
     console.log('capturePage', base64ImgString);
   }
   {
-    const elem = await SidebarUtils.engine.getElementFromPoint(115.5, 331.375, 153, 21);
-    console.log("getElementFromPoint(115.5, 331.375, 153, 21)", elem);
+    const elem = await SidebarUtils.engine.getElementFromPoint(115.5, 292.375, 153, 21);
+    console.log("getElementFromPoint(115.5, 292.375, 153, 21)", elem);
   }
   {
     const elem = await SidebarUtils.engine.getElementFromPoint(415, 355.875);
@@ -157,18 +168,19 @@ const handleInspect = async () => {
     console.log("getElementFromPoint(28, 34)", elem);
   }
   {
-    const result = await SidebarUtils.engine.runScript("let a = 1; console.log('debug log', a); return 100;");
+    const error = Math.round(Math.random() * 10) % 2 == 0 ? true : false;
+    const result = await props.runScriptWithNewStep(`let a = 1; console.log('debug log', a); ${error ? 'throw new Error("Simulated error");' : 'return 100;'} `);
     console.log('runScript', result);
   }
   {
-    const result = await analyzePageWithVisionModel();
-    if (!result) return;
-    for (const element of result.elements) {
-      const elem = await SidebarUtils.engine.getElementFromPoint((element.bbox[0] + element.bbox[2]) / 2, (element.bbox[1] + element.bbox[3]) / 2);
-      console.log("element-", element, " in ", element.bbox, " is ", elem);
-      const script = `await ${elem.pageScript}.${elem.elementScript}.highlight();`;
-      await SidebarUtils.engine.runScript(script);
-    }
+    // const result = await analyzePageWithVisionModel();
+    // if (!result) return;
+    // for (const element of result.elements) {
+    //   const elem = await SidebarUtils.engine.getElementFromPoint((element.bbox[0] + element.bbox[2]) / 2, (element.bbox[1] + element.bbox[3]) / 2);
+    //   console.log("element-", element, " in ", element.bbox, " is ", elem);
+    //   const script = `await ${elem.pageScript}.${elem.elementScript}.highlight();`;
+    //   await SidebarUtils.engine.runScript(script);
+    // }
   }
 };
 

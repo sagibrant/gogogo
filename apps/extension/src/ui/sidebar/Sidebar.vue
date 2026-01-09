@@ -30,7 +30,7 @@
     <Dialog v-model:visible="isAIDialogVisible" modal :header="t('sidebar_btn_action_steps_ai_assistant_header')"
       :style="{ width: '20rem' }">
       <!-- TODO AI Agent -->
-      <step-a-i-agent></step-a-i-agent>
+      <step-a-i-agent :run-script-with-new-step="runScriptWithNewStep"></step-a-i-agent>
     </Dialog>
 
     <!-- Header with menus -->
@@ -1203,7 +1203,7 @@ const handleDeleteTaskNode = () => {
 /**
  * Add new step
  */
-const handleAddStep = (payload: MouseEvent | undefined, edit: boolean = true) => {
+const handleAddStep = (payload: MouseEvent | undefined, edit: boolean = true, script: string = '', description: string = '') => {
   if (!(isIdle.value && activeTaskId.value)) {
     return;
   }
@@ -1216,8 +1216,8 @@ const handleAddStep = (payload: MouseEvent | undefined, edit: boolean = true) =>
   const newStep: Step = {
     uid: Utils.generateUUID(),
     type: 'script_step',
-    description: t('sidebar_btn_action_steps_add_step_new_step_label'),
-    script: ''
+    description: description || t('sidebar_btn_action_steps_add_step_new_step_label'),
+    script: script
   };
 
   if (selectedStepUid.value) {
@@ -1407,7 +1407,7 @@ const handleRecord = async () => {
 
 /**
  * Handle "Replay" button click
- * the replay will run all the steps
+ * the replay will run all the steps of the active task (not the activeSteps)
  */
 const handleReplay = async () => {
   if (!(isIdle.value && activeTaskId.value)) {
@@ -1423,49 +1423,23 @@ const handleReplay = async () => {
     return;
   }
 
-  const pre_selectedStepUid = selectedStepUid.value;
   toggleUIMode('replay');
 
-  const taskResult: TaskResult = {
-    task_id: task.id,
-    task_start_time: Date.now(),
-    task_end_time: -1,
-    status: 'passed',
-    last_error: undefined,
-    steps: []
-  };
-
-  const index = taskResults.findIndex(r => r.task_id === taskResult.task_id);
-  if (index >= 0) {
-    taskResults.splice(index, 1, taskResult);
-  }
-  else {
-    taskResults.push(taskResult);
-  }
-
-  for (const step of activeSteps.value) {
-    step.last_error = undefined;
-    step.last_status = undefined;
-  }
+  const pre_selectedStepUid = selectedStepUid.value;
+  const stepIds = task.steps.map(s => s.uid);
 
   showNotificationMessage(t('sidebar_btn_action_steps_replay_start'));
 
-  const stepResults = await runSteps(activeSteps.value);
+  const stepResults = await runSteps(task.id, stepIds);
 
-  taskResult.steps = stepResults;
-  taskResult.task_end_time = Date.now();
   const lastErrorStep = [...stepResults].reverse().find(r => r.status === 'failed');
   if (lastErrorStep) {
-    taskResult.status = 'failed';
-    taskResult.last_error = lastErrorStep.error;
     showNotificationMessage(t('sidebar_btn_action_steps_replay_failed'), 3000, 'error');
   }
   else {
-    taskResult.status = 'passed';
     showNotificationMessage(t('sidebar_btn_action_steps_replay_passed'), 3000, 'success');
   }
 
-  activeSteps.value = [...activeSteps.value];
   handleStepSelect(pre_selectedStepUid);
 
   toggleUIMode('idle');
@@ -1498,61 +1472,20 @@ const handleReplayFromStep = async () => {
 
   toggleUIMode('replayFromStep');
 
-  let taskResult: TaskResult = {
-    task_id: task.id,
-    task_start_time: Date.now(),
-    task_end_time: -1,
-    status: 'passed',
-    last_error: undefined,
-    steps: []
-  };
-
-  const index = taskResults.findIndex(r => r.task_id === taskResult.task_id);
-  if (index >= 0) {
-    taskResult = taskResults[index];
-    taskResult.task_start_time = Date.now();
-    taskResult.task_end_time = -1;
-  }
-  else {
-    taskResults.push(taskResult);
-  }
-
-  for (const step of steps) {
-    const stepIndex = taskResult.steps.findIndex(s => s.step_uid === step.uid);
-    if (stepIndex >= 0) {
-      taskResult.steps[stepIndex].error = undefined;
-      taskResult.steps[stepIndex].status = undefined;
-    }
-    step.last_error = undefined;
-    step.last_status = undefined;
-  }
+  const stepIds = steps.map(s => s.uid);
 
   showNotificationMessage(t('sidebar_btn_action_steps_replay_start'));
 
-  const stepResults = await runSteps(steps);
+  const stepResults = await runSteps(task.id, stepIds);
 
-  for (const stepResult of stepResults) {
-    const stepIndex = taskResult.steps.findIndex(s => s.step_uid === stepResult.step_uid);
-    if (stepIndex >= 0) {
-      taskResult.steps[stepIndex] = stepResult;
-    }
-    else {
-      taskResult.steps.push(stepResult);
-    }
-  }
-  taskResult.task_end_time = Date.now();
   const lastErrorStep = [...stepResults].reverse().find(r => r.status === 'failed');
   if (lastErrorStep) {
-    taskResult.status = 'failed';
-    taskResult.last_error = lastErrorStep.error;
     showNotificationMessage(t('sidebar_btn_action_steps_replay_failed'), 3000, 'error');
   }
   else {
-    taskResult.status = 'passed';
     showNotificationMessage(t('sidebar_btn_action_steps_replay_passed'), 3000, 'success');
   }
 
-  activeSteps.value = [...activeSteps.value];
   handleStepSelect(pre_selectedStepUid);
 
   toggleUIMode('idle');
@@ -1626,27 +1559,51 @@ const wait = (timeout: number, signal: AbortSignal) => {
 };
 
 /**
- * run the give steps
- * @param steps steps to run
+ * run the give steps on the given taskId, update the step results into the taskResults
+ * @param taskId id of the task
+ * @param stepIds ids of steps to run
+ * @param stopOnError whether to stop on first error
  */
-const runSteps = async (steps: Step[]): Promise<StepResult[]> => {
-
+const runSteps = async (taskId: string, stepIds: string[], stopOnError: boolean = true): Promise<StepResult[]> => {
   replayAbortController.value = new AbortController();
   const signal = replayAbortController.value.signal;
   const settings = SettingUtils.getSettings();
 
+  // get task and steps
+  const task = findTaskNode(node => node.id === taskId);
+  if (!task || task.type !== 'task') {
+    throw new Error(`runSteps: task not found - ${taskId}`);
+  }
+  const steps = task.steps.filter(s => stepIds.includes(s.uid));
+  // prepare task result
+  let taskResult: TaskResult = {
+    task_id: task.id,
+    task_start_time: Date.now(),
+    task_end_time: -1,
+    status: 'passed',
+    last_error: undefined,
+    steps: []
+  };
+  const taskResultIndex = taskResults.findIndex(r => r.task_id === taskId);
+  if (taskResultIndex >= 0) {
+    taskResult = taskResults[taskResultIndex];
+    taskResult.task_start_time = Date.now();
+    taskResult.task_end_time = -1;
+  }
+  else {
+    taskResults.push(taskResult);
+  }
+
+  const stepResults: StepResult[] = [];
+
   // update the current settings into the sandbox
   try {
-    const engine = SidebarUtils.engine;
-    await engine.updateSettings();
+    await SidebarUtils.engine.updateSettings();
   } catch (error) {
     console.error('runSteps: updateSettings failed', error);
   }
 
   // enable cdp if needed
-  const stepResults: StepResult[] = [];
-  let lastStepResult: StepResult | undefined = undefined;
-  let lastStep: Step | undefined = undefined;
   try {
     if (settings.replaySettings.attachDebugger) {
       await SidebarUtils.engine.attachDebugger();
@@ -1660,28 +1617,23 @@ const runSteps = async (steps: Step[]): Promise<StepResult[]> => {
       if (signal.aborted) {
         break;
       }
+      // select the step on ui
       handleStepSelect(step.uid);
-      lastStepResult = {
-        step_uid: step.uid,
-        step_description: step.description,
-        step_start_time: Date.now(),
-        step_end_time: -1,
-        status: 'passed',
-        error: undefined,
-        screenshot: undefined
-      };
-      lastStep = step;
-      lastStep.last_status = undefined;
-      lastStep.last_error = undefined;
 
-      await runStep(step, settings.replaySettings.stepTimeout);
+      const stepResult = await runStep(step);
 
-      lastStepResult.step_end_time = Date.now();
-      lastStepResult.status = 'passed';
-      stepResults.push(lastStepResult);
-      lastStepResult = undefined;
-      lastStep.last_status = 'passed';
-      lastStep = undefined;
+      const stepResultIndex = taskResult.steps.findIndex(s => s.step_uid === step.uid);
+      if (stepResultIndex < 0) {
+        taskResult.steps.push(stepResult);
+      }
+      else {
+        taskResult.steps[stepResultIndex] = stepResult;
+      }
+      stepResults.push(stepResult);
+
+      if (stopOnError && stepResult.status === 'failed') {
+        break;
+      }
 
       if (signal.aborted) {
         break;
@@ -1692,38 +1644,65 @@ const runSteps = async (steps: Step[]): Promise<StepResult[]> => {
       }
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    if (lastStepResult) {
-      lastStepResult.step_end_time = Date.now();
-      lastStepResult.status = 'failed';
-      lastStepResult.error = errorMessage;
-      stepResults.push(lastStepResult);
-    }
-    if (lastStep) {
-      lastStep.last_status = 'failed';
-      lastStep.last_error = errorMessage;
-    }
-  } finally {
-    try {
-      if (settings.replaySettings.attachDebugger) {
-        await SidebarUtils.engine.detachDebugger();
-      }
-    } catch (error) {
-      console.error('runSteps: detachDebugger failed', error);
-    }
-    return stepResults;
+    console.error('runSteps: runSteps failed', error);
   }
+
+  // finalize task result
+  taskResult.task_end_time = Date.now();
+  const lastErrorStep = [...taskResult.steps].reverse().find(r => r.status === 'failed');
+  if (lastErrorStep) {
+    taskResult.status = 'failed';
+    taskResult.last_error = lastErrorStep.error;
+  }
+  else {
+    taskResult.status = 'passed';
+  }
+
+  // disable cdp if needed
+  try {
+    if (settings.replaySettings.attachDebugger) {
+      await SidebarUtils.engine.detachDebugger();
+    }
+  } catch (error) {
+    console.error('runSteps: detachDebugger failed', error);
+  }
+
+  return stepResults;
 }
 
 /** 
  * run a step
  */
-const runStep = async (step: Step, timeout: number) => {
-  if (step.script.length === 0) {
-    return undefined;
+const runStep = async (step: Step): Promise<StepResult> => {
+  const settings = SettingUtils.getSettings();
+  const stepResult: StepResult = {
+    step_uid: step.uid,
+    step_description: step.description,
+    step_start_time: Date.now(),
+    step_end_time: -1,
+    status: 'passed',
+    result: undefined,
+    error: undefined,
+    screenshot: undefined
+  };
+  try {
+    step.last_error = undefined;
+    step.last_status = undefined;
+    const result = await SidebarUtils.engine.runScript(step.script, true, settings.replaySettings.stepTimeout);
+    stepResult.step_end_time = Date.now();
+    stepResult.status = 'passed';
+    stepResult.result = result;
+    step.last_error = undefined;
+    step.last_status = 'passed';
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.stack || error.message : String(error);
+    stepResult.step_end_time = Date.now();
+    stepResult.status = 'failed';
+    stepResult.error = errorMessage;
+    step.last_status = 'failed';
+    step.last_error = errorMessage;
   }
-  const engine = SidebarUtils.engine;
-  return await engine.runScript(step.script, true, timeout);
+  return stepResult;
 }
 
 /**
@@ -1807,6 +1786,36 @@ const getPageHtml = async (): Promise<string> => {
   const engine = SidebarUtils.engine;
   const pageHtml = await engine.getPageHtml();
   return pageHtml;
+}
+
+const runScriptWithNewStep = async (script: string) => {
+  if (!script || script.length === 0) {
+    throw new Error('Step script is empty');
+  }
+  if (!activeTaskId.value) {
+    throw new Error('No active task selected, please select a task first');
+  }
+
+  const taskId = activeTaskId.value;
+
+  const task = findTaskNode(node => node.id === taskId);
+  if (!task || task.type !== 'task') {
+    return;
+  }
+
+  handleAddStep(undefined, false, script);
+
+  if (!selectedStep.value) {
+    throw new Error('No step after adding new step');
+  }
+
+  const step = selectedStep.value;
+
+  const stepResults = await runSteps(activeTaskId.value, [step.uid]);
+  handleStepSelect(step.uid);
+
+  const result = stepResults[0].status === 'passed' ? stepResults[0].result : stepResults[0].error;
+  return result;
 }
 
 /**

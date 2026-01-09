@@ -94,6 +94,7 @@ export interface StepResult {
   step_description: string;
   step_start_time: number;
   step_end_time: number;
+  result?: string | Record<string, any>;
   status?: 'passed' | 'failed';
   error?: string;
   screenshot?: string;
