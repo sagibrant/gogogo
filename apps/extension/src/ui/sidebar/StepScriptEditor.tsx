@@ -297,8 +297,7 @@ ${codeContent}
             </button>
           </div>
         </div>
-        <div className="editor-container">
-          <div ref={editorRef}></div>
+        <div className="editor-container" ref={editorRef}>
         </div>
       </div>
     </div>
