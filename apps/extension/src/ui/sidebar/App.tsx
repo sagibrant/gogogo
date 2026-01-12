@@ -108,7 +108,7 @@ export default function App() {
     if (node.type === 'group' && node.children && node.children.length > 0) {
       const children = [...node.children];
       const index = children.findIndex(child => match(child));
-      if (index >= 0) {
+      if (index >= 0 && children[index].type === 'task') {
         children.splice(index + 1, 0, newNode);
         return {
           ...node,
@@ -356,6 +356,8 @@ export default function App() {
     }
 
     const asset: TaskAsset = { ...taskAsset };
+    asset.root = taskTree;
+    asset.results = taskResults;
     const jsonContent = JSON.stringify(asset, null, 2);
 
     try {
