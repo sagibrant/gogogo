@@ -233,6 +233,114 @@ export class Utils {
   }
 
   /**
+   * Performs a deep comparison between two values to determine if they are equivalent (similar to lodash.isEqual).
+   * @param a The first value to compare
+   * @param b The second value to compare
+   * @param comparedCache Used to cache compared reference objects to prevent stack overflow caused by circular references (for internal recursive use only, no need to pass externally)
+   * @returns A boolean indicating whether the two values are equivalent
+   */
+  static isEqual(
+    a: unknown,
+    b: unknown,
+    comparedCache: [unknown, unknown][] = []
+  ): boolean {
+    // 1. Handle strictly equal cases (except for NaN)
+    if (a === b) {
+      return true;
+    }
+
+    // 2. Handle the special case of NaN (NaN === NaN returns false, but they should be considered equivalent logically)
+    if (Number.isNaN(a) && Number.isNaN(b)) {
+      return true;
+    }
+
+    // 3. Get the accurate type tag of both values (solves the problem that typeof cannot distinguish between object/array/date etc.)
+    const typeTagA = Object.prototype.toString.call(a);
+    const typeTagB = Object.prototype.toString.call(b);
+
+    // 3.1 Return false directly if the type tags are inconsistent
+    if (typeTagA !== typeTagB) {
+      return false;
+    }
+
+    const typeTag = typeTagA;
+
+    // 4. Prevent circular references (avoid stack overflow, directly consider cached references as equivalent)
+    for (const [cachedA, cachedB] of comparedCache) {
+      if (cachedA === a && cachedB === b) {
+        return true;
+      }
+    }
+    // Add the current pair of reference objects to be compared to the cache
+    comparedCache.push([a, b]);
+
+    try {
+      // 5. Perform deep comparison by type
+      switch (typeTag) {
+        // 5.1 Date objects (compare by timestamp)
+        case '[object Date]':
+          return (a as Date).getTime() === (b as Date).getTime();
+
+        // 5.2 Regular expression objects (compare source string and flags)
+        case '[object RegExp]':
+          const regA = a as RegExp;
+          const regB = b as RegExp;
+          return regA.source === regB.source && regA.flags === regB.flags;
+
+        // 5.3 Arrays (traverse each element and compare recursively)
+        case '[object Array]':
+          const arrA = a as unknown[];
+          const arrB = b as unknown[];
+
+          // Return false directly if the array lengths are inconsistent
+          if (arrA.length !== arrB.length) {
+            return false;
+          }
+
+          // Compare each element recursively
+          for (let i = 0; i < arrA.length; i++) {
+            if (!Utils.isEqual(arrA[i], arrB[i], comparedCache)) {
+              return false;
+            }
+          }
+          return true;
+
+        // 5.4 Plain objects (traverse own enumerable properties and compare recursively)
+        case '[object Object]':
+          const objA = a as Record<string | symbol, unknown>;
+          const objB = b as Record<string | symbol, unknown>;
+
+          // Get own enumerable property names (excluding prototype chain properties)
+          const keysA = Reflect.ownKeys(objA);
+          const keysB = Reflect.ownKeys(objB);
+
+          // Return false directly if the number of properties is inconsistent
+          if (keysA.length !== keysB.length) {
+            return false;
+          }
+
+          // Compare the value of each property recursively
+          for (const key of keysA) {
+            if (
+              !Reflect.has(objB, key) || // The property does not exist in the other object
+              !Utils.isEqual(objA[key], objB[key], comparedCache) // The property values are not equivalent
+            ) {
+              return false;
+            }
+          }
+          return true;
+
+        // 5.5 Other unsupported complex types (such as Function, Symbol, etc., compared by reference)
+        default:
+          return false;
+      }
+    } finally {
+      // Remove the current cache after recursive return to avoid affecting comparisons in other branches
+      comparedCache.pop();
+    }
+  }
+
+  /**
    * get the item from source object
    * @param key item key
    * @param source source data object

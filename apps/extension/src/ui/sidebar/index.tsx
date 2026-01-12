@@ -2,6 +2,7 @@ import "zone.js"
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import '../../assets/css/global.css';
 import './App.css';
 import { SettingUtils } from "@gogogo/shared";
 import { SidebarDispatcher } from "./SidebarDispatcher";
@@ -19,6 +20,12 @@ SidebarUtils.engine = engine;
 SidebarUtils.dispatcher = dispatcher;
 SidebarUtils.handler = handler;
 await dispatcher.init();
+
+// Check if recording is in progress
+const isRecording = await engine.isRecording();
+if (isRecording) {
+  await engine.stopRecording();
+}
 
 const root = ReactDOM.createRoot(
   document.getElementById('app') as HTMLElement

@@ -9,6 +9,7 @@ interface Notification {
 }
 
 export default function App() {
+  console.log('options ==>');
   // Settings state
   const [settings, setSettings] = useState<Settings>(SettingUtils.getSettings());
 
