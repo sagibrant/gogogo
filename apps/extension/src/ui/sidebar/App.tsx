@@ -187,9 +187,6 @@ export default function App() {
   const [isInspectStarted, setIsInspectStarted] = useState(false);
   const [inspectedObject, setInspectedObject] = useState<ObjectDescription | undefined>(undefined);
 
-  // Refs
-  const stepScriptEditorRef = useRef<any>(null); // todo: remove this one, update script instead
-
   // Computed values
   const isReplaying = uiMode === 'replay';
   const isRecording = uiMode === 'record';
@@ -1182,6 +1179,7 @@ export default function App() {
   useEffect(() => {
     const init = async () => {
       try {
+        console.log('useEffect ==> init');
         // Load last asset from storage
         const result = await chrome.storage.local.get(['lastAsset']);
         const content = result.lastAsset || '';
@@ -1218,6 +1216,7 @@ export default function App() {
       setIsInspectStarted(!isInspectStarted);
     };
     SidebarUtils.handler.on('nodeInspected', onNodeInspected);
+
     const onStepRecorded = ({ step }: any) => {
       if (!selectedStep) return;
       const scripts: string[] = [];
@@ -1227,17 +1226,16 @@ export default function App() {
       if (step.elementScript) scripts.push(step.elementScript);
       if (step.actionScript) scripts.push(step.actionScript);
       const stepScript = (step.await ? 'await ' : '') + scripts.join('.') + ';';
-      if (stepScriptEditorRef.current) {
-        stepScriptEditorRef.current.addStepScript(stepScript);
-      }
+      selectedStep.script = selectedStep.script + '\n' + stepScript;
+      setSelectedStepUid(selectedStep.uid);
     };
     SidebarUtils.handler.on('stepRecorded', onStepRecorded);
-
     return () => {
       SidebarUtils.handler.off('nodeInspected', onNodeInspected);
-      SidebarUtils.handler.off('stepRecorded', onNodeInspected);
+      SidebarUtils.handler.off('stepRecorded', onStepRecorded);
     };
-  }, []);
+
+  }, [updateAllTaskStepResults, updateTaskData, isInspectStarted, selectedStep]);
 
   return (
     <div className="sidebar-container">
