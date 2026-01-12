@@ -502,6 +502,10 @@ export default function App() {
         showNotificationMessage(t('sidebar_btn_action_tree_delete_node_failed'), 3000, 'error');
         return;
       }
+      if (node === taskTree) {
+        showNotificationMessage(t('sidebar_btn_action_tree_delete_node_failed'), 3000, 'error');
+        return;
+      }
       const root = deepRemoveNode((node) => node.id === activeTaskNodeId, taskTree);
       updateTaskData(root);
     }
