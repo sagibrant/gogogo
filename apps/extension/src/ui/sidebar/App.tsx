@@ -1186,7 +1186,7 @@ export default function App() {
       SidebarUtils.handler.off('nodeInspected', onNodeInspected);
       SidebarUtils.handler.off('stepRecorded', onNodeInspected);
     };
-  }, [updateTaskData, taskTree, selectedStepUid, selectedStep, isInspectStarted]);
+  }, []);
 
   return (
     <div className="sidebar-container">
