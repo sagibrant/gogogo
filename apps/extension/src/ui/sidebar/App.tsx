@@ -307,7 +307,7 @@ export default function App() {
     } else {
       loadDemoTask();
     }
-  }, [isIdle, findTaskNode, updateTaskData]);
+  }, [isIdle, taskTree, updateTaskData]);
 
   // Handle load task
   const handleLoadTask = useCallback(() => {
@@ -432,7 +432,7 @@ export default function App() {
 
     const node = findTaskNode((node) => node.id === nodeId, taskTree);
     if (!node) {
-      console.warn(`Task node not found for task node selection - ${nodeId}`);
+      console.warn(`Task node not found for task node selection event - ${nodeId}`);
       return;
     }
     setActiveTaskNodeId(nodeId);
@@ -447,24 +447,24 @@ export default function App() {
 
     const node = findTaskNode((node) => node.id === nodeId, taskTree);
     if (!node) {
-      console.warn(`Task node not found for task node rename - ${nodeId}, ${newName}`);
+      console.warn(`Task node not found for task node name change event - ${nodeId}, ${newName}`);
       return;
     }
 
     const root = deepUpdateNode((node) => node.id === nodeId, taskTree, { name: newName });
     updateTaskData(root);
-  }, [isIdle, uiMode, taskTree]);
+  }, [isIdle, uiMode, taskTree, updateTaskData]);
 
   // Handle task selection
   const handleTaskSelect = useCallback((taskId: string) => {
     if (!taskId) {
-      console.warn('Invalid task id for task selection');
+      console.warn(`Unexpected task node selection event - ${taskId}, uiMode - ${uiMode}`);
       return;
     }
 
     const task = findTaskNode((node) => node.id === taskId && node.type === 'task', taskTree);
     if (!task || task.type !== 'task') {
-      console.warn(`Task not found for task selection - ${taskId}`);
+      console.warn(`Task not found for task node selection event - ${taskId}`);
       return;
     }
 
@@ -472,7 +472,7 @@ export default function App() {
     if (task.steps.findIndex(s => s.uid === selectedStepUid) < 0) {
       setSelectedStepUid('');
     }
-  }, []);
+  }, [isIdle, uiMode, taskTree]);
 
   // Handle the click to display the AddTaskNodeDialog 
   const handleShowAddTaskNodeDialog = useCallback(() => {
