@@ -721,33 +721,18 @@ export default function App() {
       screenshot: undefined
     };
     try {
-      // Update step status to undefined before running
-      let updatedTree = deepUpdateStep(s => s.uid === step.uid, taskTree, { last_error: undefined, last_status: undefined });
-      setTaskTree(updatedTree);
-      console.error('step ready to run', step, updatedTree);
-
       const result = await SidebarUtils.engine.runScript(step.script, true, settings.replaySettings.stepTimeout);
       stepResult.step_end_time = Date.now();
       stepResult.status = 'passed';
       stepResult.result = result;
-
-      // Update step status to passed
-      updatedTree = deepUpdateStep(s => s.uid === step.uid, taskTree, { last_error: undefined, last_status: 'passed' });
-      setTaskTree(updatedTree);
-      console.error('step passed', step, updatedTree);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.stack || error.message : String(error);
       stepResult.step_end_time = Date.now();
       stepResult.status = 'failed';
       stepResult.error = errorMessage;
-
-      // Update step status to failed
-      let updatedTree = deepUpdateStep(s => s.uid === step.uid, taskTree, { last_error: errorMessage, last_status: 'failed' });
-      setTaskTree(updatedTree);
-      console.error('step failed', step, updatedTree);
     }
     return stepResult;
-  }, [deepUpdateStep, taskTree]);
+  }, []);
 
   /**
    * run the give steps on the given taskId, update the step results into the taskResults
@@ -801,6 +786,7 @@ export default function App() {
       console.error('runSteps: attachDebugger failed', error);
     }
 
+    let updatedTree = taskTree;
     try {
       for (const step of steps) {
         if (signal.aborted) {
@@ -809,7 +795,15 @@ export default function App() {
         // select the step on ui
         setSelectedStepUid(step.uid);
 
+        // Update step status to undefined before running
+        updatedTree = deepUpdateStep(s => s.uid === step.uid, updatedTree, { last_error: undefined, last_status: undefined });
+        setTaskTree(updatedTree);
+
         const stepResult = await runStep(step);
+
+        // Update step status passed or failed
+        updatedTree = deepUpdateStep(s => s.uid === step.uid, updatedTree, { last_error: stepResult.error, last_status: stepResult.status });
+        setTaskTree(updatedTree);
 
         const stepResultIndex = taskResult.steps.findIndex(s => s.step_uid === step.uid);
         if (stepResultIndex < 0) {
@@ -864,7 +858,7 @@ export default function App() {
     }
 
     return stepResults;
-  }, [taskTree, findTaskNode, isDebuggerAttached, runStep, taskResults, wait]);
+  }, [taskTree, findTaskNode, isDebuggerAttached, deepUpdateStep, runStep, taskResults, wait]);
 
   // Handle replay
   const handleReplay = useCallback(async () => {
