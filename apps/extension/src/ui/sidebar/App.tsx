@@ -638,7 +638,7 @@ export default function App() {
     }
 
     const updatedTask = { ...task, steps };
-    const root = deepUpdateNode(node => node.id === task.id, task, updatedTask)
+    const root = deepUpdateNode(node => node.id === task.id, taskTree, updatedTask)
     setTaskTree(root);
     setSelectedStepUid(newStep.uid);
 
@@ -647,7 +647,7 @@ export default function App() {
     setEditingStepUid(newStep.uid);
     setEditedStepDescription(newStep.description || '');
     return newStep;
-  }, [isIdle, activeTaskId, selectedStepUid, findTaskNode, t, taskTree]);
+  }, [isIdle, activeTaskId, selectedStepUid, findTaskNode, t, taskTree, deepUpdateNode]);
 
   // Handle remove step
   const handleRemoveStep = useCallback(() => {
