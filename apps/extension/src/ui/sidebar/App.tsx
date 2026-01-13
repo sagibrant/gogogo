@@ -1270,7 +1270,7 @@ export default function App() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex justify-end gap-2 pt-2 flex-row">
-            <AlertDialogCancel onClick={handleConfirmDialogCancel}>
+            <AlertDialogCancel onClick={handleConfirmDialogCancel} autoFocus>
               {t('sidebar_confirm_cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDialogConfirm}>
