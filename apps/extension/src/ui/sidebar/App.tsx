@@ -1459,7 +1459,7 @@ export default function App() {
         </div>
 
         {/* Steps panel */}
-        <div className="steps-panel" onClick={handleStepsPanelClick}>
+        <div className="steps-panel">
           {/* Steps controls */}
           <div className="steps-controls">
             <button
@@ -1541,7 +1541,7 @@ export default function App() {
             </button>
           </div>
           {/* Steps container */}
-          <div className={`steps-container ${isRecording || isReplaying ? 'readonly' : ''}`}>
+          <div className={`steps-container ${isRecording || isReplaying ? 'readonly' : ''}`} onClick={handleStepsPanelClick}>
             {activeSteps.map(step => (
               <div
                 key={step.uid}
