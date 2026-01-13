@@ -339,7 +339,7 @@ export default function App() {
 
     if (task) {
       showConfirmDialog(
-        t('sidebar_btn_action_load_demo_confirm_text'),
+        t('sidebar_btn_action_load_demo_confirm_header'),
         t('sidebar_btn_action_load_demo_confirm_text'),
         loadDemoTask
       );
@@ -534,7 +534,7 @@ export default function App() {
     // todo: change to use shadcn/ui 
     // Confirm deletion 
     showConfirmDialog(
-      t('sidebar_btn_action_tree_delete_node_confirm_message'),
+      t('sidebar_btn_action_tree_delete_node_confirm_header'),
       t('sidebar_btn_action_tree_delete_node_confirm_message'),
       () => {
         // Remove node from tree
@@ -664,7 +664,7 @@ export default function App() {
 
     // Confirm deletion
     showConfirmDialog(
-      t('sidebar_btn_action_steps_delete_step_confirm_message'),
+      t('sidebar_btn_action_steps_delete_step_confirm_header'),
       t('sidebar_btn_action_steps_delete_step_confirm_message'),
       () => {
         const steps = [...task.steps];
@@ -1266,10 +1266,10 @@ export default function App() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleConfirmDialogCancel}>
-              {t('cancel')}
+              {t('sidebar_confirm_cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDialogConfirm}>
-              {t('confirm')}
+              {t('sidebar_confirm_accept')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
