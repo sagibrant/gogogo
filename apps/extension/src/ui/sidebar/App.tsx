@@ -867,6 +867,8 @@ export default function App() {
     }
 
     setUiMode('replay');
+    setIsBottomExpanded(false);
+    setIsTreeCollapsed(true);
 
     const pre_selectedStepUid = selectedStepUid;
     const stepIds = task.steps.map(s => s.uid);
@@ -911,6 +913,7 @@ export default function App() {
     }
 
     setUiMode('replayFromStep');
+    setIsTreeCollapsed(true);
 
     const stepIds = steps.map(s => s.uid);
 
@@ -1270,7 +1273,7 @@ export default function App() {
         <AlertDialogContent className="max-w-[20rem]">
           <AlertDialogHeader>
             <AlertDialogTitle>{alertDialogTitle}</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-left">
               {alertDialogDescription}
             </AlertDialogDescription>
           </AlertDialogHeader>
