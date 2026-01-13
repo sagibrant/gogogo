@@ -1269,11 +1269,11 @@ export default function App() {
               {alertDialogDescription}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="justify-end gap-2 pt-2">
-            <AlertDialogCancel onClick={handleConfirmDialogCancel} className="btn-outline">
+          <AlertDialogFooter className="flex justify-end gap-2 pt-2 flex-row">
+            <AlertDialogCancel onClick={handleConfirmDialogCancel}>
               {t('sidebar_confirm_cancel')}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDialogConfirm} className="btn">
+            <AlertDialogAction onClick={handleConfirmDialogConfirm}>
               {t('sidebar_confirm_accept')}
             </AlertDialogAction>
           </AlertDialogFooter>
