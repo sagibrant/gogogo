@@ -446,6 +446,9 @@ export class TabHandler extends MsgDataHandlerBase {
   async sendCDPCommand(method: string, commandParams?: { [key: string]: unknown }): Promise<void> {
     await this._browserAPI.cdpAPI.sendCommand(this._tabId, method, commandParams);
   }
+  async getInspectMode(): Promise<string> {
+    return this._inspectMode;
+  }
   async toggleInspectMode(): Promise<void> {
     if (this._inspectMode === 'none') {
       const isTabAttachedByOthers = await this._browserAPI.cdpAPI.isTabAttachedByOthers(this._tabId);
@@ -468,6 +471,7 @@ export class TabHandler extends MsgDataHandlerBase {
   }
   async handleInspectNodeRequested(source: DebuggerSession, backendNodeId: number): Promise<void> {
     const details = await this._cdpDOM.getNodeDetails(backendNodeId, source);
+    await this.toggleInspectMode();
     await BackgroundUtils.dispatchEvent('nodeInspected', details);
   }
   async getJavaScriptDialog(): Promise<any> {

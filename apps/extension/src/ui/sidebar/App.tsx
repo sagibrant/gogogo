@@ -3,7 +3,7 @@ import './App.css';
 import TreeNode from './TreeNode';
 import StepScriptEditor, { StepScriptEditorRef } from './StepScriptEditor';
 import StepAIAgent from './StepAIAgent';
-import { TaskAsset, TaskGroup, Task, Step, TaskResult, StepResult, ObjectDescription } from '../../execution/Task';
+import { TaskAsset, TaskGroup, Task, Step, TaskResult, StepResult } from '../../execution/Task';
 import { TaskUtils } from '../../execution/TaskUtils';
 import { SettingUtils, Utils } from "@gogogo/shared";
 import { SidebarUtils } from './SidebarUtils';
@@ -189,8 +189,6 @@ export default function App() {
 
   // require async get, to be set in useEffect
   const [isDebuggerAttached, setIsDebuggerAttached] = useState(false);
-  const [isInspectStarted, setIsInspectStarted] = useState(false);
-  const [inspectedObject, setInspectedObject] = useState<ObjectDescription | undefined>(undefined);
 
   // Refs
   const stepScriptEditorRef = useRef<StepScriptEditorRef | null>(null);
@@ -967,13 +965,6 @@ export default function App() {
     setUiMode('idle');
   }, [isRecording, isReplaying, replayAbortController]);
 
-  // Toggle inspect mode
-  const handleToggleInspectMode = useCallback(async () => {
-    const engine = SidebarUtils.engine;
-    await engine.toggleInspectMode();
-    setIsInspectStarted(!isInspectStarted);
-  }, [isInspectStarted]);
-
   // Toggle CDP attach
   const toggleCDPAttach = useCallback(async () => {
     try {
@@ -1257,20 +1248,9 @@ export default function App() {
       }
     };
     init();
-  }, []);
 
-  // Set up event listeners
-  useEffect(() => {
-    const onNodeInspected = async ({ details }: any) => {
-      setInspectedObject(details);
-      setIsInspectStarted(pre => !pre);
-      const engine = SidebarUtils.engine;
-      await engine.toggleInspectMode();
-    };
-    SidebarUtils.handler.on('nodeInspected', onNodeInspected);
-
+    // Set up event listeners
     const onStepRecorded = async ({ step }: any) => {
-      if (!selectedStep) return;
       const scripts: string[] = [];
       if (step.browserScript) scripts.push(step.browserScript);
       if (step.pageScript) scripts.push(step.pageScript);
@@ -1284,11 +1264,9 @@ export default function App() {
     };
     SidebarUtils.handler.on('stepRecorded', onStepRecorded);
     return () => {
-      SidebarUtils.handler.off('nodeInspected', onNodeInspected);
       SidebarUtils.handler.off('stepRecorded', onStepRecorded);
     };
-
-  }, [selectedStep]);
+  }, []);
 
   return (
     <div className="sidebar-container">
@@ -1517,14 +1495,6 @@ export default function App() {
               ■
             </button>
             <span className="menu-divider"></span>
-            <button
-              className="command-btn"
-              disabled={!(isIdle)}
-              onClick={handleToggleInspectMode}
-              title={!inspectedObject ? t('step_script_editor_btn_title_inspect') : JSON.stringify(inspectedObject, null, 2)}
-            >
-              {!inspectedObject ? "⛶" : "▣"}
-            </button>
             <button
               className="command-btn"
               disabled={!(isIdle)}
