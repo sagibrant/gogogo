@@ -34,6 +34,7 @@ export default function StepScriptEditor({
   const [isDark, setIsDark] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [scriptContent, setScriptContent] = useState(initialScriptContent);
   const [inspectedObject, setInspectedObject] = useState<ElementInfo | undefined>(undefined);
+  const [draggedInspectedObject, setDraggedInspectedObject] = useState<ElementInfo | undefined>(undefined);
 
   // Refs
   const editorRef = useRef<HTMLDivElement>(null);
@@ -53,6 +54,26 @@ export default function StepScriptEditor({
   const handleToggleInspectMode = useCallback(async () => {
     await SidebarUtils.engine.toggleInspectMode();
   }, []);
+
+  const handleDragStart = useCallback((inspectedObject?: ElementInfo) => {
+    setDraggedInspectedObject(inspectedObject);
+  }, []);
+
+  const handleDrop = useCallback((inspectedObject?: ElementInfo) => {
+    if (!inspectedObject || inspectedObject !== draggedInspectedObject) return;
+    const scripts: string[] = [];
+    if (inspectedObject.browserScript) scripts.push(inspectedObject.browserScript);
+    if (inspectedObject.pageScript) scripts.push(inspectedObject.pageScript);
+    if (inspectedObject.frameScript) scripts.push(inspectedObject.frameScript);
+    if (inspectedObject.elementScript) scripts.push(inspectedObject.elementScript);
+    scripts.push('highlight()');
+    const stepScript = 'await ' + scripts.join('.') + ';';
+    setScriptContent(pre => pre ? pre + '\n' + stepScript : stepScript);
+    setDraggedInspectedObject(undefined);
+    const scrollContainer = editorViewRef.current?.scrollDOM;
+    if (!scrollContainer) return;
+    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+  }, [draggedInspectedObject]);
 
   // Initialize CodeMirror editor
   useEffect(() => {
@@ -336,8 +357,13 @@ ${codeContent}
           <div>
             <button
               className="btn btn-inspect"
+              draggable="true"
               onClick={handleToggleInspectMode}
-              title={!inspectedObject ? t('step_script_editor_btn_title_inspect') : JSON.stringify(inspectedObject, null, 2)}
+              onDragStart={(e) => {
+                e.stopPropagation();
+                handleDragStart(inspectedObject);
+              }}
+              title={!inspectedObject ? t('step_script_editor_btn_title_inspect') : JSON.stringify(inspectedObject.element, null, 2)}
             >
               {!inspectedObject ? "⛶" : "▣"}
             </button>
@@ -350,7 +376,16 @@ ${codeContent}
             </button>
           </div>
         </div>
-        <div className="editor-container" ref={editorRef}>
+        <div className="editor-container" ref={editorRef}
+          onDragOver={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onDrop={(e) => {
+            e.stopPropagation();
+            handleDrop(inspectedObject);
+          }}
+        >
         </div>
       </div>
     </div>
