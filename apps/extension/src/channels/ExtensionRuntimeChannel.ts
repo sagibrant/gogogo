@@ -96,7 +96,7 @@ export class ExtensionRuntimeChannel extends ChannelBase {
       else {
         // send message to background
         // try to first ping and then send message
-        await this.ping();
+        await this.ping(msg);
         await chrome.runtime.sendMessage(undefined, msg);
       }
     } catch (error) {
@@ -129,7 +129,7 @@ export class ExtensionRuntimeChannel extends ChannelBase {
       else {
         // send message to background
         // try to first ping and then send message
-        await this.ping();
+        await this.ping(msg);
         response = await chrome.runtime.sendMessage(undefined, msg);
         return response as Message;
       }
@@ -176,7 +176,7 @@ export class ExtensionRuntimeChannel extends ChannelBase {
     }
   }
 
-  private async ping() {
+  private async ping(msg: Message) {
     // ping 3 times
     for (let i = 1; i <= 3; i++) {
       try {
@@ -189,10 +189,10 @@ export class ExtensionRuntimeChannel extends ChannelBase {
         }
       } catch (error) {
         if (i >= 2) {
-          this.logger.warn(`ping round - ${i} failed`, error);
+          this.logger.warn(`ping round - ${i} failed`, error, msg);
         }
         else {
-          this.logger.debug(`ping round - ${i} failed`, error);
+          this.logger.debug(`ping round - ${i} failed`, error, msg);
         }
       }
     }

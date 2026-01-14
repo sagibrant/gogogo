@@ -367,6 +367,14 @@ console.log('await page.sync();');
       .nth(1)
       .click();
     console.log(`await page.frame().nth(1).element().filter([{ "name": "tagName", "value": "DIV" }]).nth(1).click()`);
+    await page
+      .frame()
+      .nth(1)
+      .element()
+      .filter([{ name: 'tagName', value: 'DIV' }])
+      .nth(1)
+      .highlight();
+    console.log(`await page.frame().nth(1).element().filter([{ "name": "tagName", "value": "DIV" }]).nth(1).highlight()`);
     value = await page
       .frame()
       .nth(1)

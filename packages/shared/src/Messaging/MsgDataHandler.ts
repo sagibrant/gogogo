@@ -79,10 +79,15 @@ export abstract class MsgDataHandlerBase<T extends EventMap = any> extends Event
       this.logger.error('handle: ==x error on the message data:', data, error);
       if (resultCallback) {
         let errorMessage = error instanceof Error ? error.stack || error.message : String(error);
-        const runScriptErrorIndicator = 'at async eval (eval at runScript';
-        if (errorMessage.includes('at async eval (eval at runScript')) {
+        const runScriptErrorAsyncEvalIndicator = 'at async eval (eval at runScript';
+        if (errorMessage.includes(runScriptErrorAsyncEvalIndicator)) {
           // simplify the error message from runScript
-          errorMessage = errorMessage.split(runScriptErrorIndicator)[0].trim();
+          errorMessage = errorMessage.split(runScriptErrorAsyncEvalIndicator)[0].trim();
+        }
+        const runScriptErrorEvalIndicator = 'at eval (eval at runScript';
+        if (errorMessage.includes(runScriptErrorEvalIndicator)) {
+          // simplify the error message from runScript
+          errorMessage = errorMessage.split(runScriptErrorEvalIndicator)[0].trim();
         }
         errorMessage = Utils.replaceAll(errorMessage, 'chrome-extension://kpohfimcpcmbcihhpgnjcomihmcnfpna/ui/sidebar/sandbox.js', 'sandbox.js');
         errorMessage = Utils.replaceAll(errorMessage, 'extension://ilcdijkgbkkllhojpgbiajmnbdiadppj/ui/sidebar/sandbox.js', 'sandbox.js');

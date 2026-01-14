@@ -7,6 +7,8 @@
     "rootDir": ".",                                    // Root directory of source files
     "typeRoots": ["./node_modules/@types"],             // Specify where to find type definitions
     "types": ["node"],      // Include type definitions including Chrome extension API types
+    "strict": false,
+    "sourceMap": false,
   },
   "include": ["./src/**/*.ts", "./src/**/*.js"],           // Include all TypeScript and Vue files
   "exclude": ["node_modules", "dist"]                   // Exclude node_modules and output directory
