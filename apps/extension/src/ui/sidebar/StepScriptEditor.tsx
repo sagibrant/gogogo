@@ -10,7 +10,7 @@ import { JSHINT, LintError, LintOptions } from 'jshint';
 import { ayuLight, coolGlow } from 'thememirror';
 import { StepScriptEditorHelper } from './StepScriptEditorHelper';
 import { SidebarUtils } from './SidebarUtils';
-import { ObjectDescription } from '@/execution/Task';
+import { ElementInfo } from '@gogogo/shared';
 
 // Define the interface for the exposed methods
 export interface StepScriptEditorRef {
@@ -33,7 +33,7 @@ export default function StepScriptEditor({
   // State
   const [isDark, setIsDark] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [scriptContent, setScriptContent] = useState(initialScriptContent);
-  const [inspectedObject, setInspectedObject] = useState<ObjectDescription | undefined>(undefined);
+  const [inspectedObject, setInspectedObject] = useState<ElementInfo | undefined>(undefined);
 
   // Refs
   const editorRef = useRef<HTMLDivElement>(null);

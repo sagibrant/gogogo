@@ -213,9 +213,9 @@ export type queryActionName = 'query_objects' | 'query_object' | 'query_property
 export type commandActionName = 'invoke';
 
 /**
- * Type definitions for record
+ * Type definitions for record/inspect
  */
-export type recordActionName = 'record_step';
+export type recordActionName = 'record_step' | 'inspect_object';
 
 /**
  * Type definitions for all action names

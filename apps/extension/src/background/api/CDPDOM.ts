@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { Utils, DOMNode, DOMPath, DOMPathUtils, Step } from "@gogogo/shared";
+import { Utils } from "@gogogo/shared";
 import { ChromeDevToolsProtocol } from "./ChromeDevToolsProtocol";
 import { DebuggerSession } from "./CDPTypes";
 
@@ -57,28 +57,42 @@ export class CDPDOM {
     }
   }
 
-  async getNodeDetails(backendNodeId: number, session?: DebuggerSession): Promise<any> {
+  // async getNodeDetails(backendNodeId: number, session?: DebuggerSession): Promise<any> {
+  //   const target = session ?? { tabId: this._tabId };
+  //   // node => object
+  //   const object = await this.resolveNode(undefined, backendNodeId, target);
+  //   const { objectId } = object as { objectId: string };
+  //   // Serialize DOMPath class to inject into the target frame's context
+  //   const code_DOMNode = DOMNode.toString() + `\n\n`;
+  //   const code_Step = Step.toString() + `\n\n`;
+  //   const code_DOMPath = DOMPath.toString() + `\n\n`;
+  //   const code_DOMPathUtils = DOMPathUtils.toString() + `\n\n`;
+  //   // Function to execute in the target frame: Uses DOMPath to generate details
+  //   const functionDeclaration = `function() {
+  //     ${code_DOMNode}
+  //     ${code_Step}
+  //     ${code_DOMPath}
+  //     ${code_DOMPathUtils}
+  //     let node = this;
+  //     const nodeDetails = DOMPathUtils.getDOMNodeDetails(node);
+  //     return nodeDetails;
+  //   }`;
+  //   const result = await this._cdp.callFunctionOn(target, functionDeclaration, objectId);
+  //   return result?.result?.value || null;
+  // }
+
+  async handleInspectNodeRequested(backendNodeId: number, session?: DebuggerSession): Promise<any> {
     const target = session ?? { tabId: this._tabId };
     // node => object
     const object = await this.resolveNode(undefined, backendNodeId, target);
     const { objectId } = object as { objectId: string };
-    // Serialize DOMPath class to inject into the target frame's context
-    const code_DOMNode = DOMNode.toString() + `\n\n`;
-    const code_Step = Step.toString() + `\n\n`;
-    const code_DOMPath = DOMPath.toString() + `\n\n`;
-    const code_DOMPathUtils = DOMPathUtils.toString() + `\n\n`;
     // Function to execute in the target frame: Uses DOMPath to generate details
     const functionDeclaration = `function() {
-      ${code_DOMNode}
-      ${code_Step}
-      ${code_DOMPath}
-      ${code_DOMPathUtils}
-      let node = this;
-      const nodeDetails = DOMPathUtils.getDOMNodeDetails(node);
-      return nodeDetails;
+      const msg = { source: 'MAIN', funcName: 'inspectNodeRequested', params: [], callbackId: '' };
+      const event = new CustomEvent('_MAIN_To_Content_EVENT_', { detail: msg, bubbles: true, cancelable: true, composed: true });
+      this.dispatchEvent(event);
     }`;
-    const result = await this._cdp.callFunctionOn(target, functionDeclaration, objectId);
-    return result?.result?.value || null;
+    await this._cdp.callFunctionOn(target, functionDeclaration, objectId);
   }
 
   /**

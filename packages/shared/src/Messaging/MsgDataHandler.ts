@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { AODesc, AutomationObject, InvokeAction, MessageData, queryActionName, recordActionName, RecordedStep, Rtid } from "../types/protocol";
+import { AODesc, AutomationObject, ElementInfo, InvokeAction, MessageData, queryActionName, recordActionName, RecordedStep, Rtid } from "../types/protocol";
 import { EventEmitter, EventMap } from "../EventEmitter";
 import { RtidUtils, Utils } from "../Common";
 
@@ -283,6 +283,14 @@ export abstract class MsgDataHandlerBase<T extends EventMap = any> extends Event
       await this.recordStep(step);
       resData.status = 'OK';
     }
+    else if (actionName === 'inspect_object') {
+      const elem = action.params?.elem as ElementInfo;
+      if (!elem) {
+        throw new Error(`Invalid inspect object`);
+      }
+      await this.inspectObject(elem);
+      resData.status = 'OK';
+    }
 
     if (Utils.isNullOrUndefined(resData.status)) {
       throw new Error(`Unsupported action name - ${action.name}`);
@@ -352,4 +360,11 @@ export abstract class MsgDataHandlerBase<T extends EventMap = any> extends Event
     throw new Error("Method not implemented.");
   }
 
+  /**
+   * inspect the element
+   * @param _elem the inspected element information from child 
+   */
+  protected async inspectObject(_elem: ElementInfo): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

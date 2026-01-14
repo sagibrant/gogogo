@@ -317,6 +317,17 @@ export class FrameHandler extends MsgDataHandlerBase {
     return elem.elemInfo;
   }
 
+  async inspectNode(node: Node) {
+    const elem = ContentUtils.getElementByNode(node);
+    if (!elem) return;
+    const elemInfo = await ContentUtils.getElementInfo(elem);
+    if (!elemInfo) return;
+    const frameRtid = ContentUtils.frame.rtid;
+    const rtid = RtidUtils.getTabRtid(frameRtid.tab, -1);
+    const msgData = MsgUtils.createMessageData('record', rtid, { name: 'inspect_object', params: { elem: elemInfo } });
+    await ContentUtils.sendEvent(msgData);
+  }
+
   /** ==================================================================================================================== **/
   /** =================================================== Query methods ================================================== **/
   /** ==================================================================================================================== **/

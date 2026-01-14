@@ -20,11 +20,11 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, MsgDataHandlerBase, AODesc, AutomationObject, DOMElementDescription, InvokeAction, RecordedStep } from "@gogogo/shared";
+import { MsgUtils, RtidUtils, MsgDataHandlerBase, AODesc, AutomationObject, InvokeAction, RecordedStep, ElementInfo } from "@gogogo/shared";
 import { SidebarUtils } from "./SidebarUtils";
 
 interface SidebarEvents {
-  nodeInspected: { details: DOMElementDescription };
+  nodeInspected: { details: ElementInfo };
   stepRecorded: { step: RecordedStep };
 }
 
@@ -41,7 +41,7 @@ export class SidebarHandler extends MsgDataHandlerBase<SidebarEvents> {
   /** ==================================================================================================================== **/
   async onEvent(event: string, data: any): Promise<void> {
     if (event === 'nodeInspected') {
-      const details = data as DOMElementDescription;
+      const details = data as ElementInfo;
       this.emit('nodeInspected', { details });
       return;
     }

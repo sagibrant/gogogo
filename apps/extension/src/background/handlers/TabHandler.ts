@@ -470,9 +470,8 @@ export class TabHandler extends MsgDataHandlerBase {
     }
   }
   async handleInspectNodeRequested(source: DebuggerSession, backendNodeId: number): Promise<void> {
-    const details = await this._cdpDOM.getNodeDetails(backendNodeId, source);
+    await this._cdpDOM.handleInspectNodeRequested(backendNodeId, source);
     await this.toggleInspectMode();
-    await BackgroundUtils.dispatchEvent('nodeInspected', details);
   }
   async getJavaScriptDialog(): Promise<any> {
     return this._browserAPI.cdpAPI.getJavascriptDialog(this._tabId);
@@ -942,5 +941,21 @@ export class TabHandler extends MsgDataHandlerBase {
     const rtid = RtidUtils.getBrowserRtid();
     const msgData = MsgUtils.createMessageData('record', rtid, { name: 'record_step', params: { step: step } });
     await BackgroundUtils.sendEvent(msgData);
+  }
+
+  protected override async inspectObject(elem: ElementInfo): Promise<void> {
+    const elemInfo = Utils.deepClone(elem);
+    elemInfo.pageScript = 'page';
+    if (elemInfo.elementRtid && elemInfo.elementRtid.frame !== this._contentId.frame) {
+      const frameId = elemInfo.elementRtid.frame;
+      const frames = await this.frames();
+      const index = frames.findIndex(f => f.frameId === frameId);
+      elemInfo.frameScript = `frame().nth(${index})`;
+    }
+    else {
+      elemInfo.frameScript = undefined;
+    }
+    // send nodeInspected event to sidebar
+    await BackgroundUtils.dispatchEvent('nodeInspected', elemInfo);
   }
 }

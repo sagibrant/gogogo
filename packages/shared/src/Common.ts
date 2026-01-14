@@ -754,7 +754,7 @@ export class MsgUtils {
       return false;
     }
     const isActionName = (value: unknown): value is ActionName => {
-      return typeof value === 'string' && ['set', 'get', 'query_objects', 'query_object', 'query_property', 'query_properties', 'invoke', 'record_step'].includes(value);
+      return typeof value === 'string' && ['set', 'get', 'query_objects', 'query_object', 'query_property', 'query_properties', 'invoke', 'record_step', 'inspect_object'].includes(value);
     }
     const isValidAction = (value: unknown): value is Action => {
       if (typeof value !== 'object' || Utils.isNullOrUndefined(value)) {

@@ -159,6 +159,21 @@ export class FrameInMAIN {
         }
         params.splice(0, 0, elem);
       }
+      if (funcName === 'inspectNodeRequested') {
+        let target = event.target;
+        if (event.composedPath) {
+          const path = event.composedPath();
+          if (path && path.length > 0) {
+            target = path[0];
+          }
+        }
+        if (!target || target.nodeType !== Node.ELEMENT_NODE) {
+          console.warn(`${funcName}: the target is invalid`, target);
+          return;
+        }
+        params.splice(0);
+        params.push(target);
+      }
 
       const func = (this as any)[funcName] as Function;
       const result = await func.apply(this, params);
@@ -193,6 +208,12 @@ export class FrameInMAIN {
   protected async clickRuntimeElement(elem: Element, options?: ClickOptions) {
     if (elem && elem instanceof Element) {
       await EventSimulator.simulateClick(elem, options);
+    }
+  }
+
+  protected async inspectNodeRequested(node: Node) {
+    if (this._source === 'content' && typeof window.gogogo === 'object' && window.gogogo.frame && window.gogogo.frame.inspectNode) {
+      await window.gogogo.frame.inspectNode(node);
     }
   }
 }
