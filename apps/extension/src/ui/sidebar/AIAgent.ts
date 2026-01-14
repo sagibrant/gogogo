@@ -439,7 +439,7 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
     },
     {
       name: "get_element_from_point",
-      description: "Get the element description from the give position {x, y, width, height}",
+      description: "Get the element description from the give bounding box [xmin, ymin, xmax, ymax]",
       responseFormat: 'content_and_artifact',
       schema: UIElement
     }
