@@ -912,11 +912,11 @@ export class BrowserHandler extends MsgDataHandlerBase<BrowserEvents> {
     if (active && lastFocusedWindow && querySelectors.length === 2) {
       const window = await this._browserAPI.windowAPI.getLastFocused(true);
       if (window.id !== this._activeWindowId) {
-        this.logger.warn(`window cache mismatch: _activeWindowId: ${this._activeWindowId}, lastFocusedWindowId: ${window.id}`);
+        this.logger.debug(`window cache mismatch: _activeWindowId: ${this._activeWindowId}, lastFocusedWindowId: ${window.id}`);
       }
       const tabs = window.tabs?.filter(tab => tab.active).map(tab => Utils.deepClone(tab));
       if (tabs && tabs.length > 0 && (tabs[0].id !== this._activeTabId)) {
-        this.logger.warn(`tab cache mismatch: _activeTabId: ${this._activeTabId}, activeTabId: ${tabs[0].id}`);
+        this.logger.debug(`tab cache mismatch: _activeTabId: ${this._activeTabId}, activeTabId: ${tabs[0].id}`);
       }
       if (tabs) {
         candidates.push(...tabs);
