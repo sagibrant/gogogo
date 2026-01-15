@@ -75,8 +75,10 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
 
   // Event handlers
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter key for new line, handled by default behavior
-    // Shift + Enter also for new line, handled by default behavior
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
   };
 
   const handleSend = async () => {
@@ -151,9 +153,9 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
       </div>
 
       {/* User Input Area */}
-      <div className="user-input-area p-2 shrink-0">
+      <div className="user-input-area pt-2 shrink-0">
         {/* Input Area */}
-        <div className="input-area mb-4">
+        <div className="input-area mb-2">
           <div className="input-container flex items-end space-x-2">
             <Textarea
               ref={inputTextAreaRef}
@@ -168,7 +170,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
         </div>
 
         {/* Bottom Controls */}
-        <div className="bottom-controls border-t border-border bg-background px-1 pt-1">
+        <div className="bottom-controls bg-background pt-1">
           <div className="flex flex-row items-center justify-between gap-2">
             {/* Left Controls */}
             <div className="flex items-center gap-2">
