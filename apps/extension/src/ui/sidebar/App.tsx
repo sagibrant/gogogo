@@ -1597,18 +1597,6 @@ export default function App() {
 
         {/* Bottom section with tabs */}
         <footer className={`sidebar-bottom ${isBottomExpanded ? 'expanded' : ''} ${isRecording || isReplaying ? 'readonly' : ''}`}>
-          <div className="sidebar-bottom-controls">
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={!(activeTaskId && selectedStepUid && isIdle)}
-              onClick={toggleBottomExpanded}
-              title={isBottomExpanded ? t('sidebar_btn_title_bottom_collapse') : t('sidebar_btn_title_bottom_expand')}
-            >
-              ⇵
-            </Button>
-          </div>
-
           {selectedStep && (
             <div className="sidebar-bottom-content">
               <StepScriptEditor
@@ -1620,6 +1608,18 @@ export default function App() {
               />
             </div>
           )}
+          <div className="sidebar-bottom-controls">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!(activeTaskId && selectedStepUid && isIdle)}
+              onClick={toggleBottomExpanded}
+              title={isBottomExpanded ? t('sidebar_btn_title_bottom_collapse') : t('sidebar_btn_title_bottom_expand')}
+              className='w-1'
+            >
+              ⇵
+            </Button>
+          </div>
         </footer>
       </div>
     </ThemeProvider>
