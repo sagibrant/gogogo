@@ -1189,7 +1189,7 @@ export default function App() {
   /** ===================================================== AI Dialog ==================================================== */
   /** ==================================================================================================================== */
   // Run script with new step
-  const runScriptWithNewStep = useCallback(async (script: string, newStep: boolean) => {
+  const runScriptWithNewStep = useCallback(async (script: string, newStep: boolean = true) => {
     if (!script || script.length === 0) {
       throw new Error('Step script is empty');
     }

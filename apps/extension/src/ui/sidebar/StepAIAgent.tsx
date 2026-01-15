@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './StepAIAgent.css';
 import { HumanMessage, SystemMessage } from "langchain";
-import { AgentMode, AIAgent, ChatMessage } from './AIAgent';
+import { AIAgent, ChatMessage } from './AIAgent';
 import { Textarea } from '../components/ui/textarea';
 import { Button } from '../components/ui/button';
 import {
@@ -12,20 +12,17 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { Send } from 'lucide-react';
+import { SettingUtils } from '@gogogo/shared';
 
 interface StepAIAgentProps {
   runScript: (script: string, newStep: boolean) => Promise<any>;
 }
 
-interface ModeOption {
-  name: string;
-  value: AgentMode;
-}
-
 export default function StepAIAgent({ runScript }: StepAIAgentProps) {
   // State
   const [userInput, setUserInput] = useState('');
-  const [agentMode, setAgentMode] = useState<AgentMode>('agent');
+  const [model, setModel] = useState('');
+  const [modelOptions, setModelOptions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const initMessages: ChatMessage[] = (() => {
     const m1 = new SystemMessage('Hello! I\'m your AI assistant. \nHow can I help you today?');
@@ -53,19 +50,23 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
     // new SystemMessage('Hello! I\'m your AI assistant. How can I help you today?')
     ...initMessages
   ]);
+
   const agent = useMemo(() => {
-    const aiAgent = new AIAgent(runScript);
+    const aiSettings = SettingUtils.getSettings().aiSettings;
+    const aiAgent = new AIAgent(aiSettings.baseURL, aiSettings.apiKey, model, runScript);
     return aiAgent;
-  }, [runScript]);
+  }, [model, runScript]);
 
   // Refs
   const inputTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const modeOptions: ModeOption[] = [
-    { name: "Agent", value: 'agent' },
-    { name: "Chat", value: 'chat' }
-  ];
+  // init the models
+  useEffect(() => {
+    const aiSettings = SettingUtils.getSettings().aiSettings;
+    const models = aiSettings.models.split(';').filter(s => s.length > 0);
+    setModelOptions(models);
+  }, [runScript]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -93,7 +94,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
       setChatMessages(prev => [...prev, userMessage]);
       setUserInput('');
       setIsLoading(true);
-      for await (const msg of agent.invoke(userInputValue, agentMode)) {
+      for await (const msg of agent.invoke(userInputValue)) {
         setChatMessages(prev => [...prev, msg]);
       }
       if (inputTextAreaRef.current) {
@@ -178,16 +179,16 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
               {/* Agent/Chat Mode Selection */}
               <div className="flex items-center gap-2">
                 <Select
-                  value={agentMode}
-                  onValueChange={(value) => setAgentMode(value === 'chat' ? 'chat' : 'agent')}
+                  value={model}
+                  onValueChange={(value) => setModel(value)}
                 >
                   <SelectTrigger size="sm" className="w-22">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {modeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.name}
+                    {modelOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
                       </SelectItem>
                     ))}
                   </SelectContent>

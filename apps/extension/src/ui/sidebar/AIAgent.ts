@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 import { Jimp } from "jimp";
-import { Logger, SettingUtils, Utils } from "@gogogo/shared";
+import { Logger, Utils } from "@gogogo/shared";
 import { BaseMessage, AIMessage, ToolMessage, summarizationMiddleware, ReactAgent, HumanMessage } from "langchain";
 import { ChatOpenAI } from '@langchain/openai';
 import { createAgent, createMiddleware, tool } from "langchain";
@@ -31,7 +31,6 @@ import { SidebarUtils } from "./SidebarUtils";
 export interface ChatMessage extends BaseMessage {
   messageType?: 'think' | 'tool' | 'final';
 }
-export type AgentMode = 'agent' | 'chat';
 
 export const UIElement = z.object({
   type: z.string().describe("The type of the element (e.g., button, input, link, checkbox, dropdown, image, etc.)"),
@@ -51,12 +50,16 @@ export const UIPageDetails = z.object({
 export class AIAgent {
   private readonly logger: Logger;
   private runScript: (script: string, newStep: boolean) => Promise<any>;
-  private mode: AgentMode = 'agent';
+  private llm_chat: ChatOpenAI;
+  private llm_vision: ChatOpenAI;
   private agentInstance?: ReactAgent;
-  constructor(runScript: (script: string, newStep: boolean) => Promise<any>) {
-    this.runScript = runScript;
+
+  constructor(baseURL: string, apiKey: string, model: string, runScript: (script: string, newStep: boolean) => Promise<any>) {
     const prefix = Utils.isEmpty(this.constructor?.name) ? "AIAgent" : this.constructor?.name;
     this.logger = new Logger(prefix);
+    this.runScript = runScript;
+    this.llm_chat = this.createModel(baseURL, apiKey, model, 'general');
+    this.llm_vision = this.createModel(baseURL, apiKey, model, 'vision');
   }
 
   /** ==================================================================================================================== */
@@ -186,7 +189,7 @@ You are a versatile professional in web testing and automation. Your outstanding
 * You can try to get some answer directly on the page using tool analyze_page_with_vision if you failed to get result by running the Gogogo scripts with tool run_gogogo_script. e.g.: call tool analyze_page_with_vision with userPrompt "What is the weather today according to this page?".
 * You should use the same language as the user's instruction.
 
-## Script Guidelines:
+## Gogogo API Guidelines:
 * Use Gogogo API to interact with the page and browser, make sure write safe and correct javascript code
 * Use PURE JavaScript script. Although TypeScript definitions of Gogogo API are provided (defined in types.d.ts), DO NOT use TypeScript-specific syntax (type annotations, interfaces, type aliases, enums)
 * Use async/await for all asynchronous operations
@@ -250,7 +253,7 @@ ${api_doc}
 
   private async analyzePageWithVisionModel(userPrompt?: string) {
     try {
-      const visionModel = await this.createModel('vision');
+      const visionModel = this.llm_vision;
       const base64Image = await SidebarUtils.engine.capturePage();// startWith data:image/jpeg;base64,
       const base64Prefix = 'data:image/jpeg;base64,';
       // use Jimp to load the base64Image and get the image size
@@ -267,8 +270,9 @@ ${api_doc}
       }
 
       const systemPrompt = await this.loadVisionSystemPrompt();
-      const userMessage = `This is the screenshot.
-${userPrompt ? userPrompt : "Please summary the page screenshot's content and identify the UI elements."}
+      const userMessage = `This is the page screenshot. You need to analyze the screenshot, summary the screenshot content, identify the UI elements, recognize the texts${userPrompt ? ' and answer user\'s request.' : '.'}
+${userPrompt ? `## User Request
+${userPrompt}` : ""}
 Return the results in the specified JSON schema format, limiting to the 20 most significant elements.`
 
       const messages = [{
@@ -346,7 +350,7 @@ Return the results in the specified JSON schema format, limiting to the 20 most 
 
   private runGogogoScript = tool(
     async ({ script }) => {
-      const result = await this.runScript(script, this.mode === 'agent');
+      const result = await this.runScript(script, true);
       let content = 'The script run completed';
       if (result !== undefined && result !== null) {
         let resultStr = typeof result === 'object' ? `
@@ -466,25 +470,23 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
   /** ==================================================================================================================== */
   /** =================================================== llm instance =================================================== */
   /** ==================================================================================================================== */
-  private async createModel(type: 'general' | 'vision' = 'general',) {
+  private createModel(baseURL: string, apiKey: string, model: string, type: 'vision' | 'general' = 'general') {
     try {
-      const settings = type === 'vision' ? SettingUtils.getSettings().aiVisionSettings : SettingUtils.getSettings().aiSettings;
-      if (!settings.baseURL) {
+      if (!model) {
+        throw new Error('Model not configured');
+      }
+      if (!baseURL) {
         throw new Error('Base URL not configured');
       }
-      if (!settings.apiKey) {
+      if (!apiKey) {
         throw new Error('API key not configured');
-      }
-      let modelName = settings.models.split(';')[0];
-      if (!modelName) {
-        throw new Error('Model not configured');
       }
 
       return new ChatOpenAI({
-        model: modelName,
+        model: model,
         configuration: {
-          baseURL: settings.baseURL,
-          apiKey: settings.apiKey,
+          baseURL: baseURL,
+          apiKey: apiKey,
           dangerouslyAllowBrowser: true,
         },
         temperature: type === 'vision' ? 0 : 0.5, // Lower temperature for vision tasks for more consistent results
@@ -500,7 +502,7 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
 
   private async createAgent() {
     const checkpointer = new MemorySaver();
-    const model = await this.createModel();
+    const model = this.llm_chat;
     const systemPrompt = await this.loadChatSystemPrompt();
     const agent = createAgent({
       model: model,
@@ -666,9 +668,8 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
     }
   }
 
-  async* invoke(message: string, mode: AgentMode = 'agent') {
+  async* invoke(message: string) {
     const userMessage = new HumanMessage(message);
-    this.mode = mode;
 
     if (!this.agentInstance) {
       this.agentInstance = await this.createAgent();
