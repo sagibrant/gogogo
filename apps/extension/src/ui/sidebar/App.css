@@ -125,7 +125,11 @@
   background-color: var(--color-card);
   cursor: pointer;
   transition: all 0.2s;
-  max-height: 60px;
+  height: 60px;
+  overflow: hidden;
+  box-sizing: border-box;
+  gap: 8px;
+  width: 100%;
 }
 
 .step-card:hover {
@@ -153,6 +157,7 @@
 
 .step-type {
   min-width: 40px;
+  flex: 0 0 auto;
   height: 100%;
   padding: 0 12px;
   border-right: 1px solid var(--color-border);
@@ -176,19 +181,27 @@
 
 .step-description {
   flex: 1;
+  min-width: 0;
   padding: 0 12px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .step-description-edit {
   flex: 1;
+  min-width: 0;
   padding: 0 12px;
   min-width: 100px;
+  max-height: 34px;
+  line-height: 32px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .step-status {
   min-width: 24px;
+  flex: 0 0 auto;
   text-align: center;
   font-weight: bold;
 }

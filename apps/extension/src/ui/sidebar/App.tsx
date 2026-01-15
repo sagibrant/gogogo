@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
 import { Separator } from "../components/ui/separator"
 import { ThemeProvider } from '../components/theme-provider';
 
@@ -1531,10 +1532,10 @@ export default function App() {
             {/* Steps container */}
             <div className={`steps-container ${isRecording || isReplaying ? 'readonly' : ''}`} onClick={handleStepsPanelClick}>
               {activeSteps.map(step => (
-                <div
+                <Card
                   key={step.uid}
                   draggable={!!(activeTaskId && isIdle)}
-                  className={`step-card ${selectedStepUid === step.uid ? 'selected' : ''}`}
+                  className={`step-card ${selectedStepUid === step.uid ? 'selected' : ''} flex-row items-center gap-2 px-2 py-2`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleStepSelect(step.uid);
@@ -1590,7 +1591,7 @@ export default function App() {
                   >
                     {getStepLastStatus(step)}
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           </div>

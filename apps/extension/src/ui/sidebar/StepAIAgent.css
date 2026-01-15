@@ -18,15 +18,3 @@
   margin: 0;
   word-wrap: break-word;
 }
-
-/* Override PrimeVue default font sizes with higher specificity */
-/* .ai-agent-container :deep(.p-select-label) {
-  font-size: 0.6rem !important;
-}
- */
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  .ai-agent-container {
-    --vscode-editor-background: #1e1e1e;
-  }
-}
