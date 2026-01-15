@@ -77,7 +77,7 @@ export default function App({ }: AppProps) {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <Command className="action-container">
+      <Command className="action-container text-sm font-sans">
         <CommandList>
           <CommandItem onSelect={openStore} disabled={!isStoreSupported}>
             <Store size={16} className="text-popover-foreground" />
