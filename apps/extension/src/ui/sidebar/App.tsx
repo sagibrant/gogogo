@@ -1617,7 +1617,6 @@ export default function App() {
               disabled={!(activeTaskId && selectedStepUid && isIdle)}
               onClick={toggleBottomExpanded}
               title={isBottomExpanded ? t('sidebar_btn_title_bottom_collapse') : t('sidebar_btn_title_bottom_expand')}
-              className='w-1'
             >
               ⇵
             </Button>

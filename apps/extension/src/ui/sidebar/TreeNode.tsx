@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './TreeNode.css';
+import { Package, PackageOpen, SquareFunction } from 'lucide-react';
 
 export interface TreeNodeType {
   id: string;
@@ -75,17 +76,24 @@ export default function TreeNode({
         ))}
 
         {/* Expand/collapse icon */}
-        {node.type === 'group' && (
+        {/* {node.type === 'group' && (
           <span className="node-icon">
             {isExpanded ? '▼' : '▶'}
           </span>
-        )}
+        )} */}
 
         {/* Node label */}
         {!isEditing ? (
           <span className={`node-label ${isActive ? 'active' : ''}`}>
             <span className="node-type-icon">
-              {node.type === 'group' ? '📁' : '📄'}
+              {node.type === 'group' ?
+                (
+                  isExpanded ? (<PackageOpen size={16} />) : (<Package size={16} />)
+                ) :
+                (
+                  <SquareFunction size={16} />
+                )
+              }
             </span>
             <span className="node-name">
               {node.name}

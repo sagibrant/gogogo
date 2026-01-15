@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import { Send } from 'lucide-react';
 
 interface StepAIAgentProps {
   runScript: (script: string, newStep: boolean) => Promise<any>;
@@ -215,7 +216,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
                 disabled={isLoading}
                 size="icon-sm"
               >
-                {isLoading ? '...' : 'Send'}
+                <Send />
               </Button>
             </div>
           </div>
