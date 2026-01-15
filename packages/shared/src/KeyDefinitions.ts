@@ -1,7 +1,7 @@
 import { BrowserUtils } from "./Common";
 
 /**
- * @copyright 2025 Sagi All Rights Reserved.
+ * @copyright 2026 Sagi All Rights Reserved.
  * @author: Sagi <sagibrant@hotmail.com>
  * @license Apache-2.0
  * @file KeyDefinitions.ts

@@ -1263,8 +1263,21 @@ export default function App() {
     }
     else {
       const settings = SettingUtils.getSettings();
-      const result = await SidebarUtils.engine.runScript(script, true, settings.replaySettings.stepTimeout);
-      return result;
+      try {
+        const result = await SidebarUtils.engine.runScript(script, true, settings.replaySettings.stepTimeout);
+        return result;
+      }
+      catch (error) {
+        let errorMessage = error instanceof Error ? error.stack || error.message : String(error);
+        const stepEngineInvokeFunctionIndicator = 'at StepEngine.invokeFunction';
+        if (errorMessage.includes(stepEngineInvokeFunctionIndicator)) {
+          errorMessage = errorMessage.split(stepEngineInvokeFunctionIndicator)[0].trim();
+        }
+        while (errorMessage.startsWith('Error: ')) {
+          errorMessage = errorMessage.replace('Error: ', '');
+        }
+        return errorMessage;
+      }
     }
   }, [activeTaskId, taskTree, taskResults, findTaskNode, handleAddStep, runStep, setSelectedStepUid, deepUpdateStep, setTaskTree]);
 
