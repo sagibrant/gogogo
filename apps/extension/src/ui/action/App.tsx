@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react';
 import { BrowserUtils, Utils, SettingUtils } from "@gogogo/shared";
+import { ThemeProvider } from '../components/theme-provider';
+import { Command, CommandList, CommandItem } from '../components/ui/command';
 
-// 定义组件props类型
 interface AppProps {
-  // 这里可以添加组件需要的props
 }
 
 export default function App({}: AppProps) {
-  // State with proper typing
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isRecordSupported, _setIsRecordSupported] = useState<boolean>(false);
   const [isStoreSupported, _setIsStoreSupported] = useState<boolean>(false);
 
-  // Fixed translation function with proper typing
   const t = (key: string): string => {
-    return chrome.i18n.getMessage(key) || key; // Fallback to key if message not found
+    return chrome.i18n.getMessage(key) || key;
   };
 
-  // Setup storage change listener
   useEffect(() => {
-    // Load initial state from storage
     chrome.storage.local.get(['isRecording']).then((result) => {
       setIsRecording(result.isRecording as boolean || false);
     });
@@ -32,15 +28,11 @@ export default function App({}: AppProps) {
 
     chrome.storage.onChanged.addListener(storageChangeListener);
 
-    // Cleanup on component unmount
     return () => {
       chrome.storage.onChanged.removeListener(storageChangeListener);
     };
   }, []);
 
-  /**
-   * Open the store URL in a new tab using direct Chrome API
-   */
   const openStore = async (): Promise<void> => {
     try {
       if (!isStoreSupported) {
@@ -58,24 +50,18 @@ export default function App({}: AppProps) {
     }
   };
 
-  /**
-   * Open sidebar panel for current active tab
-   */
   const openSidebar = async (): Promise<void> => {
     try {
       if (!chrome.sidePanel && typeof browser !== 'undefined' && browser.sidebarAction) {
-        // Fallback for browsers that don't support sidePanel API
         await browser.sidebarAction.open();
         return;
       }
-      // Get current active tab
       const [currentTab] = await chrome.tabs.query({
         active: true,
         lastFocusedWindow: true
       });
 
       if (currentTab?.id) {
-        // Open side panel for current tab
         await chrome.sidePanel.open({ tabId: currentTab.id });
       } else {
         throw new Error('The current tab id is missing.');
@@ -86,9 +72,6 @@ export default function App({}: AppProps) {
     }
   };
 
-  /**
-   * Open sidebar panel for current active tab
-   */
   const openOptions = async (): Promise<void> => {
     try {
       const browserInfo = BrowserUtils.getBrowserInfo();
@@ -101,9 +84,6 @@ export default function App({}: AppProps) {
     }
   };
 
-  /**
-   * Toggle recording state and update storage
-   */
   const toggleRecording = async (): Promise<void> => {
     try {
       if (!isRecordSupported) {
@@ -111,9 +91,7 @@ export default function App({}: AppProps) {
         return;
       }
       const newState = !isRecording;
-      // Update storage with new state
       await chrome.storage.local.set({ isRecording: newState });
-      // Local state will be updated via storage change listener
       showNotification(newState ? t('action_notification_recordingStarted') : t('action_notification_recordingStopped'));
       if (newState) {
         await Utils.wait(2000);
@@ -125,9 +103,6 @@ export default function App({}: AppProps) {
     }
   };
 
-  /**
-   * Show error notification
-   */
   const showError = (message: string): void => {
     chrome.notifications.create({
       type: 'basic',
@@ -138,9 +113,6 @@ export default function App({}: AppProps) {
     });
   };
 
-  /**
-   * Show success notification
-   */
   const showNotification = (message: string): void => {
     chrome.notifications.create({
       type: 'basic',
@@ -152,31 +124,32 @@ export default function App({}: AppProps) {
   };
 
   return (
-    <div className="action-container">
-      <button className="menu-item" onClick={openStore} disabled={!isStoreSupported}>
-        <i className="icon store-icon"></i>
-        <span>{t('action_btn_label_store')}</span>
-      </button>
-
-      <button className="menu-item" onClick={openSidebar}>
-        <i className="icon sidebar-icon"></i>
-        <span>{t('action_btn_label_sidebar')}</span>
-      </button>
-
-      <button className="menu-item" onClick={openOptions}>
-        <i className="icon options-icon"></i>
-        <span>{t('action_btn_label_options')}</span>
-      </button>
-
-      <button 
-        className={`menu-item ${isRecording ? 'recording' : ''}`} 
-        disabled={!isRecordSupported}
-        onClick={toggleRecording}
-        hidden={true}
-      >
-        <i className={`icon ${!isRecording ? 'record-icon' : 'stop-icon'}`}></i>
-        <span>{isRecording ? t('action_btn_label_stop') : t('action_btn_label_record')}</span>
-      </button>
-    </div>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <Command className="action-container">
+        <CommandList>
+          <CommandItem onSelect={openStore} disabled={!isStoreSupported}>
+            <i className="icon store-icon"></i>
+            <span>{t('action_btn_label_store')}</span>
+          </CommandItem>
+          <CommandItem onSelect={openSidebar}>
+            <i className="icon sidebar-icon"></i>
+            <span>{t('action_btn_label_sidebar')}</span>
+          </CommandItem>
+          <CommandItem onSelect={openOptions}>
+            <i className="icon options-icon"></i>
+            <span>{t('action_btn_label_options')}</span>
+          </CommandItem>
+          <CommandItem
+            className={isRecording ? 'recording' : ''}
+            disabled={!isRecordSupported}
+            onSelect={toggleRecording}
+            hidden={true}
+          >
+            <i className={`icon ${!isRecording ? 'record-icon' : 'stop-icon'}`}></i>
+            <span>{isRecording ? t('action_btn_label_stop') : t('action_btn_label_record')}</span>
+          </CommandItem>
+        </CommandList>
+      </Command>
+    </ThemeProvider>
   );
 };
