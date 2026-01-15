@@ -163,7 +163,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
               onChange={(e) => setUserInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
-              className="flex-1 min-h-24 max-h-32 resize-none overflow-y-auto text-xs"
+              className="flex-1 min-h-24 max-h-32 resize-none overflow-y-auto text-xs focus-visible:ring-1 focus-visible:ring-blue-500/40 focus-visible:border-blue-500 focus-visible:shadow-none"
               rows={2}
             />
           </div>
