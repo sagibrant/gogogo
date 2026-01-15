@@ -292,10 +292,12 @@
 .sidebar-bottom-content {
   display: flex;
   flex-direction: column;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   gap: 16px;
   padding: 0 0 16px 24px;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
 }
 
 /* Dark Mode Styles */
