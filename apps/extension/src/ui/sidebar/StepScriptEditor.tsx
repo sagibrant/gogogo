@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useImperativeHandle, useCallback, useMemo } from 'react';
 import './StepScriptEditor.css';
-import { EditorView, lineNumbers, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor } from '@codemirror/view';
+import { EditorView, lineNumbers, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, placeholder } from '@codemirror/view';
 import { Compartment, EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { autocompletion, type Completion } from '@codemirror/autocomplete';
@@ -260,6 +260,7 @@ ${codeContent}
       javascript(),
       codeLinter,
       lintGutter(),
+      placeholder(t('step_script_editor_scripts_placeholder')),
       autocompletion({
         override: [createCompletionSource()],
         activateOnTyping: true,

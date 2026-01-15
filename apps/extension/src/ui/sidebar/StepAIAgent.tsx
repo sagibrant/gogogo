@@ -52,6 +52,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
   ]);
 
   const agent = useMemo(() => {
+    if (!model) return null;
     const aiSettings = SettingUtils.getSettings().aiSettings;
     const aiAgent = new AIAgent(aiSettings.baseURL, aiSettings.apiKey, model, runScript);
     return aiAgent;
@@ -66,6 +67,9 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
     const aiSettings = SettingUtils.getSettings().aiSettings;
     const models = aiSettings.models.split(';').filter(s => s.length > 0);
     setModelOptions(models);
+    if (models.length > 0) {
+      setModel(models[0]);
+    }
   }, [runScript]);
 
   // Auto-scroll to bottom when messages change
@@ -84,7 +88,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
   };
 
   const handleSend = async () => {
-    if (!userInput.trim() || isLoading) {
+    if (!userInput.trim() || isLoading || !agent) {
       return;
     }
     try {
@@ -110,7 +114,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
 
   const handleInspect = async () => {
     console.log('Inspect functionality triggered');
-    await agent.toolTest();
+    await agent?.toolTest();
   };
 
   return (

@@ -271,8 +271,8 @@ ${api_doc}
 
       const systemPrompt = await this.loadVisionSystemPrompt();
       const userMessage = `This is the page screenshot. You need to analyze the screenshot, summary the screenshot content, identify the UI elements, recognize the texts${userPrompt ? ' and answer user\'s request.' : '.'}
-${userPrompt ? `## User Request
-${userPrompt}` : ""}
+${!userPrompt ? "" : `## User Request:
+${userPrompt}`}
 Return the results in the specified JSON schema format, limiting to the 20 most significant elements.`
 
       const messages = [{
@@ -687,14 +687,13 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
           if (!step || !content || step === 'SummarizationMiddleware.before_model') {
             continue;
           }
-          this.logger.debug('')
           const msgs = this.toChatMessage(content.messages);
           for (const msg of msgs) {
             yield msg;
           }
         }
       } catch (streamError) {
-        console.warn('Stream error, falling back to regular invoke:', streamError);
+        this.logger.warn('Stream error, falling back to regular invoke:', streamError);
         useStreaming = false;
       }
     }
@@ -742,20 +741,20 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
       console.log("getElementFromPoint(28, 34)", elem);
     }
     {
-      const result1 = await this.runScript(`let a = 1; console.log('debug log', a); return 100;} `, true);
-      console.log('runScript with new step', result1);
-      const result2 = await this.runScript(`let a = 1; console.log('debug log', a); throw new Error("Simulated error");} `, false);
-      console.log('runScript with error', result2);
+      const result1 = await this.runScript(`let a = 1; console.log('debug log', a); return 100; `, true);
+      console.log('runScript with new step, result expect to be 100, now the result is: ', result1);
+      const result2 = await this.runScript(`let a = 1; console.log('debug log', a); throw new Error("Simulated error"); `, false);
+      console.log('runScript with error, result expect to be Error: Simulated error, now the result is: ', result2);
     }
-    {
-      const result = await this.analyzePageWithVisionModel();
-      if (!result) return;
-      for (const element of result.elements) {
-        const elem = await SidebarUtils.engine.getElementFromPoint((element.bbox[0] + element.bbox[2]) / 2, (element.bbox[1] + element.bbox[3]) / 2);
-        console.log("element-", element, " in ", element.bbox, " is ", elem);
-        const script = `await ${elem.pageScript}.${elem.elementScript}.highlight();`;
-        await SidebarUtils.engine.runScript(script);
-      }
-    }
+    // {
+    //   const result = await this.analyzePageWithVisionModel();
+    //   if (!result) return;
+    //   for (const element of result.elements) {
+    //     const elem = await SidebarUtils.engine.getElementFromPoint((element.bbox[0] + element.bbox[2]) / 2, (element.bbox[1] + element.bbox[3]) / 2);
+    //     console.log("element-", element, " in ", element.bbox, " is ", elem);
+    //     const script = `await ${elem.pageScript}.${elem.elementScript}.highlight();`;
+    //     await SidebarUtils.engine.runScript(script);
+    //   }
+    // }
   }
 }

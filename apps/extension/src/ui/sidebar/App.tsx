@@ -5,11 +5,11 @@ import StepScriptEditor, { StepScriptEditorRef } from './StepScriptEditor';
 import StepAIAgent from './StepAIAgent';
 import { TaskAsset, TaskGroup, Task, Step, TaskResult, StepResult } from '../../execution/Task';
 import { TaskUtils } from '../../execution/TaskUtils';
-import { SettingUtils, Utils } from "@gogogo/shared";
+import { BrowserUtils, SettingUtils, Utils } from "@gogogo/shared";
 import { SidebarUtils } from './SidebarUtils';
 import { toast, Toaster } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogClose } from '../components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '../components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
@@ -297,7 +297,7 @@ export default function App() {
   /**
    * Custom confirm dialog using AlertDialog
    */
-  const showConfirmDialog = useCallback((title: string, description: string, onConfirm: () => void) => {
+  const showConfirmDialog = useCallback((title: string, description: string, onConfirm: () => void | Promise<void>) => {
     setAlertDialogTitle(title);
     setAlertDialogDescription(description);
     confirmCallbackRef.current = onConfirm;
@@ -307,9 +307,9 @@ export default function App() {
   /**
    * Handle confirm dialog confirm button click
    */
-  const handleConfirmDialogConfirm = useCallback(() => {
+  const handleConfirmDialogConfirm = useCallback(async () => {
     if (confirmCallbackRef.current) {
-      confirmCallbackRef.current();
+      await confirmCallbackRef.current();
       confirmCallbackRef.current = null;
     }
     setIsAlertDialogOpen(false);
@@ -989,7 +989,26 @@ export default function App() {
   }, [isDebuggerAttached, t, showNotificationMessage]);
 
   // Open AI dialog
-  const openAIDialog = useCallback(() => {
+  const openAIDialog = useCallback(async () => {
+    const settings = SettingUtils.getSettings().aiSettings;
+    if (!settings.baseURL || !settings.apiKey || !settings.models) {
+      showConfirmDialog(
+        t('sidebar_btn_action_steps_ai_assistant_config_settings_confirm_header'),
+        t('sidebar_btn_action_steps_ai_assistant_config_settings_confirm_message'),
+        async () => {
+          try {
+            const browserInfo = BrowserUtils.getBrowserInfo();
+            const prefix = browserInfo.name === 'edge' ? 'extension' : 'chrome-extension';
+            const url = `${prefix}://${chrome.runtime.id}/ui/options/index.html`;
+            await chrome.tabs.create({ url: url });
+          } catch (error) {
+            console.error('Error opening options:', error);
+            showNotificationMessage(t('action_error_failedToOpenOptions'), 3000, 'error');
+          }
+        }
+      );
+      return;
+    }
     setIsAIDialogVisible(true);
   }, []);
 
@@ -1206,17 +1225,48 @@ export default function App() {
       if (!step) {
         throw new Error('No step after adding new step');
       }
-      const stepResults = await runSteps(taskId, [step.uid]);
       setSelectedStepUid(step.uid);
-      const result = stepResults[0].status === 'passed' ? stepResults[0].result : stepResults[0].error;
-      return result;
+
+      let taskResult: TaskResult = {
+        task_id: task.id,
+        task_start_time: Date.now(),
+        task_end_time: -1,
+        status: 'passed',
+        last_error: undefined,
+        steps: []
+      };
+      const taskResultIndex = taskResults.findIndex(r => r.task_id === taskId);
+      if (taskResultIndex >= 0) {
+        taskResult = taskResults[taskResultIndex];
+      }
+      const stepResult = await runStep(step);
+      setTaskTree(prev => deepUpdateStep(s => s.uid === step.uid, prev, { last_error: stepResult.error, last_status: stepResult.status }));
+      taskResult.steps.push(stepResult);
+      taskResult.task_end_time = Date.now();
+      const lastErrorStep = [...taskResult.steps].reverse().find(r => r.status === 'failed');
+      if (lastErrorStep) {
+        taskResult.status = 'failed';
+        taskResult.last_error = lastErrorStep.error;
+      }
+      else {
+        taskResult.status = 'passed';
+      }
+
+      if (taskResultIndex >= 0) {
+        setTaskResults([...taskResults])
+      }
+      else {
+        setTaskResults([...taskResults, taskResult]);
+      }
+
+      return stepResult.status === 'passed' ? stepResult.result : stepResult.error;
     }
     else {
       const settings = SettingUtils.getSettings();
       const result = await SidebarUtils.engine.runScript(script, true, settings.replaySettings.stepTimeout);
       return result;
     }
-  }, [activeTaskId, taskTree, findTaskNode, handleAddStep, runSteps, setSelectedStepUid]);
+  }, [activeTaskId, taskTree, taskResults, findTaskNode, handleAddStep, runStep, setSelectedStepUid, deepUpdateStep, setTaskTree]);
 
   // Initialize component
   useEffect(() => {
@@ -1363,7 +1413,9 @@ export default function App() {
         <Dialog open={isAIDialogVisible} onOpenChange={setIsAIDialogVisible}>
           <DialogContent className="max-w-[20rem]">
             <DialogHeader>
-              <DialogTitle>{t('sidebar_btn_action_steps_ai_assistant_header')}</DialogTitle>
+              <DialogTitle>{t('sidebar_btn_action_steps_ai_assistant_dialog_header')}</DialogTitle>
+              <DialogDescription>
+              </DialogDescription>
             </DialogHeader>
             <StepAIAgent runScript={runScriptWithNewStep} />
           </DialogContent>
