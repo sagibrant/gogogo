@@ -27,7 +27,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
   const [agentMode, setAgentMode] = useState<AgentMode>('agent');
   const [isLoading, setIsLoading] = useState(false);
   const initMessages: ChatMessage[] = (() => {
-    const m1 = new SystemMessage('Hello! I\'m your AI assistant. How can I help you today?');
+    const m1 = new SystemMessage('Hello! I\'m your AI assistant. \nHow can I help you today?');
     const m2 = new HumanMessage('this is the human message');
 
     const m3 = new SystemMessage('prepare call tool');
@@ -129,7 +129,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
                     ? 'bg-yellow-50 text-yellow-800 rounded-bl-none border border-yellow-200 italic dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800'
                     : 'bg-gray-200 text-gray-800 rounded-bl-none dark:bg-muted dark:text-foreground'
             ].join(' ')}>
-              <p>{typeof message.content === 'string' ? message.content : (message.content as any[]).map(block => block.type === 'text' ? block.text : JSON.stringify(block)).join('\n')}</p>
+              <p className="whitespace-pre-wrap">{typeof message.content === 'string' ? message.content : (message.content as any[]).map(block => block.type === 'text' ? block.text : JSON.stringify(block)).join('\n')}</p>
             </div>
           </div>
         ))}
