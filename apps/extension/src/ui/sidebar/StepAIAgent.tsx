@@ -200,7 +200,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
               <Button
                 type="button"
                 variant="outline"
-                size="icon"
+                size="icon-sm"
                 onClick={handleInspect}
                 title="Inspect elements on the page"
               >
@@ -213,7 +213,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
                 onClick={handleSend}
                 title="Send message"
                 disabled={isLoading}
-                size="sm"
+                size="icon-sm"
               >
                 {isLoading ? '...' : 'Send'}
               </Button>

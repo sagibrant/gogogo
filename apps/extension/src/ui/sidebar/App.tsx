@@ -1613,7 +1613,7 @@ export default function App() {
           <div className="sidebar-bottom-controls">
             <Button
               variant="ghost"
-              size="sm"
+              size="icon-sm"
               disabled={!(activeTaskId && selectedStepUid && isIdle)}
               onClick={toggleBottomExpanded}
               title={isBottomExpanded ? t('sidebar_btn_title_bottom_collapse') : t('sidebar_btn_title_bottom_expand')}

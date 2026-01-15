@@ -359,7 +359,7 @@ ${codeContent}
           <div>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon-sm"
               draggable="true"
               onClick={handleToggleInspectMode}
               onDragStart={(e: React.DragEvent) => {
@@ -372,7 +372,7 @@ ${codeContent}
             </Button>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon-sm"
               onClick={runScript}
               title={t('step_script_editor_btn_title_run_script')}
             >
