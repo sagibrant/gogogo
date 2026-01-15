@@ -125,6 +125,7 @@
   background-color: var(--color-card);
   cursor: pointer;
   transition: all 0.2s;
+  max-height: 60px;
 }
 
 .step-card:hover {
