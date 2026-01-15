@@ -1535,7 +1535,7 @@ export default function App() {
                 <Card
                   key={step.uid}
                   draggable={!!(activeTaskId && isIdle)}
-                  className={`step-card ${selectedStepUid === step.uid ? 'selected' : ''} flex-row items-center gap-2 px-2 py-2`}
+                  className={`step-card ${selectedStepUid === step.uid ? 'selected' : ''} flex-row items-center gap-2 px-2 py-2 h-15`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleStepSelect(step.uid);

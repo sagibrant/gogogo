@@ -126,6 +126,8 @@
   cursor: pointer;
   transition: all 0.2s;
   height: 60px;
+  min-height: 60px;
+  max-height: 60px;
   overflow: hidden;
   box-sizing: border-box;
   gap: 8px;
