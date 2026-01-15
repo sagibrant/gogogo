@@ -124,7 +124,7 @@
     "step_script_editor_cb_title_analyze_page_html_disabled":  { "message": "Not supported on this model" },
     "step_script_editor_btn_label_inspect":  { "message": "⛶" },
     "step_script_editor_btn_label_inspected":  { "message": "▣" },
-    "step_script_editor_btn_title_inspect":  { "message": "Select an element in the page for AI" },
+    "step_script_editor_btn_title_inspect":  { "message": "Select an element in the page" },
     "step_script_editor_text_placeholder_ai_chat":  { "message": "Hello! How can I help with your JavaScript scripts?" },
     "step_script_editor_text_placeholder_ai_chat_wait":  { "message": "Waiting for AI response..." },
     "step_script_editor_text_placeholder_ai_chat_demo_token_exceeded":  { "message": "Warning: Token over trial limit. Upgrade to continue." },

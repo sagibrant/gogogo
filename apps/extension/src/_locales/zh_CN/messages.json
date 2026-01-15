@@ -124,7 +124,7 @@
     "step_script_editor_cb_title_analyze_page_html_disabled":  { "message": "暂不支持当前模型" },
     "step_script_editor_btn_label_inspect":  { "message": "⛶" },
     "step_script_editor_btn_label_inspected":  { "message": "▣" },
-    "step_script_editor_btn_title_inspect":  { "message": "在网页中选取对象，传递给AI服务" },
+    "step_script_editor_btn_title_inspect":  { "message": "在网页中选取对象" },
     "step_script_editor_text_placeholder_ai_chat":  { "message": "你好！输入需求，我将为你生成脚本。" },
     "step_script_editor_text_placeholder_ai_chat_wait":  { "message": "等待回复..." },
     "step_script_editor_text_placeholder_ai_chat_demo_token_exceeded":  { "message": "提示：token 超试用额度，建议升级继续使用。" },
