@@ -1,63 +1,59 @@
-# @gogogo/web
+# @gogogo/browser-sdk
 
-Web automation SDK for the Gogogo project. This package provides a comprehensive set of tools for web automation that works across different environments including node, web, and browser extensions.
+Gogogo automation SDK for browser environments. This package targets front-end browser environments (including front-end bundlers like Vite/Webpack), and currently does not support Node.js server-side or SSR usage.
 
 ## Installation
 
 ```bash
-npm install @gogogo/web
+npm install @gogogo/browser-sdk
+# or
+pnpm add @gogogo/browser-sdk
 ```
 
-Or with pnpm:
+## Usage (Front-end Bundler, Recommended)
 
-```bash
-pnpm add @gogogo/web
+Use with front-end bundlers in browser environments:
+
+```javascript
+import { BrowserLocator, AIClient, expect, RuntimeUtils } from '@gogogo/browser-sdk';
+
+// Clear cache objects (optional)
+RuntimeUtils.repo.clear();
+
+// Get current browser and page
+const browser = await new BrowserLocator().get();
+const page = await browser.lastActivePage();
+
+// Example: Click button
+await page.element('#submit-btn').first().click();
+
+// Example: Use AIClient
+const ai = new AIClient();
+await ai.init().setModel('gpt-4o').chat('hello');
 ```
 
-## Usage
+## Usage (Direct UMD Import)
 
-The package provides a fluent API for web automation, similar to:
+No bundling required, directly import the UMD build in your page:
 
-```typescript
-import { Page } from '@gogogo/web';
-
-// Example usage
-const page = new Page();
-await page.element().first().click();
+```html
+<script src="node_modules/@gogogo/browser-sdk/dist/browser/index.js"></script>
+<script>
+  const { BrowserLocator, AIClient, expect, RuntimeUtils } = GogogoWeb;
+  (async () => {
+    RuntimeUtils.repo.clear();
+    const browser = await new BrowserLocator().get();
+    const page = await browser.lastActivePage();
+    await page.element('#submit-btn').first().click();
+  })();
+<\/script>
 ```
 
-## Features
+## Environment Notes
 
-- Cross-environment compatibility (node, web, extension)
-- Fluent API for web automation
-- Comprehensive element selection and interaction
-- Support for frames, windows, dialogs, and other browser contexts
-
-## API Reference
-
-The package exports the following main classes:
-
-- `AIClient` - AI-powered automation client
-- `Browser` - Browser instance management
-- `Page` - Page interaction and navigation
-- `Element` - Element selection and interaction
-- `Frame` - Frame context management
-- `Window` - Window management
-- `Keyboard` - Keyboard input simulation
-- `Mouse` - Mouse input simulation
-- `Locator` - Element location strategies
-- `Channel` - Communication channel management
-- `Dialog` - Dialog handling
-- `Expect` - Assertion and expectation utilities
-- `RuntimeUtils` - Runtime utilities
-- And more...
-
-## Environments
-
-This package is built to work in multiple environments:
-- Node.js applications
-- Web browsers
-- Browser extensions
+- Currently only supported in browser environments; please do not import or use in Node.js server-side or SSR
+- The package's `exports` only exposes `browser` and `types`; modern tools will prioritize the browser entry
+- `main` / `module` fields are for compatibility with some older tools, but do not indicate Node runtime support
 
 ## License
 
