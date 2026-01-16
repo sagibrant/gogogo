@@ -587,35 +587,35 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
             let toolCallMsg = '';
             switch (toolCall.name) {
               case 'get_gogogo_api_document': {
-                toolCallMsg = 'Loading Gogogo API Documentation';
+                toolCallMsg = 'Loading Gogogo API documentation…';
                 break;
               }
               case 'get_gogogo_api_definition': {
-                toolCallMsg = 'Loading Gogogo API Definition';
+                toolCallMsg = 'Loading Gogogo API definitions…';
                 break;
               }
               case 'run_gogogo_script': {
                 if (toolCall.args?.script) {
-                  toolCallMsg = `Running script
+                  toolCallMsg = `Executing script:
 \`\`\`javascript
  ${toolCall.args?.script}
 \`\`\``;
                 }
                 else {
-                  toolCallMsg = `Running script`;
+                  toolCallMsg = `Executing script…`;
                 }
                 break;
               }
               case 'get_page_info': {
-                toolCallMsg = 'Retrieving page information';
+                toolCallMsg = 'Retrieving page info…';
                 break;
               }
               case 'analyze_page_with_vision': {
-                toolCallMsg = 'Analyzing page with vision model';
+                toolCallMsg = 'Analyzing page screenshot…';
                 break;
               }
               case 'get_element_from_point': {
-                toolCallMsg = 'Getting element from coordinates';
+                toolCallMsg = 'Resolving element from bbox coordinates…';
                 break;
               }
               default:
@@ -646,82 +646,82 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
         let toolCallResultMsg = '';
         switch (toolMessage.name) {
           case 'get_gogogo_api_document': {
-            toolCallResultMsg = 'Gogogo API Documentation loaded successfully';
+            toolCallResultMsg = 'API documentation loaded';
             break;
           }
           case 'get_gogogo_api_definition': {
-            toolCallResultMsg = 'Gogogo API Definition loaded successfully';
+            toolCallResultMsg = 'API definitions loaded';
             break;
           }
           case 'run_gogogo_script': {
             if (toolMessage.artifact) {
-              const jsonArtifact = JSON.stringify(toolMessage.artifact);
+              const jsonArtifact = JSON.stringify(toolMessage.artifact, null, 2);
               if (jsonArtifact) {
-                toolCallResultMsg = `Script executed successfully\n
+                toolCallResultMsg = `Script completed. Result:
 \`\`\`json
 ${jsonArtifact}
 \`\`\``;
               }
               else {
-                toolCallResultMsg = 'Script executed successfully';
+                toolCallResultMsg = 'Script completed';
               }
             }
             else {
-              toolCallResultMsg = 'Script executed successfully';
+              toolCallResultMsg = 'Script completed';
             }
             break;
           }
           case 'get_page_info': {
             if (toolMessage.artifact) {
-              const jsonArtifact = JSON.stringify(toolMessage.artifact);
+              const jsonArtifact = JSON.stringify(toolMessage.artifact, null, 2);
               if (jsonArtifact) {
-                toolCallResultMsg = `Page information retrieved
+                toolCallResultMsg = `Page info:
 \`\`\`json
 ${jsonArtifact}
 \`\`\``;
               }
               else {
-                toolCallResultMsg = 'Page information retrieved successfully';
+                toolCallResultMsg = 'Page info retrieved';
               }
             }
             else {
-              toolCallResultMsg = 'Page information retrieved successfully';
+              toolCallResultMsg = 'Page info retrieved';
             }
             break;
           }
           case 'analyze_page_with_vision': {
             if (toolMessage.artifact) {
-              const jsonArtifact = JSON.stringify(toolMessage.artifact);
+              const jsonArtifact = JSON.stringify(toolMessage.artifact, null, 2);
               if (jsonArtifact) {
-                toolCallResultMsg = `Page analysis completed:
+                toolCallResultMsg = `Vision analysis:
 \`\`\`json
 ${jsonArtifact}
 \`\`\``;
               }
               else {
-                toolCallResultMsg = 'Page analysis completed';
+                toolCallResultMsg = 'Vision analysis completed';
               }
             }
             else {
-              toolCallResultMsg = 'Page analysis complete';
+              toolCallResultMsg = 'Vision analysis completed';
             }
             break;
           }
           case 'get_element_from_point': {
             if (toolMessage.artifact) {
-              const jsonArtifact = JSON.stringify(toolMessage.artifact);
+              const jsonArtifact = JSON.stringify(toolMessage.artifact, null, 2);
               if (jsonArtifact) {
-                toolCallResultMsg = `Element retrieved from coordinates:
+                toolCallResultMsg = `Element resolved:
 \`\`\`json
 ${jsonArtifact}
 \`\`\``;
               }
               else {
-                toolCallResultMsg = 'Element retrieved from coordinates';
+                toolCallResultMsg = 'Element resolved from coordinates';
               }
             }
             else {
-              toolCallResultMsg = 'Element retrieved from coordinates';
+              toolCallResultMsg = 'Element resolved from coordinates';
             }
             break;
           }
