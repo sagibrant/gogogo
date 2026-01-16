@@ -35,7 +35,7 @@ export default [
   ...tailwind.configs["flat/recommended"].map(cfg => ({
     ...cfg,
     files: [
-      'apps/extension/src/**/*.{js,ts,tsx,vue}',
+      'apps/extension/src/**/*.{tsx,jsx,vue,html}',
     ],
   })),
   eslintConfigPrettier,

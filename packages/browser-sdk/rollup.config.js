@@ -25,8 +25,6 @@ const config = [
       })
     ],
     external: [
-      // Add any external dependencies that should not be bundled
-      '@gogogo/shared',
       'openai'
     ]
   },
@@ -51,8 +49,6 @@ const config = [
       })
     ],
     external: [
-      // Add any external dependencies that should not be bundled
-      '@gogogo/shared',
       'openai'
     ]
   },
@@ -65,11 +61,9 @@ const config = [
       format: 'umd',
       name: 'GogogoWeb',
       sourcemap: true,
-      globals: {
-        // Define global variables for external dependencies if any
-        '@gogogo/shared': 'GogogoShared',
-        'openai': 'OpenAI'
-      }
+    globals: {
+      'openai': 'OpenAI'
+    }
     },
     plugins: [
       nodeResolve({
@@ -83,8 +77,6 @@ const config = [
       })
     ],
     external: [
-      // Add any external dependencies that should not be bundled
-      '@gogogo/shared',
       'openai'
     ]
   },

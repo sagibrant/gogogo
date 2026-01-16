@@ -1,4 +1,4 @@
-import { expect, BrowserLocator, RuntimeUtils, AIClient } from "@gogogo/web";
+import { expect, BrowserLocator, RuntimeUtils, AIClient } from "@gogogo/browser-sdk";
 
 export class GogogoUtils {
   static async runScript(script: string, url?: string): Promise<any> {

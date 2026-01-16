@@ -64,7 +64,7 @@
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.6",
     "@gogogo/shared": "workspace:*",
-    "@gogogo/web": "workspace:*",
+    "@gogogo/browser-sdk": "workspace:*",
     "@langchain/core": "^1.1.8",
     "@langchain/langgraph": "^1.0.7",
     "@langchain/openai": "^1.2.0",
