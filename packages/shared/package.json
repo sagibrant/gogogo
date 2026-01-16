@@ -2,7 +2,7 @@
   "name": "@gogogo/shared",
   "private": true,
   "version": "0.1.0",
-  "description": "Shared utilities for gogogo project that work across web, node, and extension environments",
+  "description": "Shared utilities for gogogo project",
   "repository": "https://github.com/sagibrant/gogogo",
   "homepage": "https://qagogogo.com/",
   "type": "module",

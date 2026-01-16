@@ -1,7 +1,7 @@
 {
   "name": "@gogogo/browser-sdk",
   "version": "0.1.0",
-  "description": "Browser automation SDK for Gogogo project (browser-only publish)",
+  "description": "Browser automation SDK for Gogogo project",
   "repository": "https://github.com/sagibrant/gogogo",
   "homepage": "https://qagogogo.com/",
   "type": "module",
