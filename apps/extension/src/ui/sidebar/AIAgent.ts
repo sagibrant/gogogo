@@ -484,13 +484,22 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
   /** ==================================================================================================================== */
   private handleToolErrors = createMiddleware({
     name: "HandleToolErrors",
-    wrapToolCall: (request, handler) => {
+    wrapToolCall: async (request, handler) => {
       try {
-        return handler(request);
+        return await handler(request);
       } catch (error) {
-        // Return a custom error message to the model
+        const toolName = request.toolCall.name;
+        const errMsg = error instanceof Error ? (error.stack || error.message) : String(error);
+        let guidance = "Tool error occurred. ";
+        if (toolName === "run_gogogo_script") {
+          guidance += "Use Gogogo API only. Review API definition and document. Simplify the script or consider analyze_page_with_vision for Q&A.";
+        } else if (toolName === "get_element_from_point") {
+          guidance += "Verify bbox coordinates in normalized 0–1000 space and consider alternative candidate elements.";
+        } else if (toolName === "analyze_page_with_vision") {
+          guidance += "Refine the userPrompt or reduce the number of requested elements.";
+        }
         return new ToolMessage({
-          content: `Tool error: Please check your input and try again. (${error instanceof Error ? error.stack || error.message : String(error)})`,
+          content: `${guidance} (${errMsg})`,
           tool_call_id: request.toolCall.id!,
         });
       }
