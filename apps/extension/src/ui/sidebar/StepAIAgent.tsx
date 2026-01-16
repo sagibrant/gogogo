@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-import { Send } from 'lucide-react';
+import { Ellipsis, Send } from 'lucide-react';
 import { CryptoUtil, SettingUtils } from '@gogogo/shared';
 
 interface StepAIAgentProps {
@@ -136,12 +136,10 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
             <div className={[
               'rounded-2xl px-4 py-2 max-w-[85%]',
               message.type === 'human'
-                ? 'bg-blue-500 text-white rounded-br-none dark:bg-blue-600'
-                : message.messageType === 'tool'
-                  ? 'bg-purple-100 text-purple-800 rounded-bl-none border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800'
-                  : message.messageType === 'think'
-                    ? 'bg-yellow-50 text-yellow-800 rounded-bl-none border border-yellow-200 italic dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800'
-                    : 'bg-gray-200 text-gray-800 rounded-bl-none dark:bg-muted dark:text-foreground'
+                ? 'message-human rounded-br-none'
+                : message.messageType === 'tool' || message.messageType === 'think'
+                  ? 'message-secondary italic rounded-bl-none'
+                  : 'message-default rounded-bl-none'
             ].join(' ')}>
               <p className="whitespace-pre-wrap">{typeof message.content === 'string' ? message.content : (message.content as any[]).map(block => block.type === 'text' ? block.text : JSON.stringify(block)).join('\n')}</p>
             </div>
@@ -229,7 +227,7 @@ export default function StepAIAgent({ runScript }: StepAIAgentProps) {
                 disabled={isLoading}
                 size="icon-sm"
               >
-                <Send />
+                {isLoading ? (<Ellipsis />) : (<Send />)}
               </Button>
             </div>
           </div>

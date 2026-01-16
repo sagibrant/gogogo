@@ -18,3 +18,23 @@
   margin: 0;
   word-wrap: break-word;
 }
+
+.message-human {
+  background-color: var(--color-muted);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  font-weight: 500;
+}
+
+.message-secondary {
+  background-color: var(--color-muted);
+  color: var(--color-muted-foreground);
+  border: 1px solid var(--color-border);
+  font-style: italic;
+}
+
+.message-default {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+}
