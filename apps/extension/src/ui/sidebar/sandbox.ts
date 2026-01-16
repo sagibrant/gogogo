@@ -21,7 +21,7 @@
  */
 
 import { SettingUtils } from "@gogogo/shared";
-import { RuntimeUtils } from "@gogogo/web";
+import { RuntimeUtils } from "@gogogo/browser-sdk";
 import { SandboxHandler } from "./SandboxHandler";
 import { SandboxDispatcher } from "./SandboxDispatcher";
 

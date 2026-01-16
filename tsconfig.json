@@ -10,7 +10,7 @@
     "rootDir": ".",                                     // Root directory of source files
     "paths": {                                          // Path alias for source files
       "@shared": ["./packages/shared/src/*"], 
-      "@web": ["./packages/web/src/*"], 
+      "@browser-sdk": ["./packages/browser-sdk/src/*"], 
     },                       
 
     // Type checking

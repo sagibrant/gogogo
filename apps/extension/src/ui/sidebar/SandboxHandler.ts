@@ -21,7 +21,7 @@
  */
 
 import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, MsgDataHandlerBase, Settings, SettingUtils } from "@gogogo/shared";
-import { expect, BrowserLocator, RuntimeUtils, AIClient } from "@gogogo/web";
+import { expect, BrowserLocator, RuntimeUtils, AIClient } from "@gogogo/browser-sdk";
 
 export class SandboxHandler extends MsgDataHandlerBase {
 

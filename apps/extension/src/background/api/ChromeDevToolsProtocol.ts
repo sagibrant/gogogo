@@ -569,7 +569,7 @@ export class ChromeDevToolsProtocol extends EventEmitter<CDPEvents> {
          *      },
          *      id: 12,
          *      name: "",
-         *      origin: "http://mama.swinfra.net",
+         *      origin: "http://demo.example.net",
          *      uniqueId: "7854474203346722172.-5914632085921131557"
          *  }
          * }
@@ -701,7 +701,7 @@ export class ChromeDevToolsProtocol extends EventEmitter<CDPEvents> {
          *  frame: { 
          *      adFrameStatus: {adFrameType: 'none'},
          *      crossOriginIsolatedContextType: "NotIsolated",
-         *      domainAndRegistry: "swinfra.net",
+         *      domainAndRegistry: "example.net",
          *      gatedAPIFeatures: [],
          *      id: "9402047E45B1745F42A98167EDBE25B4",
          *      loaderId: "6EE0314E5EE7AB62595024AC07FC4E5C",
@@ -709,8 +709,8 @@ export class ChromeDevToolsProtocol extends EventEmitter<CDPEvents> {
          *      name: "frame"
          *      parentId: "57784D671172321996AB58ECE63F0DE2"
          *      secureContextType: "InsecureScheme",
-         *      securityOrigin: "http://mama.swinfra.net",
-         *      url: "http://mama.swinfra.net/war/web_aut/Frames/frame_cross_origin.html" 
+         *      securityOrigin: "http://demo.example.net",
+         *      url: "http://demo.example.net/war/web_aut/Frames/frame_cross_origin.html" 
          *  },
          *  type: "Navigation"
          * }

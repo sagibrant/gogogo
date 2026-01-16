@@ -42,7 +42,7 @@ export class BackgroundUtils {
     } as InvokeAction);
     // event to sidebar
     await BackgroundUtils.sendEvent(msgData);
-    // event to all content MAIN worlds in case @gogogo/web is used there
+    // event to all content MAIN worlds in case @gogogo/browser-sdk is used there
     await BackgroundUtils.broadcastEvent(msgData);
   }
 
