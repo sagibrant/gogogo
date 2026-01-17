@@ -23,6 +23,7 @@ export type { Settings } from './SettingUtils';
 export * from './Logger';
 export * from './DOMNode';
 export * from './EventEmitter';
+export * from './WaitUtils';
 
 // Export messaging utilities
 export * from './Messaging/ChannelBase';

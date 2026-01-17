@@ -202,13 +202,6 @@ const USKeyboardLayout: Record<string, KeyDefinition> = {
 };
 
 /**
- * Key Definitions Map
- * Map from 'key', 'code' and 'shiftKey' to KeyDescription
- * Reference: https://www.w3.org/TR/uievents-key/
- */
-export const KeyDefinitions: Map<string, KeyDescription> = buildLayoutClosure();
-
-/**
    * 
    * Build a closure map from layout definition
    * Map from 'key', 'code' and 'shiftKey' to KeyDescription
@@ -285,3 +278,10 @@ function buildLayoutClosure(layout?: Record<string, KeyDefinition>): Map<string,
   }
   return result;
 }
+
+/**
+ * Key Definitions Map
+ * Map from 'key', 'code' and 'shiftKey' to KeyDescription
+ * Reference: https://www.w3.org/TR/uievents-key/
+ */
+export const KeyDefinitions: Map<string, KeyDescription> = buildLayoutClosure();
