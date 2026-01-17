@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 import * as Utils from "./Utils";
-import { SettingUtils } from "./SettingUtils";
+import * as SettingUtils from "./SettingUtils";
 
 export enum LogLevel {
   TRACE = 1, // Lowest priority

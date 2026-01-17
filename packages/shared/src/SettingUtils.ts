@@ -49,185 +49,186 @@ interface Settings {
   recordSettings: RecordSettings;
 }
 
-export class SettingUtils {
+interface InternalSettingsCache {
+  settings: Settings;
+  onChangedListener?: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void;
+}
 
-  private static settings: Settings = SettingUtils.defaultSettings();
-  private static onChangedListener: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void;
+const cachedSettings: InternalSettingsCache = {
+  settings: getDefaultSettings()
+};
 
-  public static isSettings(data: unknown): data is Settings {
-    if (Utils.isNullOrUndefined(data)) {
-      return false;
+export function getDefaultSettings(): Settings {
+  return {
+    storeURL: '',
+    logLevel: 'WARN',
+    aiSettings: {
+      baseURL: '',
+      apiKey: '',
+      models: ''
+    },
+    replaySettings: {
+      attachDebugger: true,
+      autoSync: true,
+      autoActionCheck: true,
+      inputMode: 'auto',
+      stepTimeout: 300000,
+      stepInterval: 1000,
+      locatorTimeout: 5000,
+      captureScreenshot: false
+    },
+    recordSettings: {
+      recordNavigation: true
     }
-    const settings = data as Record<string, unknown>;
-    const defaultSettings = SettingUtils.defaultSettings();
-    Utils.fillWithDefaultValues(settings, defaultSettings);
-    const checks = [
-      typeof settings.storeURL === 'string',
-      typeof settings.logLevel === 'string' && ['TRACE', 'DEBUG', 'LOG', 'INFO', 'WARN', 'ERROR'].includes(settings.logLevel),
-      typeof settings.aiSettings === 'object',
-      typeof settings.replaySettings === 'object',
-      typeof settings.recordSettings === 'object',
-    ];
-    if (checks.some(c => !c)) {
-      return false;
-    }
+  };
+}
 
-    const check_aiSettings = [
-      typeof (settings.aiSettings as AISettings).apiKey === 'string',
-      typeof (settings.aiSettings as AISettings).baseURL === 'string',
-      typeof (settings.aiSettings as AISettings).models === 'string',
-    ];
-    if (check_aiSettings.some(c => !c)) {
-      return false;
-    }
-
-    const check_replaySettings = [
-      typeof (settings.replaySettings as ReplaySettings).attachDebugger === 'boolean',
-      typeof (settings.replaySettings as ReplaySettings).autoSync === 'boolean',
-      typeof (settings.replaySettings as ReplaySettings).autoActionCheck === 'boolean',
-      typeof (settings.replaySettings as ReplaySettings).inputMode === 'string' && ['auto', 'event', 'cdp'].includes((settings.replaySettings as ReplaySettings).inputMode),
-      typeof (settings.replaySettings as ReplaySettings).stepTimeout === 'number',
-      typeof (settings.replaySettings as ReplaySettings).stepInterval === 'number',
-      typeof (settings.replaySettings as ReplaySettings).locatorTimeout === 'number',
-      typeof (settings.replaySettings as ReplaySettings).captureScreenshot === 'boolean'
-    ];
-    if (check_replaySettings.some(c => !c)) {
-      return false;
-    }
-
-    const check_recordSettings = [
-      typeof (settings.recordSettings as RecordSettings).recordNavigation === 'boolean',
-    ];
-    if (check_recordSettings.some(c => !c)) {
-      return false;
-    }
-
-    return true;
+export function isSettings(data: unknown): data is Settings {
+  if (Utils.isNullOrUndefined(data)) {
+    return false;
+  }
+  const settings = data as Record<string, unknown>;
+  const defaultSettings = getDefaultSettings();
+  Utils.fillWithDefaultValues(settings, defaultSettings);
+  const checks = [
+    typeof settings.storeURL === 'string',
+    typeof settings.logLevel === 'string' && ['TRACE', 'DEBUG', 'LOG', 'INFO', 'WARN', 'ERROR'].includes(settings.logLevel),
+    typeof settings.aiSettings === 'object',
+    typeof settings.replaySettings === 'object',
+    typeof settings.recordSettings === 'object',
+  ];
+  if (checks.some(c => !c)) {
+    return false;
   }
 
-  public static parse2Settings(text: string): Settings | null {
-    try {
-      const settings = JSON.parse(text);
-      if (!SettingUtils.isSettings(settings)) {
-        return null;
-      }
-      return settings as Settings;
-    } catch (error) {
-      console.error('parse2Settings Error:', error, ' text:', text);
+  const check_aiSettings = [
+    typeof (settings.aiSettings as AISettings).apiKey === 'string',
+    typeof (settings.aiSettings as AISettings).baseURL === 'string',
+    typeof (settings.aiSettings as AISettings).models === 'string',
+  ];
+  if (check_aiSettings.some(c => !c)) {
+    return false;
+  }
+
+  const check_replaySettings = [
+    typeof (settings.replaySettings as ReplaySettings).attachDebugger === 'boolean',
+    typeof (settings.replaySettings as ReplaySettings).autoSync === 'boolean',
+    typeof (settings.replaySettings as ReplaySettings).autoActionCheck === 'boolean',
+    typeof (settings.replaySettings as ReplaySettings).inputMode === 'string' && ['auto', 'event', 'cdp'].includes((settings.replaySettings as ReplaySettings).inputMode),
+    typeof (settings.replaySettings as ReplaySettings).stepTimeout === 'number',
+    typeof (settings.replaySettings as ReplaySettings).stepInterval === 'number',
+    typeof (settings.replaySettings as ReplaySettings).locatorTimeout === 'number',
+    typeof (settings.replaySettings as ReplaySettings).captureScreenshot === 'boolean'
+  ];
+  if (check_replaySettings.some(c => !c)) {
+    return false;
+  }
+
+  const check_recordSettings = [
+    typeof (settings.recordSettings as RecordSettings).recordNavigation === 'boolean',
+  ];
+  if (check_recordSettings.some(c => !c)) {
+    return false;
+  }
+
+  return true;
+}
+
+export function parse2Settings(text: string): Settings | null {
+  try {
+    const settings = JSON.parse(text) as unknown;
+    if (!isSettings(settings)) {
       return null;
     }
+    return settings as Settings;
+  } catch (error) {
+    console.error('parse2Settings Error:', error, ' text:', text);
+    return null;
   }
+}
 
-  public static defaultSettings(): Settings {
-    return {
-      storeURL: '',
-      logLevel: 'WARN',
-      aiSettings: {
-        baseURL: '',
-        apiKey: '',
-        models: ''
-      },
-      replaySettings: {
-        attachDebugger: true,
-        autoSync: true,
-        autoActionCheck: true,
-        inputMode: 'auto',
-        stepTimeout: 300000,
-        stepInterval: 1000,
-        locatorTimeout: 5000,
-        captureScreenshot: false
-      },
-      recordSettings: {
-        recordNavigation: true
-      }
-    };
-  }
-
-  static async init(): Promise<void> {
-    try {
-      if (!SettingUtils.onChangedListener) {
-        SettingUtils.onChangedListener = (changes, areaName) => {
-          if (areaName !== 'local') {
-            return;
-          }
-          if ('settings' in changes) {
-            const newValue = changes['settings'].newValue as string;
-            if (newValue) {
-              const newSettings = SettingUtils.parse2Settings(newValue);
-              if (newSettings) {
-                SettingUtils.settings = newSettings;
-              }
-            }
-            else {
-              SettingUtils.settings = SettingUtils.defaultSettings();
+export async function init(): Promise<void> {
+  try {
+    if (!cachedSettings.onChangedListener) {
+      cachedSettings.onChangedListener = (changes, areaName): void => {
+        if (areaName !== 'local') {
+          return;
+        }
+        if ('settings' in changes) {
+          const newValue = changes['settings'].newValue;
+          if (newValue && typeof newValue === 'string') {
+            const newSettings = parse2Settings(newValue);
+            if (newSettings) {
+              cachedSettings.settings = newSettings;
             }
           }
-        };
-        StorageUtils.AddOnChangedListener(SettingUtils.onChangedListener);
-      }
-      await SettingUtils.load();
-    } catch (error) {
-      console.error('init Error:', error);
-    }
-  }
-
-  static async load(data?: Settings): Promise<Settings | undefined> {
-    try {
-      if (data && SettingUtils.isSettings(data)) {
-        const newSettings = data as Settings;
-        SettingUtils.settings = newSettings;
-      }
-      else {
-        const result = await StorageUtils.get('settings');
-        if (result) {
-          const newSettings = SettingUtils.parse2Settings(result);
-          if (newSettings) {
-            SettingUtils.settings = newSettings;
+          else {
+            cachedSettings.settings = getDefaultSettings();
           }
         }
+      };
+      StorageUtils.AddOnChangedListener(cachedSettings.onChangedListener);
+    }
+    await load();
+  } catch (error) {
+    console.error('init Error:', error);
+  }
+}
+
+export async function load(data?: Settings): Promise<Settings | undefined> {
+  try {
+    if (data && isSettings(data)) {
+      const newSettings = data as Settings;
+      cachedSettings.settings = newSettings;
+    }
+    else {
+      const result = await StorageUtils.get('settings');
+      if (result) {
+        const newSettings = parse2Settings(result);
+        if (newSettings) {
+          cachedSettings.settings = newSettings;
+        }
       }
-    } catch (error) {
-      console.error('load Error:', error, ' data:', data);
     }
-    finally {
-      return SettingUtils.settings;
+    return cachedSettings.settings;
+  } catch (error) {
+    console.error('load Error:', error, ' data:', data);
+    return cachedSettings.settings;
+  }
+}
+
+export async function save(settings?: Settings): Promise<Settings> {
+  try {
+    if (settings && !isSettings(settings)) {
+      throw new Error('Invalid Settings');
     }
+    settings = settings || cachedSettings.settings;
+    const strValue = JSON.stringify(settings, null, 2);
+    await StorageUtils.set('settings', strValue);
+    cachedSettings.settings = settings;
+    return cachedSettings.settings;
+  } catch (error) {
+    console.error('save Error:', error, ' settings:', settings);
+    return cachedSettings.settings;
   }
+}
 
-  static async save(settings?: Settings): Promise<Settings> {
-    try {
-      if (settings && !SettingUtils.isSettings(settings)) {
-        throw new Error('Invalid Settings');
-      }
-      settings = settings || SettingUtils.settings;
-      const strValue = JSON.stringify(settings, null, 2);
-      await StorageUtils.set('settings', strValue);
-      SettingUtils.settings = settings;
-    } catch (error) {
-      console.error('save Error:', error, ' settings:', settings);
-    }
-    finally {
-      return SettingUtils.settings;
-    }
-  }
+export function getSettings(): Settings {
+  return cachedSettings.settings;
+}
 
-  static getSettings(): Settings {
-    return SettingUtils.settings;
-  }
+export function getStoreURL(): string {
+  return cachedSettings.settings.storeURL;
+}
 
-  static getStoreURL(): string {
-    return SettingUtils.settings.storeURL;
-  }
+export function getLogLevel(): string {
+  return cachedSettings.settings.logLevel;
+}
 
-  static getLogLevel(): string {
-    return SettingUtils.settings.logLevel;
-  }
+export function getReplaySettings(): ReplaySettings {
+  return cachedSettings.settings.replaySettings;
+}
 
-  static getReplaySettings() {
-    return SettingUtils.settings.replaySettings;
-  }
-
-  static getRecordSettings() {
-    return SettingUtils.settings.recordSettings;
-  }
+export function getRecordSettings(): RecordSettings {
+  return cachedSettings.settings.recordSettings;
 }
