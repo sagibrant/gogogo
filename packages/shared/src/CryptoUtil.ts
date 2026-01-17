@@ -22,8 +22,6 @@
 
 import * as BrowserUtils from "./BrowserUtils";
 
-
-
 /**
  * Encrypt plaintext using the extension ID-derived key
  * @param plaintext Data to encrypt (e.g., API key)

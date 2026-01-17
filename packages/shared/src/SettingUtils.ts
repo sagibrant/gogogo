@@ -23,12 +23,13 @@
 import * as Utils from "./Utils";
 import * as StorageUtils from "./StorageUtils";
 
-interface AISettings {
+export interface AISettings {
   apiKey: string;
   baseURL: string;
   models: string;
-};
-interface ReplaySettings {
+}
+
+export interface ReplaySettings {
   attachDebugger: boolean;
   autoSync: boolean;
   autoActionCheck: boolean;
@@ -37,11 +38,13 @@ interface ReplaySettings {
   stepInterval: number;
   locatorTimeout: number;
   captureScreenshot: boolean;
-};
-interface RecordSettings {
+}
+
+export interface RecordSettings {
   recordNavigation: boolean;
-};
-interface Settings {
+}
+
+export interface Settings {
   storeURL: string;
   logLevel: 'TRACE' | 'DEBUG' | 'LOG' | 'INFO' | 'WARN' | 'ERROR';
   aiSettings: AISettings;
