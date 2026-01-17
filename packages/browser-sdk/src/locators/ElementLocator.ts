@@ -23,8 +23,8 @@
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils, SettingUtils } from "@gogogo/shared";
 import { Locator } from "./Locator";
-import { Page } from "./Page";
-import { Frame } from "./Frame";
+import { Page } from "../aos/Page";
+import { Frame } from "../sdk/Frame";
 import { Element } from "./Element";
 import { TextLocator } from "./TextLocator";
 

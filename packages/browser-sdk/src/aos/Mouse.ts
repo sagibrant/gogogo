@@ -2,9 +2,9 @@
  * @copyright 2026 Sagi All Rights Reserved.
  * @author: Sagi <sagibrant@hotmail.com>
  * @license Apache-2.0
- * @file Keyboard.ts
+ * @file Mouse.ts
  * @description 
- * Class for Keyboard automation (cdp based)
+ * Class for Mouse automation (cdp based)
  * 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,10 +22,10 @@
 
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
-import { ChannelBase } from "./Channel";
-import { PageLocator } from "./PageLocator";
+import { ChannelBase } from "../Channel";
+import { PageLocator } from "../locators/PageLocator";
 
-export class Keyboard extends ChannelBase implements api.Keyboard {
+export class Mouse extends ChannelBase implements api.Mouse {
   private readonly _pageLocator: PageLocator;
   private _pageRtid?: Rtid;
 
@@ -33,6 +33,8 @@ export class Keyboard extends ChannelBase implements api.Keyboard {
     super();
     this._pageLocator = pageLocator;
   }
+
+
   /** ==================================================================================================================== */
   /** ==================================================== properties ==================================================== */
   /** ==================================================================================================================== */
@@ -47,28 +49,25 @@ export class Keyboard extends ChannelBase implements api.Keyboard {
   /** ==================================================================================================================== */
   /** ====================================================== methods ===================================================== */
   /** ==================================================================================================================== */
-  async type(text: string, options?: api.TextInputOptions): Promise<void> {
-    let timeout = 0;
-    const { delayBetweenDownUp = 0, delayBetweenChar = 0 } = options || {};
-    if (delayBetweenDownUp > 0) {
-      timeout += text.length * delayBetweenDownUp;
-    }
-    if (delayBetweenChar > 0) {
-      timeout += text.length * delayBetweenChar;
-    }
+  async click(x: number, y: number, options?: Omit<api.ClickOptions, 'position'>): Promise<void> {
     const tabRtid = await this.tabRtid();
-    await this.invokeFunction(tabRtid, 'keyboardType', [text, options], undefined, timeout > 0 ? timeout + 5000 : undefined);
+    const clickOptions: api.ClickOptions = Object.assign({}, options, { position: { x, y } });
+    await this.invokeFunction(tabRtid, 'mouseClick', [clickOptions]);
   }
-  async down(key: string): Promise<void> {
+  async down(options?: { button?: "left" | "right" | "middle"; clickCount?: number; }): Promise<void> {
     const tabRtid = await this.tabRtid();
-    await this.invokeFunction(tabRtid, 'keyboardDown', [key]);
+    await this.invokeFunction(tabRtid, 'mouseDown', [options]);
   }
-  async up(key: string): Promise<void> {
+  async up(options?: { button?: "left" | "right" | "middle"; clickCount?: number; }): Promise<void> {
     const tabRtid = await this.tabRtid();
-    await this.invokeFunction(tabRtid, 'keyboardUp', [key]);
+    await this.invokeFunction(tabRtid, 'mouseUp', [options]);
   }
-  async press(keys: string | string[], options?: { delayBetweenDownUp?: number; }): Promise<void> {
+  async move(x: number, y: number, options?: { steps?: number }): Promise<void> {
     const tabRtid = await this.tabRtid();
-    await this.invokeFunction(tabRtid, 'keyboardPress', [keys, options]);
+    await this.invokeFunction(tabRtid, 'mouseMove', [x, y, options]);
+  }
+  async wheel(deltaX: number, deltaY: number): Promise<void> {
+    const tabRtid = await this.tabRtid();
+    await this.invokeFunction(tabRtid, 'mouseWheel', [deltaX, deltaY]);
   }
 }

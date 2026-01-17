@@ -21,12 +21,12 @@
  */
 
 import { Rtid, RtidUtils, Utils, Logger } from "@gogogo/shared";
-import { Browser } from "./Browser";
-import { Window } from "./Window";
-import { Page } from "./Page";
-import { Frame } from "./Frame";
-import { Element } from "./Element";
-import { Text } from "./Text";
+import { Browser } from "./aos/Browser";
+import { Window } from "./aos/Window";
+import { Page } from "./aos/Page";
+import { Frame } from "./aos/Frame";
+import { Element } from "./aos/Element";
+import { Text } from "./aos/Text";
 
 export class ObjectRepository {
   protected readonly logger: Logger;

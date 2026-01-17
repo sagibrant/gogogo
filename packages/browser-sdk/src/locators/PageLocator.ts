@@ -23,16 +23,15 @@
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
 import { Locator } from "./Locator";
-import { Page } from "./Page";
-import { Window } from "./Window";
-import { Browser } from "./Browser";
+import { Page } from "../aos/Page";
+import { Window } from "../aos/Window";
+import { Browser } from "../aos/Browser";
 import { FrameLocator } from "./FrameLocator";
 import { ElementLocator } from "./ElementLocator";
 import { TextLocator } from "./TextLocator";
-import { Mouse } from "./Mouse";
-import { Keyboard } from "./Keyboard";
-import { Dialog } from "./Dialog";
-import { Listener } from "./AutomationObject";
+import { Mouse } from "../aos/Mouse";
+import { Keyboard } from "../aos/Keyboard";
+import { Dialog } from "../aos/Dialog";
 
 export class PageLocator extends Locator<Page> implements api.PageLocator {
   private readonly _mouse: api.Mouse;
@@ -235,14 +234,14 @@ export class PageLocator extends Locator<Page> implements api.PageLocator {
     return await page.querySelectorAll(selector);
   }
 
-  on(event: string, listener: Listener): this {
+  on(event: string, listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((dialog: api.Dialog) => (unknown | Promise<unknown>))): this {
     this.get().then((page) => {
       if (event === 'close') {
-        page.on(event, listener);
+        page.on(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
       } else if (event === 'dialog') {
-        page.on(event, listener);
+        page.on(event, listener as ((dialog: api.Dialog) => (unknown | Promise<unknown>)));
       } else if (event === 'domcontentloaded') {
-        page.on(event, listener);
+        page.on(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
       }
     }).catch(error => {
       this.logger.error(error);

@@ -22,9 +22,13 @@
 
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
-import { WindowLocator } from "./WindowLocator";
-import { PageLocator } from "./PageLocator";
-import { AutomationObject, Listener } from "./AutomationObject";
+import { WindowLocator } from "../locators/WindowLocator";
+import { PageLocator } from "../locators/PageLocator";
+import { AutomationObject } from "./AutomationObject";
+
+interface TabInfo extends Record<string, unknown> {
+  id?: number;
+}
 
 export class Window extends AutomationObject implements api.Window {
   private readonly _browser: api.Browser;
@@ -99,9 +103,9 @@ export class Window extends AutomationObject implements api.Window {
   /** ==================================================================================================================== */
 
   async openNewPage(url?: string): Promise<api.Page> {
-    const tabInfo = await this.invokeFunction(this._rtid, 'openNewTab', [url]);
-    if (tabInfo && !Utils.isNullOrUndefined((tabInfo as any).id)) {
-      const tabId = (tabInfo as any).id;
+    const tabInfo = await this.invokeFunction(this._rtid, 'openNewTab', [url]) as TabInfo;
+    if (tabInfo && !Utils.isNullOrUndefined(tabInfo.id) && typeof tabInfo.id === 'number') {
+      const tabId = tabInfo.id;
       const tabRtid = RtidUtils.getTabRtid(tabId, -1, this._rtid.browser);
       const page = this.repo.getPage(tabRtid);
       return page;
@@ -139,16 +143,16 @@ export class Window extends AutomationObject implements api.Window {
   /** ==================================================================================================================== */
   /** ====================================================== events ====================================================== */
   /** ==================================================================================================================== */
-  on(event: 'page', listener: (page: api.Page) => any): this;
-  on(event: 'close', listener: (window: api.Window) => any): this;
-  override on(event: string, listener: Listener): this {
-    return super.on(event, listener);
+  on(event: 'page', listener: (page: api.Page) => (unknown | Promise<unknown>)): this;
+  on(event: 'close', listener: (window: api.Window) => (unknown | Promise<unknown>)): this;
+  on(event: string, listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((window: api.Window) => (unknown | Promise<unknown>))): this {
+    return super.on(event, listener as (arg: unknown) => (unknown | Promise<unknown>));
   }
-  emit(event: 'page' | 'close', data?: any): void {
+  emit(event: 'page' | 'close', data?: unknown): void {
     if (event === 'page') {
-      const tabInfo = data;
+      const tabInfo = data as TabInfo;
       if (!Utils.isNullOrUndefined(tabInfo?.id) && typeof tabInfo.id === 'number') {
-        const tabId = (tabInfo as any).id as number;
+        const tabId = tabInfo.id;
         const tabRtid = RtidUtils.getTabRtid(tabId, -1, this._rtid.browser);
         const page = this.repo.getPage(tabRtid);
         super.emit('page', page);

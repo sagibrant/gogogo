@@ -22,10 +22,10 @@
 
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
-import { FrameLocator } from "./FrameLocator";
-import { ElementLocator } from "./ElementLocator";
-import { TextLocator } from "./TextLocator";
-import { AutomationObject } from "./AutomationObject";
+import { FrameLocator } from "../locators/FrameLocator";
+import { ElementLocator } from "../locators/ElementLocator";
+import { TextLocator } from "../locators/TextLocator";
+import { AutomationObject } from "../aos/AutomationObject";
 
 export class Frame extends AutomationObject implements api.Frame {
   private readonly _page: api.Page;

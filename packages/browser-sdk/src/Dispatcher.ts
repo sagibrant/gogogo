@@ -130,7 +130,7 @@ class GogogoEventHandler extends MsgDataHandlerBase {
   /** ==================================================================================================================== **/
   async onEvent(event: 'windowCreated' | 'windowRemoved' |
     'pageCreated' | 'pageDOMContentLoaded' | 'pageRemoved' |
-    'dialogOpened' | 'dialogClosed', data: any): Promise<void> {
+    'dialogOpened' | 'dialogClosed', data: unknown): Promise<void> {
 
     const supportedEvents = ['windowCreated', 'windowRemoved',
       'pageCreated', 'pageDOMContentLoaded', 'pageRemoved',
@@ -235,14 +235,15 @@ export class MainToContentDispatcher extends Dispatcher {
     const reqMsgData = MsgUtils.createMessageData('config', RtidUtils.getAgentRtid(), { name: 'get', params: { frameRtid: undefined, settings: undefined } });
     const resMsgData = await sendRequest(reqMsgData);
     if (resMsgData.status === 'OK') {
-      const frameRtid = Utils.getItem('frameRtid', resMsgData.result as any) as Rtid;
+      const result = resMsgData.result as Record<string, unknown>;
+      const frameRtid = Utils.getItem('frameRtid', result) as Rtid;
       this._handler.rtid.context = 'MAIN';
       this._handler.rtid.browser = frameRtid.browser;
       this._handler.rtid.window = -1;
       this._handler.rtid.tab = frameRtid.tab;
       this._handler.rtid.frame = frameRtid.frame;
       this._handler.rtid.object = 0;
-      const settings = Utils.getItem('settings', resMsgData.result as any) as Settings;
+      const settings = Utils.getItem('settings', result) as Settings;
       await this._handler.updateSettings(settings);
       this.logger.debug('registerToContentScript: MAIN frame rtid are updated to', this._handler.rtid);
     }

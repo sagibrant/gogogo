@@ -22,11 +22,10 @@
 
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
-import { Window } from "./Window";
+import { Window } from "../aos/Window";
 import { Locator } from "./Locator";
 import { PageLocator } from "./PageLocator";
-import { Browser } from "./Browser";
-import { Listener } from "./AutomationObject";
+import { Browser } from "../aos/Browser";
 
 export class WindowLocator extends Locator<Window> implements api.WindowLocator {
 
@@ -152,13 +151,12 @@ export class WindowLocator extends Locator<Window> implements api.WindowLocator 
     const window = await this.get();
     return await window.fullscreen(toggle);
   }
-
-  on(event: string, listener: Listener): this {
+  on(event: string, listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((window: api.Window) => (unknown | Promise<unknown>))): this {
     this.get().then((window) => {
       if (event === 'page') {
-        window.on(event, listener);
+        window.on(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
       } else if (event === 'close') {
-        window.on(event, listener);
+        window.on(event, listener as ((window: api.Window) => (unknown | Promise<unknown>)));
       }
     }).catch(error => {
       this.logger.error(error);

@@ -23,12 +23,12 @@
 import * as api from "@gogogo/shared";
 import { RtidUtils } from "@gogogo/shared";
 import { ChannelBase } from "./Channel";
-import { Browser } from "./Browser";
-import { Window } from "./Window";
-import { Page } from "./Page";
-import { Frame } from "./Frame";
-import { Element } from "./Element";
-import { Text } from "./Text";
+import { Browser } from "./aos/Browser";
+import { Window } from "./aos/Window";
+import { Page } from "./aos/Page";
+import { Frame } from "./aos/Frame";
+import { Element } from "./aos/Element";
+import { Text } from "./aos/Text";
 
 /**
  * Assertion Error Class: Carries full values but displays concise messages

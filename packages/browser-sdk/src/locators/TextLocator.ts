@@ -23,10 +23,10 @@
 import * as api from "@gogogo/shared";
 import { Rtid, Utils, SettingUtils } from "@gogogo/shared";
 import { Locator } from "./Locator";
-import { Page } from "./Page";
+import { Page } from "../aos/Page";
 import { Frame } from "./Frame";
 import { Element } from "./Element";
-import { Text } from "./Text";
+import { Text } from "../aos/Text";
 
 export class TextLocator extends Locator<Text> implements api.TextLocator {
 

@@ -22,7 +22,7 @@
 
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils, SettingUtils } from "@gogogo/shared";
-import { AutomationObject } from "./AutomationObject";
+import { AutomationObject } from "../aos/AutomationObject";
 
 export class Node extends AutomationObject implements api.MouseActions, api.KeyboardActions, api.TouchActions {
   protected readonly _frame: api.Frame;

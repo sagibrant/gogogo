@@ -23,8 +23,8 @@
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils, SettingUtils } from "@gogogo/shared";
 import { Frame } from "./Frame";
-import { ElementLocator } from "./ElementLocator";
-import { TextLocator } from "./TextLocator";
+import { ElementLocator } from "../locators/ElementLocator";
+import { TextLocator } from "../locators/TextLocator";
 import { Node } from "./Node";
 
 export class Element extends Node implements api.Element {

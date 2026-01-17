@@ -22,7 +22,7 @@
 
 import * as api from "@gogogo/shared";
 import { Utils } from "@gogogo/shared";
-import { ChannelBase } from "./Channel";
+import { ChannelBase } from "../Channel";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { ClientOptions } from "openai";

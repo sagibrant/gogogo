@@ -22,8 +22,8 @@
 
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils} from "@gogogo/shared";
-import { ChannelBase } from "./Channel";
-import { PageLocator } from "./PageLocator";
+import { ChannelBase } from "../Channel";
+import { PageLocator } from "../locators/PageLocator";
 
 interface DialogInfo extends Record<string, unknown> {
   type?: 'alert' | 'confirm' | 'prompt' | 'beforeunload';

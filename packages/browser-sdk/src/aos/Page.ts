@@ -23,14 +23,18 @@
 import * as api from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
 import { Window } from "./Window";
-import { FrameLocator } from "./FrameLocator";
-import { PageLocator } from "./PageLocator";
-import { ElementLocator } from "./ElementLocator";
-import { TextLocator } from "./TextLocator";
+import { FrameLocator } from "../locators/FrameLocator";
+import { PageLocator } from "../locators/PageLocator";
+import { ElementLocator } from "../locators/ElementLocator";
+import { TextLocator } from "../locators/TextLocator";
 import { Mouse } from "./Mouse";
 import { Keyboard } from "./Keyboard";
 import { Dialog } from "./Dialog";
-import { AutomationObject, Listener } from "./AutomationObject";
+import { AutomationObject } from "./AutomationObject";
+
+export interface TabInfo extends Record<string, unknown> {
+  id?: number;
+}
 
 export class Page extends AutomationObject implements api.Page {
   private readonly _browser: api.Browser;
@@ -185,9 +189,9 @@ export class Page extends AutomationObject implements api.Page {
   }
 
   async openNewPage(url?: string): Promise<api.Page> {
-    const tabInfo = await this.invokeFunction(this._rtid, 'openNewTab', [url]);
-    if (tabInfo && !Utils.isNullOrUndefined((tabInfo as any).id)) {
-      const tabId = (tabInfo as any).id;
+    const tabInfo = await this.invokeFunction(this._rtid, 'openNewTab', [url]) as TabInfo;
+    if (tabInfo && !Utils.isNullOrUndefined(tabInfo.id) && typeof tabInfo.id === 'number') {
+      const tabId = tabInfo.id;
       const tabRtid = RtidUtils.getTabRtid(tabId, -1, this._rtid.browser);
       const newPage = this.repo.getPage(tabRtid);
       return newPage;
@@ -232,9 +236,9 @@ export class Page extends AutomationObject implements api.Page {
     return base64ImgString as string;
   }
 
-  async executeScript<Args extends any[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result> {
+  async executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result> {
     const funcScript = func.toString();
-    const buildArgsString = (arg: any): string => {
+    const buildArgsString = (arg: unknown): string => {
       if (typeof arg === 'object') {
         return JSON.stringify(arg);
       }
@@ -262,13 +266,13 @@ export class Page extends AutomationObject implements api.Page {
   /** ==================================================================================================================== */
   /** ====================================================== events ====================================================== */
   /** ==================================================================================================================== */
-  on(event: 'close', listener: (page: api.Page) => any): this;
-  on(event: 'dialog', listener: (dialog: api.Dialog) => any): this;
-  on(event: 'domcontentloaded', listener: (page: api.Page) => any): this;
-  override on(event: string, listener: Listener): this {
-    return super.on(event, listener);
+  on(event: 'close', listener: (page: api.Page) => (unknown | Promise<unknown>)): this;
+  on(event: 'dialog', listener: (dialog: api.Dialog) => (unknown | Promise<unknown>)): this;
+  on(event: 'domcontentloaded', listener: (page: api.Page) => (unknown | Promise<unknown>)): this;
+  on(event: string, listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((dialog: api.Dialog) => (unknown | Promise<unknown>))): this {
+    return super.on(event, listener as (arg: unknown) => (unknown | Promise<unknown>));
   }
-  emit(event: 'close' | 'dialog' | 'domcontentloaded', _data?: any): void {
+  emit(event: 'close' | 'dialog' | 'domcontentloaded', _data?: unknown): void {
     if (event === 'close') {
       super.emit('close', this);
     }
@@ -296,7 +300,7 @@ export class Page extends AutomationObject implements api.Page {
       },
     });
 
-    return rawObj as any;
+    return rawObj as unknown as api.JSObject;
   }
 
 }

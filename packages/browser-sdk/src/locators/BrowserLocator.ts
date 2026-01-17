@@ -22,11 +22,10 @@
 
 import * as api from "@gogogo/shared";
 import { BrowserUtils, RtidUtils } from "@gogogo/shared";
-import { Browser } from "./Browser";
+import { Browser } from "../aos/Browser";
 import { Locator } from "./Locator";
 import { WindowLocator } from "./WindowLocator";
 import { PageLocator } from "./PageLocator";
-import { Listener } from "./AutomationObject";
 
 export class BrowserLocator extends Locator<Browser> implements api.BrowserLocator {
 
@@ -140,12 +139,12 @@ export class BrowserLocator extends Locator<Browser> implements api.BrowserLocat
     return await browser.close();
   }
 
-  on(event: string, listener: Listener): this {
+  on(event: string, listener: ((window: api.Window) => (unknown | Promise<unknown>)) | ((page: api.Page) => (unknown | Promise<unknown>))): this {
     this.get().then((browser) => {
       if (event === 'window') {
-        browser.on(event, listener);
+        browser.on(event, listener as ((window: api.Window) => (unknown | Promise<unknown>)));
       } else if (event === 'page') {
-        browser.on(event, listener);
+        browser.on(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
       }
     }).catch(error => {
       this.logger.error(error);
