@@ -31,7 +31,7 @@ export interface KeyDefinition {
   location?: number;
 }
 
-export type KeyDescription = {
+export interface KeyDescription {
   keyCode: number,
   keyCodeWithoutLocation: number,
   key: string,
@@ -41,7 +41,8 @@ export type KeyDescription = {
   shifted?: KeyDescription;
   // shiftKey?: string;
   // shiftKeyCode?: number;
-};
+}
+
 export type KeyboardModifier = 'Alt' | 'Control' | 'Meta' | 'Shift';
 export type SmartKeyboardModifier = KeyboardModifier | 'ControlOrMeta';
 

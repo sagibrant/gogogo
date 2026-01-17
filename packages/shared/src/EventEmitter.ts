@@ -121,7 +121,7 @@ export class EventEmitter<Events extends EventMap = Record<string, unknown>> {
     }
 
     // Add listener with metadata
-    const listeners = this._listeners.get(event)!;
+    const listeners = this._listeners.get(event) || [];
     listeners.push({
       listener: listener as Listener<Events[keyof Events]>,
       priority: options.priority ?? 0,
