@@ -21,6 +21,7 @@
  */
 
 import * as api from "@gogogo/shared";
+import { WaitUtils } from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
 import { Window } from "./Window";
 import { FrameLocator } from "../locators/FrameLocator";
@@ -182,7 +183,7 @@ export class Page extends AutomationObject implements api.Page {
       const status = await this.status();
       return status === 'complete';
     };
-    const result = await Utils.waitChecked(check, timeout);
+    const result = await WaitUtils.waitChecked(check, timeout);
     if (!result) {
       this.logger.warn('sync: status is still not complete');
     }
@@ -219,7 +220,7 @@ export class Page extends AutomationObject implements api.Page {
 
   async close(): Promise<void> {
     await this.invokeFunction(this._rtid, 'close', []);
-    await Utils.wait(200);
+    await WaitUtils.wait(200);
   }
 
   async zoom(zoomFactor: number): Promise<void> {

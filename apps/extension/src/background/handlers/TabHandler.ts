@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, InvokeAction, QueryInfo, RecordedStep, Rtid, ClickOptions, Point, RectInfo, TextInputOptions, LocatorUtils, MsgDataHandlerBase, KeyDefinitionUtils, ElementInfo } from "@gogogo/shared";
+import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, InvokeAction, QueryInfo, RecordedStep, Rtid, ClickOptions, Point, RectInfo, TextInputOptions, LocatorUtils, MsgDataHandlerBase, KeyDefinitionUtils, ElementInfo, WaitUtils } from "@gogogo/shared";
 import { ChromeExtensionAPI } from "../api/ChromeExtensionAPI";
 import { FrameInfo, TabInfo, WindowInfo } from "../api/BrowserWrapperTypes";
 import { WebNavigationEventDetails } from "../api/ChromeWebNavigationAPI";
@@ -47,7 +47,7 @@ export class TabHandler extends MsgDataHandlerBase {
   private readonly _cdpDOM: CDPDOM;
 
   private _inspectMode: 'searchForNode' | 'none';
-/** the device scale factor is decided by --force-device-scale-factor or same as the desktop scale */
+  /** the device scale factor is decided by --force-device-scale-factor or same as the desktop scale */
   private _deviceScaleFactor: number | undefined = undefined;
 
   constructor(tabId: number, browserAPI: ChromeExtensionAPI) {
@@ -458,7 +458,7 @@ export class TabHandler extends MsgDataHandlerBase {
         throw new Error('Another debugger is already attached to this page—please close DevTools and other debugging tools first.');
       }
       await this._browserAPI.cdpAPI.attachTab(this._tabId);
-      await Utils.wait(1000);
+      await WaitUtils.wait(1000);
       await this._cdpOverlay.setInspectMode('searchForNode');
       this._inspectMode = 'searchForNode';
     }
@@ -509,11 +509,11 @@ export class TabHandler extends MsgDataHandlerBase {
     for (let i = 1; i <= clickCount; i++) {
       await this.mouseDown({ button: button, clickCount: i });
       if (delayBetweenDownUp > 0) {
-        await Utils.wait(delayBetweenDownUp);
+        await WaitUtils.wait(delayBetweenDownUp);
       }
       await this.mouseUp({ button: button, clickCount: i });
       if (i < clickCount && delayBetweenClick > 0) {
-        await Utils.wait(delayBetweenClick);
+        await WaitUtils.wait(delayBetweenClick);
       }
     }
     if (modifiers.length > 0) {
@@ -558,12 +558,12 @@ export class TabHandler extends MsgDataHandlerBase {
       }
       else {
         if (delayBetweenDownUp > 0) {
-          await Utils.wait(delayBetweenDownUp);
+          await WaitUtils.wait(delayBetweenDownUp);
         }
         await this._cdpKeyboard.insertText(char);
       }
       if (delayBetweenChar > 0) {
-        await Utils.wait(delayBetweenChar);
+        await WaitUtils.wait(delayBetweenChar);
       }
     }
   }
@@ -581,7 +581,7 @@ export class TabHandler extends MsgDataHandlerBase {
       await this.keyboardDown(token);
     }
     if (delayBetweenDownUp > 0) {
-      await Utils.wait(delayBetweenDownUp);
+      await WaitUtils.wait(delayBetweenDownUp);
     }
     const reverseTokens = Utils.deepClone(tokens);
     reverseTokens.reverse();
@@ -593,7 +593,7 @@ export class TabHandler extends MsgDataHandlerBase {
     await this.mouseClick({ position: { x, y } });
     // await this.keyboardPress(['ControlOrMeta', 'a']);
     await this._cdpKeyboard.selectAll();
-    await Utils.wait(200);
+    await WaitUtils.wait(200);
     await this.keyboardPress('Backspace');
   }
   /** ==================================================================================================================== **/

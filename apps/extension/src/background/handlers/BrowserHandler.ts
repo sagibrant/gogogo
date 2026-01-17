@@ -20,14 +20,14 @@
  * limitations under the License.
  */
 
-import { BrowserInfo, BrowserUtils, RtidUtils, Utils, SettingUtils, AODesc, AutomationObject, QueryInfo, RecordedStep, RegExpSpec, Selector, LocatorUtils, MsgDataHandlerBase, Cookie } from "@gogogo/shared";
+import { BrowserInfo, BrowserUtils, RtidUtils, Utils, SettingUtils, AODesc, AutomationObject, QueryInfo, RecordedStep, RegExpSpec, Selector, LocatorUtils, MsgDataHandlerBase, Cookie, WaitUtils } from "@gogogo/shared";
 import { ChromeExtensionAPI } from "../api/ChromeExtensionAPI";
 import { TabInfo, WindowInfo } from '../api/BrowserWrapperTypes'
 import { WindowHandler } from "./WindowHandler";
 import { TabHandler } from "./TabHandler";
 import { BackgroundUtils } from "../BackgroundUtils";
 
-interface BrowserEvents {
+interface BrowserEvents extends Record<string, unknown> {
   windowCreated: { window: WindowHandler };
   windowRemoved: { window: WindowHandler };
   tabCreated: { tab: TabHandler };
@@ -380,7 +380,7 @@ export class BrowserHandler extends MsgDataHandlerBase<BrowserEvents> {
       tab.updateFrameDetails(ev.frameId, { status: 'Completed', ev: ev });
 
       if (tab && this.config.attachDebugger && ev.frameId === 0) {
-        Utils.wait(500).then(async () => {
+        WaitUtils.wait(500).then(async () => {
           await this.attachDebuggerToTab(ev.tabId);
         });
       }

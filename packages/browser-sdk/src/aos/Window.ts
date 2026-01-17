@@ -21,6 +21,7 @@
  */
 
 import * as api from "@gogogo/shared";
+import { WaitUtils } from "@gogogo/shared";
 import { Rtid, RtidUtils, Utils } from "@gogogo/shared";
 import { WindowLocator } from "../locators/WindowLocator";
 import { PageLocator } from "../locators/PageLocator";
@@ -121,7 +122,7 @@ export class Window extends AutomationObject implements api.Window {
 
   async close(): Promise<void> {
     await this.invokeFunction(this._rtid, 'close', []);
-    await Utils.wait(200);
+    await WaitUtils.wait(200);
   }
 
   async minimize(): Promise<void> {

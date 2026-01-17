@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { Utils, LocatorUtils, RectInfo, MessageData, Selector, Dispatcher, DOMElementDescription, AODesc, MsgUtils, AO, RtidUtils, DOMPathUtils, ElementInfo } from "@gogogo/shared";
+import { Utils, LocatorUtils, RectInfo, MessageData, Selector, Dispatcher, DOMElementDescription, AODesc, MsgUtils, AO, RtidUtils, DOMPathUtils, ElementInfo, WaitUtils } from "@gogogo/shared";
 import { ObjectRepository } from "./ObjectRepository";
 import { FrameHandler } from "./handlers/FrameHandler";
 
@@ -216,7 +216,7 @@ export class ContentUtils {
   }
 
   /**
-   * Get the shadowroot from node
+   * Get the ShadowRoot from node
    * @param node dom node
    * @returns ShadowRoot or null
    */
@@ -366,7 +366,7 @@ export class ContentUtils {
       if (desc.textContent) {
         mandatorySelectors.push({ name: 'textContent', value: desc.textContent, type: 'property', match: 'exact' });
       }
-      if (desc.attributes && desc.attributes.length > 0) {
+      if (desc.attributes && Object.keys(desc.attributes).length > 0) {
         const attrs = Object.entries(desc.attributes);
         for (const [name, value] of attrs) {
           mandatorySelectors.push({ name: name, value: value, type: 'attribute', match: 'exact' });
@@ -919,9 +919,9 @@ export class ContentUtils {
     document.body.appendChild(rect_elem);
     for (let i = 0; i < 3; i++) {
       rect_elem.style.display = 'block';
-      await Utils.wait(300);
+      await WaitUtils.wait(300);
       rect_elem.style.display = 'none';
-      await Utils.wait(200);
+      await WaitUtils.wait(200);
     }
     document.body.removeChild(rect_elem);
   }

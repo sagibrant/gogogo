@@ -20,11 +20,11 @@
  * limitations under the License.
  */
 
-import { BrowserUtils, RtidUtils, Utils, AODesc, AutomationObject, SettingUtils, Settings, MsgDataHandlerBase } from "@gogogo/shared";
+import { BrowserUtils, RtidUtils, AODesc, AutomationObject, SettingUtils, Settings, MsgDataHandlerBase, WaitUtils } from "@gogogo/shared";
 import { ChromeExtensionAPI } from "../api/ChromeExtensionAPI";
 import { BrowserHandler } from "./BrowserHandler";
 
-interface AgentEvent {
+interface AgentEvent extends Record<string, unknown> {
   browserCreated: { browser: BrowserHandler };
   browserRemoved: { browser: BrowserHandler };
 }
@@ -61,7 +61,7 @@ export class AgentHandler extends MsgDataHandlerBase<AgentEvent> {
   }
 
   async wait(timeout: number): Promise<void> {
-    await Utils.wait(timeout);
+    await WaitUtils.wait(timeout);
   }
 
   /** ==================================================================================================================== **/

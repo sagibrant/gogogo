@@ -12,11 +12,13 @@ export * as Utils from './Utils';
 export * as RtidUtils from './RtidUtils';
 export * as MsgUtils from './MsgUtils';
 export * as BrowserUtils from './BrowserUtils';
+export type { BrowserInfo } from './BrowserUtils';
 export * as StorageUtils from './StorageUtils';
 export * as CryptoUtil from './CryptoUtil';
 export * as LocatorUtils from './LocatorUtils';
 export * as DOMPathUtils from './DOMPathUtils';
 export * as KeyDefinitionUtils from './KeyDefinitionUtils';
+export type { KeyboardModifier } from './KeyDefinitionUtils';
 export * as SettingUtils from './SettingUtils';
 export type { Settings } from './SettingUtils';
 // Export all shared class utilities
