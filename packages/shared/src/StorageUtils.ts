@@ -2,9 +2,9 @@
  * @copyright 2026 Sagi All Rights Reserved.
  * @author: Sagi <sagibrant@hotmail.com>
  * @license Apache-2.0
- * @file Storage.ts
+ * @file StorageUtils.ts
  * @description 
- * Shared utility classes for storage
+ * Shared utility functions for storage
  * 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,24 +20,22 @@
  * limitations under the License.
  */
 
-// Declare chrome in a way that avoids TypeScript errors without adding dependencies
-declare global {
-  // eslint-disable-next-line no-var
-  var chrome: {
-    storage?: {
-      local?: {
-        get: (keys: string[]) => Promise<Record<string, unknown>>;
-        set: (items: Record<string, unknown>) => Promise<void>;
-      };
-      onChanged?: {
-        addListener: (callback: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void) => void;
-      };
+// Type definition for chrome storage API
+type ChromeStorage = {
+  storage?: {
+    local?: {
+      get: (keys: string[]) => Promise<Record<string, unknown>>;
+      set: (items: Record<string, unknown>) => Promise<void>;
+    };
+    onChanged?: {
+      addListener: (callback: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void) => void;
     };
   };
-}
+};
 
 export async function get(key: string): Promise<string | null> {
-  if (typeof chrome !== 'undefined' && chrome?.storage?.local) {
+  const chrome = (typeof globalThis !== 'undefined' && 'chrome' in globalThis) ? (globalThis as typeof globalThis & { chrome: ChromeStorage }).chrome : undefined;
+  if (chrome?.storage?.local) {
     const result = await chrome.storage.local.get([key]);
     if (key in result && typeof result[key] === 'string') {
       return result[key] as string
@@ -52,7 +50,8 @@ export async function get(key: string): Promise<string | null> {
 }
 
 export async function set(key: string, value: string): Promise<void> {
-  if (typeof chrome !== 'undefined' && chrome?.storage?.local) {
+  const chrome = (typeof globalThis !== 'undefined' && 'chrome' in globalThis) ? (globalThis as typeof globalThis & { chrome: ChromeStorage }).chrome : undefined;
+  if (chrome?.storage?.local) {
     const obj: Record<string, string> = {};
     obj[key] = value;
     await chrome.storage.local.set(obj);
@@ -64,7 +63,8 @@ export async function set(key: string, value: string): Promise<void> {
 }
 
 export function AddOnChangedListener(listener: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void): void {
-  if (typeof chrome !== 'undefined' && chrome?.storage?.onChanged) {
+  const chrome = (typeof globalThis !== 'undefined' && 'chrome' in globalThis) ? (globalThis as typeof globalThis & { chrome: ChromeStorage }).chrome : undefined;
+  if (chrome?.storage?.onChanged) {
     chrome.storage.onChanged.addListener(listener);
   }
 }
