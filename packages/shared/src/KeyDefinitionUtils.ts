@@ -109,7 +109,7 @@ const USKeyboardLayout: Record<string, KeyDefinition> = {
   'Digit6': { 'keyCode': 54, 'shiftKey': '^', 'key': '6' },
   'Digit7': { 'keyCode': 55, 'shiftKey': '&', 'key': '7' },
   'Digit8': { 'keyCode': 56, 'shiftKey': '*', 'key': '8' },
-  'Digit9': { 'keyCode': 57, 'shiftKey': '\(', 'key': '9' },
+  'Digit9': { 'keyCode': 57, 'shiftKey': '(', 'key': '9' },
   'Digit0': { 'keyCode': 48, 'shiftKey': ')', 'key': '0' },
   'Minus': { 'keyCode': 189, 'shiftKey': '_', 'key': '-' },
   'Equal': { 'keyCode': 187, 'shiftKey': '+', 'key': '=' },
@@ -155,7 +155,7 @@ const USKeyboardLayout: Record<string, KeyDefinition> = {
   'KeyB': { 'keyCode': 66, 'shiftKey': 'B', 'key': 'b' },
   'KeyN': { 'keyCode': 78, 'shiftKey': 'N', 'key': 'n' },
   'KeyM': { 'keyCode': 77, 'shiftKey': 'M', 'key': 'm' },
-  'Comma': { 'keyCode': 188, 'shiftKey': '\<', 'key': ',' },
+  'Comma': { 'keyCode': 188, 'shiftKey': '<', 'key': ',' },
   'Period': { 'keyCode': 190, 'shiftKey': '>', 'key': '.' },
   'Slash': { 'keyCode': 191, 'shiftKey': '?', 'key': '/' },
   'ShiftRight': { 'keyCode': 161, 'keyCodeWithoutLocation': 16, 'key': 'Shift', 'location': 2 },
@@ -262,7 +262,8 @@ function buildLayoutClosure(layout?: Record<string, KeyDefinition>): Map<string,
     // Map from aliases: Shift -> non-shiftable definition
 
     if (aliases.has(code)) {
-      for (const alias of aliases.get(code)!) {
+      const aliasItems = aliases.get(code) || [];
+      for (const alias of aliasItems) {
         result.set(alias, description);
       }
     }
