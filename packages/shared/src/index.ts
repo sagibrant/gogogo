@@ -15,10 +15,10 @@ export * as BrowserUtils from './BrowserUtils';
 export * as StorageUtils from './StorageUtils';
 export * as LocatorUtils from './LocatorUtils';
 export * as DOMPathUtils from './DOMPathUtils';
-
+export * as CryptoUtil from './CryptoUtil';
+// Export all shared class utilities
 export * from './SettingUtils';
 export * from './Logger';
-export * from './CryptoUtil';
 export * from './DOMNode';
 export * from './EventEmitter';
 export * from './KeyDefinitions';
