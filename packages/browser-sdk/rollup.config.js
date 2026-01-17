@@ -26,7 +26,7 @@ const config = [
         ]
       }),
       nodeResolve({
-        browser: false
+        browser: true
       }),
       commonjs(),
       typescript({
@@ -56,7 +56,7 @@ const config = [
       }),
 
       nodeResolve({
-        browser: false
+        browser: true
       }),
       commonjs(),
       typescript({

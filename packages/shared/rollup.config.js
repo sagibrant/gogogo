@@ -15,7 +15,7 @@ const config = [
     },
     plugins: [
       nodeResolve({
-        browser: false
+        browser: true
       }),
       commonjs(),
       typescript({
@@ -39,7 +39,7 @@ const config = [
     },
     plugins: [
       nodeResolve({
-        browser: false
+        browser: true
       }),
       commonjs(),
       typescript({
