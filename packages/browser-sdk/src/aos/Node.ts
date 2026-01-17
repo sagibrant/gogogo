@@ -221,9 +221,9 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
 
     if (mode === 'cdp') {
       const startPoint = await this.getBoundingPoint(this, options?.sourcePosition);
-      const targetObj = target as any as Node;
+      const targetObj = target as unknown as Node;
       const targetPoint = await this.getBoundingPoint(targetObj, options?.targetPosition);
-      let steps = options?.steps ?? 10;
+      const steps = options?.steps ?? 10;
       // if (Utils.isNullOrUndefined(options?.steps)) {
       //   const dx = targetPoint.x - startPoint.x;
       //   const dy = targetPoint.y - startPoint.y;
@@ -234,8 +234,8 @@ export class Node extends AutomationObject implements api.MouseActions, api.Keyb
       await this.invokeFunction(tabRtid, 'mouseDragAndDrop', [startPoint, targetPoint, steps]);
     }
     else {
-      const rtid = Utils.isFunction((target as any).rtid) ? (target as any).rtid() : undefined;
-      if (Utils.isNullOrUndefined(rtid)) {
+      const rtid = Utils.isFunction((target as any).rtid) ? (target as any).rtid() as unknown : undefined;
+      if (Utils.isNullOrUndefined(rtid) || !RtidUtils.isRtid(rtid)) {
         throw new Error('Invalid target for dragTo');
       }
       await this.invokeFunction(this._rtid, 'dragTo', [rtid, options]);

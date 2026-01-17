@@ -329,7 +329,7 @@ export class Element extends Node implements api.Element {
   }
   async selectOption(values: string | string[] | number | number[] | api.Element | api.Element[]): Promise<void> {
     const elems = Array.isArray(values) ? values : [values];
-    let options = [];
+    const options = [];
     for (const elem of elems) {
       if (elem instanceof Element && Utils.isFunction(elem.rtid)) {
         const rtid = elem.rtid();

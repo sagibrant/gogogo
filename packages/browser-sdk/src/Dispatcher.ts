@@ -108,7 +108,7 @@ class MainToContentChannel extends ChannelBase {
 
   private onMessage(ev: Event): void {
     this.logger.debug('onMessage: >>>> ev=', ev);
-    const msg = ev instanceof CustomEvent ? ev.detail : null;
+    const msg = ev instanceof CustomEvent ? ev.detail as unknown: null;
     if (!MsgUtils.isMessage(msg)) {
       this.logger.error('Invalid message format: msg:', msg, ' ev:', ev);
       return;

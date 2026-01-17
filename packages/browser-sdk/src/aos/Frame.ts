@@ -183,9 +183,9 @@ export class Frame extends AutomationObject implements api.Frame {
     }
   }
 
-  async executeScript<Args extends any[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result> {
+  async executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result> {
     const funcScript = func.toString();
-    const buildArgsString = (arg: any): string => {
+    const buildArgsString = (arg: unknown): string => {
       if (typeof arg === 'object') {
         return JSON.stringify(arg);
       }
@@ -232,7 +232,7 @@ export class Frame extends AutomationObject implements api.Frame {
       },
     });
 
-    return rawObj as any;
+    return rawObj as unknown as api.JSObject;
   }
 
 }
