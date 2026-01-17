@@ -29,10 +29,6 @@ import { Browser } from "../aos/Browser";
 
 export class WindowLocator extends Locator<Window> implements api.WindowLocator {
 
-  constructor(parent?: api.BrowserLocator, options?: api.WindowLocatorOptions) {
-    super(parent, options);
-  }
-
   /** ==================================================================================================================== */
   /** ================================================= locator methods ================================================== */
   /** ==================================================================================================================== */

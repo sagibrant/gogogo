@@ -31,10 +31,6 @@ import { AutomationObject } from "../aos/AutomationObject";
 
 export class ElementLocator extends Locator<Element> implements api.ElementLocator {
 
-  constructor(parent?: api.PageLocator | api.FrameLocator | api.ElementLocator, options?: api.ElementLocatorOptions) {
-    super(parent, options);
-  }
-
   /** ==================================================================================================================== */
   /** ===================================================== locator ====================================================== */
   /** ==================================================================================================================== */

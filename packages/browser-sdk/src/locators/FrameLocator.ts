@@ -30,10 +30,6 @@ import { TextLocator } from "./TextLocator";
 
 export class FrameLocator extends Locator<Frame> implements api.FrameLocator {
 
-  constructor(parent?: api.PageLocator, options?: api.FrameLocatorOptions) {
-    super(parent, options);
-  }
-
   /** ==================================================================================================================== */
   /** ===================================================== locator ====================================================== */
   /** ==================================================================================================================== */

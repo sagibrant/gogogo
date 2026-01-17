@@ -30,10 +30,6 @@ import { Text } from "../aos/Text";
 
 export class TextLocator extends Locator<Text> implements api.TextLocator {
 
-  constructor(parent?: api.PageLocator | api.FrameLocator | api.ElementLocator, options?: api.TextLocatorOptions) {
-    super(parent, options);
-  }
-
   /** ==================================================================================================================== */
   /** ===================================================== locator ====================================================== */
   /** ==================================================================================================================== */
