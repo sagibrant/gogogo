@@ -5,6 +5,5 @@ export { expect } from './Expect';
 export { AIClient } from './aos/AIClient';
 export { BrowserLocator } from './locators/BrowserLocator';
 
-
 // Export types if there are any specific types defined in the SDK
 // Additional exports can be added as needed

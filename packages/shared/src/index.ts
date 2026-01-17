@@ -19,13 +19,12 @@ export * as LocatorUtils from './LocatorUtils';
 export * as DOMPathUtils from './DOMPathUtils';
 export * as KeyDefinitionUtils from './KeyDefinitionUtils';
 export type { KeyboardModifier } from './KeyDefinitionUtils';
-export { SettingUtils } from './SettingUtils';
-export type { Settings } from './SettingUtils';
 // Export all shared class utilities
 export * from './Logger';
 export * from './DOMNode';
 export * from './EventEmitter';
 export * from './WaitUtils';
+export * from './SettingUtils';
 
 // Export messaging utilities
 export * from './Messaging/ChannelBase';

@@ -23,15 +23,20 @@
 
 import * as Utils from './Utils';
 
-export const WaitUtils = {
+export class WaitUtils {
+
+  // bypass the lint error
+  // error  Unexpected class with only static properties  @typescript-eslint/no-extraneous-class
+  doNothing(): void { }
   /**
    * wait 
    * @param ms timeout
    * @returns 
    */
-  async wait(ms: number): Promise<void> {
+  static async wait(ms: number): Promise<void> {
+    console.error('old wait called', ms);
     return new Promise(resolve => setTimeout(resolve, ms));
-  },
+  }
 
   /**
    * wait for the checkFunc to be checked
@@ -40,7 +45,7 @@ export const WaitUtils = {
    * @param delay delay for each check
    * @returns property value match the expected value
    */
-  async waitChecked(checkFunc: () => Promise<boolean>, timeout: number = 5000, delay: number = 500): Promise<boolean> {
+  static async waitChecked(checkFunc: () => Promise<boolean>, timeout: number = 5000, delay: number = 500): Promise<boolean> {
     const end_time = performance.now() + timeout;
     let count = 0;
     const noWaitRetryNum = 0;
@@ -60,7 +65,7 @@ export const WaitUtils = {
       }
     }
     return false;
-  },
+  }
 
   /**
    * use requestAnimationFrame for wait 
@@ -70,7 +75,7 @@ export const WaitUtils = {
    * @param delay delay for each check
    * @returns property value match the expected value
    */
-  async rafWaitChecked(checkFunc: () => Promise<boolean>, timeout: number = 5000, delay: number = 100): Promise<boolean> {
+  static async rafWaitChecked(checkFunc: () => Promise<boolean>, timeout: number = 5000, delay: number = 100): Promise<boolean> {
     if (typeof requestAnimationFrame !== 'function') {
       throw new Error('requestAnimationFrame is not a valid function');
     }
@@ -105,7 +110,7 @@ export const WaitUtils = {
       };
       requestAnimationFrame(rafFunc);
     });
-  },
+  }
 
   /**
    * wait for the function result within timeout duration
@@ -113,7 +118,7 @@ export const WaitUtils = {
    * @param timeout the timeout
    * @returns the function run result
    */
-  async waitResult<T>(func: () => Promise<T>, timeout: number = 5000): Promise<T> {
+  static async waitResult<T>(func: () => Promise<T>, timeout: number = 5000): Promise<T> {
     if (timeout <= 0) {
       return await func();
     }
