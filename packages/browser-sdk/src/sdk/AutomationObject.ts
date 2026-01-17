@@ -23,7 +23,7 @@
 import { Rtid } from "@gogogo/shared";
 import { ChannelBase } from "./Channel";
 
-export type Listener = (...args: unknown[]) => unknown | Promise<unknown>;
+export type Listener = (...args: unknown[]) => (unknown | Promise<unknown>);
 
 export class AutomationObject extends ChannelBase {
   protected readonly _rtid: Rtid;
