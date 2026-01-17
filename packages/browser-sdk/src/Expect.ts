@@ -213,7 +213,7 @@ export class Expect extends ChannelBase implements api.Expect {
    * Falsy value assertion
    */
   toBeFalsy(): void {
-    const isFalsy = !Boolean(this.actual);
+    const isFalsy = !this.actual;
     const reason = this._not
       ? `Value should NOT be falsy`
       : `Value should be falsy`;
@@ -349,7 +349,7 @@ export class Expect extends ChannelBase implements api.Expect {
     let actualErrorMsg = "";
 
     try {
-      (this.actual as Function)();
+      (this.actual as () => unknown)();
     } catch (error) {
       didThrow = true;
       actualErrorMsg = error instanceof Error ? error.message : String(error);

@@ -112,7 +112,7 @@ export abstract class Locator<T extends AutomationObject> extends ChannelBase im
           queryInfo.primary.push({ name: name, value: Utils.toRegExpSpec(value), type: 'property', match: 'regex' });
         }
         else {
-          queryInfo.primary.push({ name: name, value: value, type: 'property', match: 'exact' });
+          queryInfo.primary.push({ name: name, value: value as string | number | boolean | undefined, type: 'property', match: 'exact' });
         }
       }
     }
