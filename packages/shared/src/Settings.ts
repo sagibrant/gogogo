@@ -23,39 +23,42 @@
 import { Utils } from "./Common";
 import { StorageUtils } from "./Storage";
 
-export interface Settings {
+interface AISettings {
+  apiKey: string;
+  baseURL: string;
+  models: string;
+};
+interface ReplaySettings {
+  attachDebugger: boolean;
+  autoSync: boolean;
+  autoActionCheck: boolean;
+  inputMode: 'auto' | 'event' | 'cdp';
+  stepTimeout: number;
+  stepInterval: number;
+  locatorTimeout: number;
+  captureScreenshot: boolean;
+};
+interface RecordSettings {
+  recordNavigation: boolean;
+};
+interface Settings {
   storeURL: string;
   logLevel: 'TRACE' | 'DEBUG' | 'LOG' | 'INFO' | 'WARN' | 'ERROR';
-  aiSettings: {
-    apiKey: string;
-    baseURL: string;
-    models: string;
-  };
-  replaySettings: {
-    attachDebugger: boolean;
-    autoSync: boolean;
-    autoActionCheck: boolean;
-    inputMode: 'auto' | 'event' | 'cdp';
-    stepTimeout: number;
-    stepInterval: number;
-    locatorTimeout: number;
-    captureScreenshot: boolean;
-  };
-  recordSettings: {
-    recordNavigation: boolean;
-  };
+  aiSettings: AISettings;
+  replaySettings: ReplaySettings;
+  recordSettings: RecordSettings;
 }
 
 export class SettingUtils {
 
   private static settings: Settings = SettingUtils.defaultSettings();
-  private static onChangedListener: (changes: any, areaName: any) => void;
+  private static onChangedListener: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void;
 
   public static isSettings(data: unknown): data is Settings {
     if (Utils.isNullOrUndefined(data)) {
       return false;
     }
-    const settings = data as any;
+    const settings = data as Record<string, unknown>;
     const defaultSettings = SettingUtils.defaultSettings();
     Utils.fillWithDefaultValues(settings, defaultSettings);
     const checks = [
@@ -70,30 +73,30 @@ export class SettingUtils {
     }
 
     const check_aiSettings = [
-      typeof settings.aiSettings.apiKey === 'string',
-      typeof settings.aiSettings.baseURL === 'string',
-      typeof settings.aiSettings.models === 'string',
+      typeof (settings.aiSettings as AISettings).apiKey === 'string',
+      typeof (settings.aiSettings as AISettings).baseURL === 'string',
+      typeof (settings.aiSettings as AISettings).models === 'string',
     ];
     if (check_aiSettings.some(c => !c)) {
       return false;
     }
 
     const check_replaySettings = [
-      typeof settings.replaySettings.attachDebugger === 'boolean',
-      typeof settings.replaySettings.autoSync === 'boolean',
-      typeof settings.replaySettings.autoActionCheck === 'boolean',
-      typeof settings.replaySettings.inputMode === 'string' && ['auto', 'event', 'cdp'].includes(settings.replaySettings.inputMode),
-      typeof settings.replaySettings.stepTimeout === 'number',
-      typeof settings.replaySettings.stepInterval === 'number',
-      typeof settings.replaySettings.locatorTimeout === 'number',
-      typeof settings.replaySettings.captureScreenshot === 'boolean'
+      typeof (settings.replaySettings as ReplaySettings).attachDebugger === 'boolean',
+      typeof (settings.replaySettings as ReplaySettings).autoSync === 'boolean',
+      typeof (settings.replaySettings as ReplaySettings).autoActionCheck === 'boolean',
+      typeof (settings.replaySettings as ReplaySettings).inputMode === 'string' && ['auto', 'event', 'cdp'].includes((settings.replaySettings as ReplaySettings).inputMode),
+      typeof (settings.replaySettings as ReplaySettings).stepTimeout === 'number',
+      typeof (settings.replaySettings as ReplaySettings).stepInterval === 'number',
+      typeof (settings.replaySettings as ReplaySettings).locatorTimeout === 'number',
+      typeof (settings.replaySettings as ReplaySettings).captureScreenshot === 'boolean'
     ];
     if (check_replaySettings.some(c => !c)) {
       return false;
     }
 
     const check_recordSettings = [
-      typeof settings.recordSettings.recordNavigation === 'boolean',
+      typeof (settings.recordSettings as RecordSettings).recordNavigation === 'boolean',
     ];
     if (check_recordSettings.some(c => !c)) {
       return false;
@@ -148,7 +151,7 @@ export class SettingUtils {
             return;
           }
           if ('settings' in changes) {
-            const newValue = changes['settings'].newValue;
+            const newValue = changes['settings'].newValue as string;
             if (newValue) {
               const newSettings = SettingUtils.parse2Settings(newValue);
               if (newSettings) {

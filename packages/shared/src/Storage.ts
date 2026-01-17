@@ -22,7 +22,18 @@
 
 // Declare chrome in a way that avoids TypeScript errors without adding dependencies
 declare global {
-  var chrome: any;
+  // eslint-disable-next-line no-var
+  var chrome: {
+    storage?: {
+      local?: {
+        get: (keys: string[]) => Promise<Record<string, unknown>>;
+        set: (items: Record<string, unknown>) => Promise<void>;
+      };
+      onChanged?: {
+        addListener: (callback: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void) => void;
+      };
+    };
+  };
 }
 
 export class StorageUtils {
@@ -41,10 +52,10 @@ export class StorageUtils {
     return null;
   }
 
-  static async set(key: string, value: string) {
+  static async set(key: string, value: string): Promise<void> {
     if (typeof chrome !== 'undefined' && chrome?.storage?.local) {
-      let obj = {};
-      (obj as any)[key] = value;
+      const obj: Record<string, string> = {};
+      obj[key] = value;
       await chrome.storage.local.set(obj);
     }
     else if (typeof localStorage !== 'undefined') {
@@ -53,7 +64,7 @@ export class StorageUtils {
     // todo: add node env support
   }
 
-  static AddOnChangedListener(listener: (changes: any, areaName: any) => void) {
+  static AddOnChangedListener(listener: (changes: Record<string, { oldValue?: unknown; newValue?: unknown }>, areaName: string) => void): void {
     if (typeof chrome !== 'undefined' && chrome?.storage?.onChanged) {
       chrome.storage.onChanged.addListener(listener);
     }

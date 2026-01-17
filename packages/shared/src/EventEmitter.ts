@@ -64,7 +64,7 @@ import { Utils } from "./Common";
 import { Logger } from "./Logger";
 
 // EventMap defines the structure of events: event names mapped to their payload types
-export type EventMap = Record<string, any>;
+export type EventMap = Record<string, unknown>;
 
 // Listener function type that can handle both sync and async operations
 type Listener<Args> = (args: Args) => void | Promise<void>;
@@ -76,9 +76,9 @@ interface ListenerWrapper<Args> {
   once: boolean;     // Flag for one-time execution
 }
 
-export class EventEmitter<Events extends EventMap = any> {
+export class EventEmitter<Events extends EventMap = Record<string, unknown>> {
   // Stores all event listeners in a nested map structure
-  private _listeners: Map<keyof Events, ListenerWrapper<any>[]> = new Map();
+  private _listeners: Map<keyof Events, ListenerWrapper<Events[keyof Events]>[]> = new Map();
 
   // Optional set of allowed event names for validation
   private _allowedEvents: Set<keyof Events> | null = null;
@@ -123,7 +123,7 @@ export class EventEmitter<Events extends EventMap = any> {
     // Add listener with metadata
     const listeners = this._listeners.get(event)!;
     listeners.push({
-      listener,
+      listener: listener as Listener<Events[keyof Events]>,
       priority: options.priority ?? 0,
       once: options.once ?? false
     });

@@ -51,7 +51,7 @@ export class LocatorUtils {
     else {
       // even queryInfo.mandatory is undefined, we still need to call queryObjectsFunc once with empty selectors
       // because the queryObjectsFunc return all objects if no selectors 
-      let candidates = await queryObjectsFunc(queryInfo.mandatory || []) || [];
+      const candidates = await queryObjectsFunc(queryInfo.mandatory || []) || [];
       queryResults = {
         objects: candidates || [],
         queryInfo: { primary: [], mandatory: queryInfo.mandatory }
@@ -86,7 +86,7 @@ export class LocatorUtils {
       };
     }
     else {
-      let candidates = queryObjectsFunc(queryInfo.mandatory || []);
+      const candidates = queryObjectsFunc(queryInfo.mandatory || []);
       queryResults = {
         objects: candidates || [],
         queryInfo: { primary: [], mandatory: queryInfo.mandatory, assistive: [] }
@@ -225,12 +225,13 @@ export class LocatorUtils {
     }
     else if (selector.type === 'attribute') {
       if ('hasAttribute' in obj && Utils.isFunction(obj.hasAttribute)) {
-        return obj.hasAttribute(key);
+        return (obj.hasAttribute as (name: string) => boolean)(key);
       }
       return false;
     }
     else if (selector.type === 'function') {
-      return key in obj && Utils.isFunction((obj as any)[key]);
+      const candidate = obj as Record<string, unknown>;
+      return key in obj && Utils.isFunction(candidate[key]);
     }
     else if (selector.type === 'text') {
       return obj instanceof Node && obj.nodeType === Node.TEXT_NODE;
@@ -249,16 +250,18 @@ export class LocatorUtils {
     let nodeValue: string | number | boolean | undefined | null = undefined;
 
     if (selector.type === 'property') {
-      nodeValue = (obj as any)[key];
+      const candidate = obj as Record<string, unknown>;
+      nodeValue = candidate[key] as string | number | boolean | undefined | null;
     }
     else if (selector.type === 'attribute') {
       if ('getAttribute' in obj && Utils.isFunction(obj.getAttribute)) {
-        nodeValue = obj.getAttribute(key);
+        nodeValue = (obj.getAttribute as (name: string) => string | null)(key);
       }
     }
     else if (selector.type === 'function') {
-      if (key in obj && Utils.isFunction((obj as any)[key])) {
-        nodeValue = (obj as any)[key]();
+      const candidate = obj as Record<string, unknown>;
+      if (key in obj && Utils.isFunction(candidate[key])) {
+        nodeValue = (candidate[key] as () => string | number | boolean | undefined | null)();
       }
     }
     else if (selector.type === 'text') {
@@ -299,7 +302,7 @@ export class LocatorUtils {
         return regExp.test(actual as string);
       }
       else {
-        var regExp = new RegExp(expected as string);
+        const regExp = new RegExp(expected as string);
         return regExp.test(actual as string);
       }
     }

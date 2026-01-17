@@ -119,10 +119,10 @@ export class Utils {
       if (value instanceof Date || value instanceof RegExp) {
         return false;
       }
-      if ((value as any) instanceof Map || (value as any) instanceof Set) {
-        return (value as any).size === 0;
+      if (value instanceof Map || value instanceof Set) {
+        return value.size === 0;
       }
-      const proto = Object.getPrototypeOf(value);
+      const proto: unknown = Object.getPrototypeOf(value);
       if (proto === Object.prototype) {
         return Object.keys(value).length === 0;
       }
@@ -137,8 +137,8 @@ export class Utils {
    * Checks if the provided value is `function`.
    * @param value The value to check.
    */
-  static isFunction(value: unknown): value is Function {
-    return typeof (value as any) === 'function';
+  static isFunction(value: unknown): value is (...args: unknown[]) => unknown {
+    return typeof value === 'function';
   }
 
   /**
@@ -149,8 +149,8 @@ export class Utils {
    * @returns updated string
    */
   static replaceAll(str: string, pattern: string, replacement: string): string {
-    if (Utils.isFunction((str as any).replaceAll)) {
-      return (str as any).replaceAll(pattern, replacement);
+    if (typeof (str as { replaceAll?: unknown }).replaceAll === 'function') {
+      return (str as unknown as { replaceAll: (pattern: string, replacement: string) => string }).replaceAll(pattern, replacement);
     }
     return str.split(pattern).join(replacement);
   }
@@ -219,7 +219,7 @@ export class Utils {
       if (input instanceof Date) return new Date(input.getTime());
       if (input instanceof RegExp) return new RegExp(input);
 
-      const output: unknown = Array.isArray(input) ? [] : {};
+      const output = Array.isArray(input) ? [] : {};
       seen.set(input, output);
 
       for (const [key, value] of Object.entries(input)) {
@@ -283,13 +283,14 @@ export class Utils {
           return (a as Date).getTime() === (b as Date).getTime();
 
         // 5.2 Regular expression objects (compare source string and flags)
-        case '[object RegExp]':
+        case '[object RegExp]': {
           const regA = a as RegExp;
           const regB = b as RegExp;
           return regA.source === regB.source && regA.flags === regB.flags;
+        }
 
         // 5.3 Arrays (traverse each element and compare recursively)
-        case '[object Array]':
+        case '[object Array]': {
           const arrA = a as unknown[];
           const arrB = b as unknown[];
 
@@ -305,9 +306,10 @@ export class Utils {
             }
           }
           return true;
+        }
 
         // 5.4 Plain objects (traverse own enumerable properties and compare recursively)
-        case '[object Object]':
+        case '[object Object]': {
           const objA = a as Record<string | symbol, unknown>;
           const objB = b as Record<string | symbol, unknown>;
 
@@ -330,6 +332,7 @@ export class Utils {
             }
           }
           return true;
+        }
 
         // 5.5 Other unsupported complex types (such as Function, Symbol, etc., compared by reference)
         default:
@@ -376,7 +379,7 @@ export class Utils {
       return rect;
     }
     // x + y = z
-    const solveEquation = (x?: number, y?: number, z?: number) => {
+    const solveEquation = (x?: number, y?: number, z?: number): (number | undefined)[] => {
       if (Utils.isNullOrUndefined(x) && !Utils.isNullOrUndefined(y) && !Utils.isNullOrUndefined(z)) {
         return [z - y, y, z];
       }
@@ -495,7 +498,7 @@ export class Utils {
      * @param start - Starting index for selection
      * @param current - Current combination being built
      */
-    function backtrack(start: number, current: T[]) {
+    function backtrack(start: number, current: T[]): void {
       // When current combination reaches size k, add to results
       if (current.length === k) {
         result.push([...current]);
@@ -575,7 +578,7 @@ export class Utils {
     const end_time = performance.now() + timeout;
     return new Promise((resolve, _reject) => {
       let lastExecution: number | undefined = undefined;
-      const rafFunc = async () => {
+      const rafFunc = async (): Promise<void> => {
         // time out
         if (performance.now() >= end_time) {
           resolve(false);
@@ -596,7 +599,9 @@ export class Utils {
               return;
             }
           }
-        } catch { }
+        } catch {
+          // Ignore errors and continue
+        }
         requestAnimationFrame(rafFunc);
       };
       requestAnimationFrame(rafFunc);
@@ -655,14 +660,14 @@ export class Utils {
 
   static fillWithDefaultValues<T extends object>(source: Partial<T>, defaults: T): void {
     for (const key in defaults) {
-      if (!defaults.hasOwnProperty(key)) continue;
+      if (!Object.prototype.hasOwnProperty.call(defaults, key)) continue;
 
       if (source[key] === undefined) {
         source[key] = defaults[key];
       }
       else if (typeof defaults[key] === 'object' && defaults[key] !== null &&
         typeof source[key] === 'object' && source[key] !== null) {
-        Utils.fillWithDefaultValues(source[key] as Partial<any>, defaults[key]);
+        Utils.fillWithDefaultValues(source[key] as Partial<object>, defaults[key] as object);
       }
     }
   }
@@ -670,7 +675,7 @@ export class Utils {
 
 export class MsgUtils {
 
-  static createMessageData(type: MessageDataType, dest: Rtid, action: Action, target?: AODesc) {
+  static createMessageData(type: MessageDataType, dest: Rtid, action: Action, target?: AODesc): MessageData {
     const msgData: MessageData = { type, dest, action, target };
     return msgData;
   }
@@ -715,8 +720,8 @@ export class MsgUtils {
     if (msg.type === 'request') {
       return MsgUtils.createRequest(msg.data, msg.correlationId);
     }
-    if (msg.type === 'response') {
-      return MsgUtils.createResponse(msg.data, msg.syncId!, msg.correlationId);
+    if (msg.type === 'response' && msg.syncId) {
+      return MsgUtils.createResponse(msg.data, msg.syncId, msg.correlationId);
     }
     return undefined;
   }
@@ -783,13 +788,15 @@ export class RtidUtils {
    * @param obj The object to check.
    */
   static isRtid(obj: unknown): obj is Rtid {
+    if (typeof obj !== 'object' || obj === null) {
+      return false;
+    }
+    const candidate = obj as Record<string, unknown>;
     return (
-      typeof obj === 'object' &&
-      obj !== null &&
-      typeof (obj as any).browser === 'number' &&
-      typeof (obj as any).tab === 'number' &&
-      typeof (obj as any).frame === 'number' &&
-      typeof (obj as any).object === 'number'
+      typeof candidate.browser === 'number' &&
+      typeof candidate.tab === 'number' &&
+      typeof candidate.frame === 'number' &&
+      typeof candidate.object === 'number'
     );
   }
 

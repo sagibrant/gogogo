@@ -43,11 +43,11 @@ export class DOMNode {
     return ancestorShadowRoot ? new DOMNode(ancestorShadowRoot.host) : null;
   }
 
-  nodeName() {
+  nodeName(): string {
     return this._node.nodeName;
   }
 
-  nodeType() {
+  nodeType(): number {
     return this._node.nodeType;
   }
 
@@ -58,7 +58,7 @@ export class DOMNode {
     return null;
   }
 
-  localName() {
+  localName(): string {
     if (this._node.nodeType === Node.ELEMENT_NODE && this._node instanceof Element) {
       return this._node.localName;
     }
@@ -73,8 +73,8 @@ export class DOMNode {
     return this._node;
   }
 
-  children() {
-    const result = [];
+  children(): DOMNode[] {
+    const result: DOMNode[] = [];
     if (this._node.nodeType === Node.ELEMENT_NODE && this._node instanceof Element) {
       const children = this._node.children;
       for (let i = 0; i < children.length; i++) {
@@ -449,7 +449,7 @@ export class DOMPathUtils {
     }
 
     if (elem.attributes) {
-      const attributes: Record<string, any> = {};
+      const attributes: Record<string, string> = {};
       for (let i = 0; i < elem.attributes.length; i++) {
         const attr = elem.attributes[i];
         attributes[attr.name] = attr.value;

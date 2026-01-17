@@ -49,7 +49,7 @@ export class Logger {
    */
   setLevel(newLevel: LogLevel | string): void {
     if (typeof newLevel === 'string') {
-      const getLogLevelFromString = (str: string) => {
+      const getLogLevelFromString = (str: string): LogLevel => {
         switch (str) {
           case 'TRACE': return LogLevel.TRACE;
           case 'DEBUG': return LogLevel.DEBUG;
@@ -64,7 +64,7 @@ export class Logger {
       this._level = getLogLevelFromString(this._levelString);
     }
     else {
-      const getLogStringFromLevel = (logLevel: LogLevel) => {
+      const getLogStringFromLevel = (logLevel: LogLevel): string => {
         switch (logLevel) {
           case LogLevel.TRACE: return 'TRACE';
           case LogLevel.DEBUG: return 'DEBUG';
@@ -73,7 +73,6 @@ export class Logger {
           case LogLevel.WARN: return 'WARN';
           case LogLevel.ERROR: return 'ERROR';
         }
-        console.error(`get unexpected logLevel: ${logLevel}`);
       }
       this._levelString = getLogStringFromLevel(newLevel);
       this._level = newLevel;

@@ -323,11 +323,11 @@ export interface OrdinalSelector {
 export interface DOMElementDescription {
   nodeType: number; //'ELEMENT_NODE' = 1 | 'TEXT_NODE' = 3;
   nodeName?: string;
-  nodeValue?: any;
+  nodeValue?: string | null;
   textContent?: string;
   localName?: string;
   tagName?: string;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, string>;
 
   selector?: string;
   xPath?: string;

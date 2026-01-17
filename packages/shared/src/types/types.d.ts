@@ -89,8 +89,8 @@ export interface BrowserMethods {
 }
 
 export interface BrowserEvents {
-  on(event: 'window', listener: (window: Window) => any): this;
-  on(event: 'page', listener: (page: Page) => any): this;
+  on(event: 'window', listener: (window: Window) => unknown): this;
+  on(event: 'page', listener: (page: Page) => unknown): this;
 }
 
 export interface Browser extends BrowserProperties, BrowserMethods, BrowserLocatorMethods, BrowserEvents {
@@ -128,8 +128,8 @@ export interface WindowMethods {
 }
 
 export interface WindowEvents {
-  on(event: 'page', listener: (page: Page) => any): this;
-  on(event: 'close', listener: (window: Window) => any): this;
+  on(event: 'page', listener: (page: Page) => unknown): this;
+  on(event: 'close', listener: (window: Window) => unknown): this;
 }
 
 export interface Window extends WindowProperties, WindowMethods, WindowLocatorMethods, WindowEvents {
@@ -178,13 +178,12 @@ export interface PageMethods {
   captureScreenshot(): Promise<string>;
 
   querySelectorAll(selector: string): Promise<Element[]>;
-  executeScript<Args extends any[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>;
+  executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>;
 }
 
 export interface PageEvents {
-  on(event: 'dialog', listener: (dialog: Dialog) => any): this;
-  on(event: 'domcontentloaded', listener: (page: Page) => any): this;
-  on(event: 'close', listener: (page: Page) => any): this;
+  on(event: 'dialog', listener: (dialog: Dialog) => unknown): this;
+  on(event: 'domcontentloaded' | 'close', listener: (page: Page) => unknown): this;
 }
 
 export interface Page extends PageProperties, PageMethods, PageLocatorMethods, PageEvents {
@@ -219,7 +218,7 @@ export interface FrameProperties {
 export interface FrameMethods {
   sync(timeout: number): Promise<void>;
   querySelectorAll(selector: string): Promise<Element[]>;
-  executeScript<Args extends any[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>;
+  executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>;
 }
 
 export interface Frame extends FrameProperties, FrameMethods, FrameLocatorMethods {
@@ -242,8 +241,8 @@ export interface NodeProperties {
 
 export interface NodeMethods {
   highlight(): Promise<void>;
-  getProperty(name: string): Promise<any>;
-  setProperty(name: string, value: any): Promise<void>;
+  getProperty(name: string): Promise<unknown>;
+  setProperty(name: string, value: unknown): Promise<void>;
   getBoundingClientRect(): Promise<RectInfo>;
   dispatchEvent(type: string, options?: object): Promise<void>;
   sendCDPCommand(method: string, commandParams?: { [key: string]: unknown }): Promise<void>;
@@ -348,7 +347,7 @@ export interface Text extends NodeProperties, NodeMethods, MouseActions, TouchAc
 
 export interface TextLocator extends Locator<Text>, Text { }
 
-export type JSObject = any;
+export type JSObject = Record<string, unknown>;
 
 export interface Mouse {
   click(x: number, y: number, options?: Omit<ClickOptions, 'position'>): Promise<void>;
@@ -427,7 +426,7 @@ export interface Cookie {
 }
 
 export interface AIClient {
-  init(options?: any): this;
+  init(options?: Record<string, unknown>): this;
   setModel(model: string): this;
   setSystemPrompt(prompt: string): this;
   chat(message: string): Promise<string | null>;

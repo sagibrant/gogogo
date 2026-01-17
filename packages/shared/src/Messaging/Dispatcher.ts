@@ -35,7 +35,7 @@ export abstract class Dispatcher {
   protected readonly mode: string;
   private _timeout: number = 5000;
   private _responseCallbacks: Record<string, (result: MessageData) => void> = {};
-  private _responseTimeoutId: Record<string, any> = {};
+  private _responseTimeoutId: Record<string, ReturnType<typeof setTimeout>> = {};
   private _handlers: IMsgDataHandler[] = [];
 
 
@@ -144,7 +144,7 @@ export abstract class Dispatcher {
   /**
    * Handler for incoming messages from a channel.
    */
-  onMessage(msg: Message, sender?: any, responseCallback?: (response: Message) => void): void {
+  onMessage(msg: Message, sender?: unknown, responseCallback?: (response: Message) => void): void {
     this.logger.debug('onMessage: ------> msg=', msg, ' sender=', sender, ' responseCallback=', !!responseCallback);
 
     // response:
