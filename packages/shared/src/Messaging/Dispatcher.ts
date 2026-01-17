@@ -160,7 +160,7 @@ export abstract class Dispatcher {
         const cachedResponseCallback = this._responseCallbacks[msg.syncId];
         delete this._responseCallbacks[msg.syncId];
         cachedResponseCallback(msg.data);
-        this.logger.debug('onMessage: <------ handled by cachedResponseCallback, msg=', msg, ' sender=', sender);
+        this.logger.debug('onMessage: <------ response handled by cachedResponseCallback, msg=', msg, ' sender=', sender);
       }
       return;
     }
@@ -168,8 +168,11 @@ export abstract class Dispatcher {
     if (msg.type === 'event') {
       const handlers = this.getLocalHandlers(msg.data);
       if (handlers.length > 0) {
-        this.handleMsgData(msg.data, handlers);
-        this.logger.debug('onMessage: <------ handled by local handlers, msg=', msg, ' sender=', sender);
+        this.handleMsgData(msg.data, handlers).then((result) => {
+          this.logger.debug('onMessage: <------ event handled by local handlers, msg=', msg, ' sender=', sender, 'result=', result);
+        }).catch((err) => {
+          this.logger.warn('onMessage: <------ event handled by local handlers, msg=', msg, ' sender=', sender, 'error=', err);
+        });
       }
       else {
         const event = MsgUtils.createEvent(msg.data, msg.correlationId);
@@ -179,23 +182,32 @@ export abstract class Dispatcher {
           throw new Error('Cannot find the communication channel');
         }
         if (channel.async) {
-          channel.sendEvent(event);
+          channel.sendEvent(event).then(() => {
+            this.logger.debug('onMessage: <------ event forwarded by [sendEvent], msg=', msg, ' new event=', event, ' channel=', channel);
+          }).catch((err) => {
+            this.logger.warn('onMessage: <------ event forwarded by [sendEvent], msg=', msg, ' new event=', event, ' channel=', channel, 'error=', err);
+          });
         }
         else {
           channel.postMessage(event);
+          this.logger.debug('onMessage: <------ event forwarded by [postMessage], msg=', msg, ' new event=', event, ' channel=', channel);
         }
-        this.logger.debug('onMessage: <------ forward event msg=', msg, ' new event=', event, ' channel:', channel);
       }
     }
     else if (msg.type === 'request') {
       const handlers = this.getLocalHandlers(msg.data);
       if (handlers.length > 0) {
         this.handleMsgData(msg.data, handlers).then((result) => {
-          const response = MsgUtils.createResponse(result, msg.syncId!, msg.correlationId);
-          this.logger.debug('onMessage: <------ handled by local handlers, msg=', msg, ' sender=', sender, ' response=', response);
+          if (!msg.syncId) {
+            throw new Error('syncId is empty');
+          }
+          const response = MsgUtils.createResponse(result, msg.syncId, msg.correlationId);
           if (responseCallback) {
             responseCallback(response);
           }
+          this.logger.debug('onMessage: <------ request handled by local handlers, msg=', msg, ' sender=', sender, ' response=', response);
+        }).catch((err) => {
+          this.logger.error('onMessage: <------ request handled by local handlers, msg=', msg, ' sender=', sender, ' error=', err);
         });
       }
       else {
@@ -207,21 +219,31 @@ export abstract class Dispatcher {
         }
         if (channel.async) {
           channel.sendRequest(request).then((resMsg) => {
-            const response = MsgUtils.createResponse(resMsg.data, msg.syncId!, msg.correlationId);
+            if (!msg.syncId) {
+              throw new Error('syncId is empty');
+            }
+            const response = MsgUtils.createResponse(resMsg.data, msg.syncId, msg.correlationId);
             if (responseCallback) {
               responseCallback(response);
             }
-            this.logger.debug('onMessage: <------ forward request async msg=', msg, ' sender=', sender, ' response=', response, ' channel:', channel);
+            this.logger.debug('onMessage: <------ request forwarded by [sendRequest], msg=', msg, ' sender=', sender, ' channel:', channel, ' response=', response);
+          }).catch((err) => {
+            this.logger.error('onMessage: <------ request forwarded by [sendRequest], msg=', msg, ' sender=', sender, ' channel:', channel, ' error=', err);
           });
         }
         else {
           // set timeout to -1 so that it will not rejected by timeout
           this._postRequest(request, channel, -1).then((result) => {
-            const response = MsgUtils.createResponse(result, msg.syncId!, msg.correlationId);
+            if (!msg.syncId) {
+              throw new Error('syncId is empty');
+            }
+            const response = MsgUtils.createResponse(result, msg.syncId, msg.correlationId);
             if (responseCallback) {
               responseCallback(response);
             }
-            this.logger.debug('onMessage: <------ forward request post msg=', msg, ' sender=', sender, ' response=', response, ' channel:', channel);
+            this.logger.debug('onMessage: <------ forward request post msg=', msg, ' sender=', sender, ' channel:', channel, ' response=', response);
+          }).catch((err) => {
+            this.logger.debug('onMessage: <------ forward request post msg=', msg, ' sender=', sender, ' channel:', channel, ' error=', err);
           });
         }
       }
@@ -256,7 +278,7 @@ export abstract class Dispatcher {
         return false;
       }
 
-      const resultCallback = (result: MessageData) => {
+      const resultCallback = (result: MessageData): void => {
         resolve(result);
       };
       for (const handler of handlers) {
@@ -278,7 +300,7 @@ export abstract class Dispatcher {
    */
   private async _postRequest(msg: Message, channel: IChannel, timeout: number = this._timeout): Promise<MessageData> {
     return new Promise((resolve, reject) => {
-      const resultCallback = (result: MessageData) => {
+      const resultCallback = (result: MessageData): void => {
         resolve(result);
       };
 
