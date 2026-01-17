@@ -24,30 +24,38 @@ import { Utils, Dispatcher } from "@gogogo/shared";
 import { ObjectRepository } from "./ObjectRepository";
 import { MainToContentDispatcher } from "./Dispatcher";
 
-export class RuntimeUtils {
-  private static _dispatcher?: Dispatcher;
-  private static _repo?: ObjectRepository;
+interface InternalRuntimeObjects {
+  dispatcher?: Dispatcher,
+  repo?: ObjectRepository
+}
 
-  static set dispatcher(dispatcher: Dispatcher) {
-    RuntimeUtils._dispatcher = dispatcher;
-  }
+const RuntimeObjects: InternalRuntimeObjects = {
+  dispatcher: undefined,
+  repo: undefined
+}
 
-  static get dispatcher(): Dispatcher {
+export const RuntimeUtils = {
+
+  set dispatcher(dispatcher: Dispatcher) {
+    RuntimeObjects.dispatcher = dispatcher;
+  },
+
+  get dispatcher(): Dispatcher {
     // init with build-in MainToContentDispatcher for web package
-    if (Utils.isNullOrUndefined(RuntimeUtils._dispatcher)) {
-      RuntimeUtils._dispatcher = new MainToContentDispatcher();
+    if (Utils.isNullOrUndefined(RuntimeObjects.dispatcher)) {
+      RuntimeObjects.dispatcher = new MainToContentDispatcher();
     }
-    return RuntimeUtils._dispatcher;
-  }
+    return RuntimeObjects.dispatcher;
+  },
 
-  static set repo(repo: ObjectRepository) {
-    RuntimeUtils._repo = repo;
-  }
+  set repo(repo: ObjectRepository) {
+    RuntimeObjects.repo = repo;
+  },
 
-  static get repo(): ObjectRepository {
-    if (Utils.isNullOrUndefined(RuntimeUtils._repo)) {
-      RuntimeUtils._repo = new ObjectRepository();
+  get repo(): ObjectRepository {
+    if (Utils.isNullOrUndefined(RuntimeObjects.repo)) {
+      RuntimeObjects.repo = new ObjectRepository();
     }
-    return RuntimeUtils._repo;
+    return RuntimeObjects.repo;
   }
 }
