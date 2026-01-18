@@ -31,7 +31,7 @@ let onMouseOverListener: ((ev: MouseEvent) => void) | undefined = undefined;
 let onResizeListener: ((ev: UIEvent) => void) | undefined = undefined;
 
 export function turnOnUserInteractiveMode(deviceScaleFactor: number): void {
-  onMouseOverListener = (ev: MouseEvent) => {
+  onMouseOverListener = (ev: MouseEvent): void => {
     if (window.parent !== window) {
       return; // check if in page
     }

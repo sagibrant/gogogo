@@ -78,7 +78,7 @@ export class ContentDispatcher extends Dispatcher {
             status: 'OK',
             result: { frameRtid: ContentUtils.frame.rtid, settings: SettingUtils.getSettings() }
           };
-          const response = MsgUtils.createResponse(resData, msg.syncId!, msg.correlationId);
+          const response = MsgUtils.createResponse(resData, msg.syncId || '', msg.correlationId);
           responseCallback(response);
           return;
         }
@@ -89,7 +89,7 @@ export class ContentDispatcher extends Dispatcher {
             status: 'ERROR',
             error: 'Invalid config get request message'
           };
-          const response = MsgUtils.createResponse(resData, msg.syncId!, msg.correlationId);
+          const response = MsgUtils.createResponse(resData, msg.syncId || '', msg.correlationId);
           responseCallback(response);
         }
         return;

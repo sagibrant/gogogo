@@ -99,7 +99,7 @@ export default function App() {
         return null;
       }
       return settings;
-    } catch (e) {
+    } catch {
       return null;
     }
   };
@@ -116,7 +116,7 @@ export default function App() {
         return null;
       }
       return settings;
-    } catch (e) {
+    } catch {
       return null;
     }
   };

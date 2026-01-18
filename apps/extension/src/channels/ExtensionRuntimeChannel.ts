@@ -181,8 +181,8 @@ export class ExtensionRuntimeChannel extends ChannelBase {
     for (let i = 1; i <= 3; i++) {
       try {
         const response = await Utils.waitResult(async () => {
-          const response = await chrome.runtime.sendMessage(undefined, 'PING');
-          return response as string;
+          const responseRaw: unknown = await chrome.runtime.sendMessage(undefined, 'PING');
+          return responseRaw as string;
         }, 100);
         if (response === 'PONG') {
           return;

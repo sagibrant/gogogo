@@ -66,9 +66,9 @@ export class ExtensionFrameChannel extends ChannelBase {
     this.logger.debug('sendRequest: >>>>>> msg=', msg);
     const dest = msg.data.dest;
     await this.ping(dest.tab, dest.frame, msg);
-    const response = await chrome.tabs.sendMessage(dest.tab, msg, { frameId: dest.frame });
-    this.logger.debug('sendRequest: <<<<<< msg=', msg, ' response=', response);
-    return response as Message;
+    const responseUnknown: unknown = await chrome.tabs.sendMessage(dest.tab, msg, { frameId: dest.frame });
+    this.logger.debug('sendRequest: <<<<<< msg=', msg, ' response=', responseUnknown);
+    return responseUnknown as Message;
   }
 
   disconnect(_reason?: string): void {
@@ -84,8 +84,8 @@ export class ExtensionFrameChannel extends ChannelBase {
     for (let i = 1; i <= 3; i++) {
       try {
         const response = await Utils.waitResult(async () => {
-          const response = await chrome.tabs.sendMessage(tabId, 'PING', { frameId: frameId });
-          return response as string;
+          const responseUnknown: unknown = await chrome.tabs.sendMessage(tabId, 'PING', { frameId: frameId });
+          return responseUnknown as string;
         }, 100);
         if (response === 'PONG') {
           return;

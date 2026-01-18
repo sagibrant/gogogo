@@ -163,7 +163,7 @@ export function dispatchEvent(node: Node, type: string, eventInitObj?: object): 
     case 'keyboard': event = new KeyboardEvent(type, eventInit as KeyboardEventInit); break;
     case 'touch': {
       // WebKit does not support Touch constructor, but has deprecated createTouch and createTouchList methods.
-      if (typeof 'Touch' === 'undefined'
+      if (typeof Touch === 'undefined'
         && 'createTouch' in document
         && 'createTouchList' in document
       ) {
@@ -178,7 +178,9 @@ export function dispatchEvent(node: Node, type: string, eventInitObj?: object): 
           let pageY = tObj.pageY;
           if (pageY === undefined && tObj.clientY !== undefined)
             pageY = tObj.clientY + (document.scrollingElement?.scrollTop || 0);
-          return (document as unknown as LegacyDocument).createTouch(window, tObj.target ?? node, tObj.identifier, pageX!, pageY!, tObj.screenX, tObj.screenY, tObj.radiusX, tObj.radiusY, tObj.rotationAngle, tObj.force);
+          const px = pageX ?? 0;
+          const py = pageY ?? 0;
+          return (document as unknown as LegacyDocument).createTouch(window, tObj.target ?? node, tObj.identifier, px, py, tObj.screenX, tObj.screenY, tObj.radiusX, tObj.radiusY, tObj.rotationAngle, tObj.force);
         };
         const createTouchList = (touches: unknown): TouchList => {
           if (touches instanceof TouchList || !touches)
@@ -266,12 +268,12 @@ export function dispatchPointerEvent(
     pressure?: number;
   }
 ): boolean {
-  let { x, y, button, buttons, pointerType, pressure } = options || {};
-  button = button ?? MouseButton.Left;
+  const { x, y, button: btnOpt, buttons: btnsOpt, pointerType: ptOpt, pressure: prOpt } = options || {};
+  const button = btnOpt ?? MouseButton.Left;
   // no buttons pressed unless type is pointermove or pointerdown
-  buttons = buttons ?? (['pointermove', 'pointerdown'].includes(type) ? (1 << button) : 0);
-  pointerType = pointerType ?? 'mouse';
-  pressure = pressure ?? (pointerType === 'mouse' ? 0 : 0.5);
+  const buttons = btnsOpt ?? (['pointermove', 'pointerdown'].includes(type) ? (1 << button) : 0);
+  const pointerType = ptOpt ?? 'mouse';
+  const pressure = prOpt ?? (pointerType === 'mouse' ? 0 : 0.5);
 
   const { clientX, clientY } = getClientPoint(target, x, y);
 
@@ -346,10 +348,10 @@ export function dispatchMouseEvent(
     }
   }
 ): boolean {
-  let { x, y, button, buttons, modifiers } = options || {};
-  button = button ?? MouseButton.Left;
+  const { x, y, button: btnOpt, buttons: btnsOpt, modifiers } = options || {};
+  const button = btnOpt ?? MouseButton.Left;
   // no buttons pressed unless type is mousemove,mousedown
-  buttons = buttons ?? (['mousemove', 'mousedown'].includes(type) ? (1 << button) : 0);
+  const buttons = btnsOpt ?? (['mousemove', 'mousedown'].includes(type) ? (1 << button) : 0);
 
   // Destructure modifier keys with defaults (all false if not specified)
   const {
@@ -427,8 +429,8 @@ export function dispatchDragEvent(
     dataTransfer?: DataTransfer;
   }
 ): boolean {
-  let { x, y, dataTransfer } = options || {};
-  dataTransfer = dataTransfer ?? new DataTransfer();
+  const { x, y, dataTransfer } = options || {};
+  const dt = dataTransfer ?? new DataTransfer();
 
   const { clientX, clientY } = getClientPoint(target, x, y);
 
@@ -442,7 +444,7 @@ export function dispatchDragEvent(
     cancelable,
     clientX,
     clientY,
-    dataTransfer,
+    dataTransfer: dt,
     view: window, // Maintain UIEvent compliance
     // Omitted screenX/screenY to avoid scale-related inaccuracies
   });
@@ -497,10 +499,10 @@ export function dispatchWheelEvent(
     }
   }
 ): boolean {
-  let { x, y, deltaY, deltaX, deltaMode, modifiers } = options || {};
-  deltaX = deltaX ?? 0;
-  deltaY = deltaY ?? 100;
-  deltaMode = deltaMode ?? WheelEvent.DOM_DELTA_PIXEL;
+  const { x, y, deltaY: dyOpt, deltaX: dxOpt, deltaMode: dmOpt, modifiers } = options || {};
+  const deltaX = dxOpt ?? 0;
+  const deltaY = dyOpt ?? 100;
+  const deltaMode = dmOpt ?? WheelEvent.DOM_DELTA_PIXEL;
   // Destructure modifier keys with safe defaults
   const {
     ctrlKey = false,
@@ -638,7 +640,10 @@ export async function simulateMove(
     steps?: number
   }
 ): Promise<void> {
-  let { button, buttons, startPoint, endPoint, steps = 1 } = options || {};
+  const { button, buttons, startPoint: spOpt, endPoint: epOpt, steps: stepsOpt = 1 } = options || {};
+  let startPoint = spOpt;
+  let endPoint = epOpt;
+  const steps = stepsOpt;
 
   if (Utils.isNullOrUndefined(startPoint) || Utils.isNullOrUndefined(endPoint)) {
     const rect = target.getBoundingClientRect();
@@ -1212,10 +1217,13 @@ export async function simulateDragDrop(
     buttons?: number;
   }
 ): Promise<void> {
-  let { startPoint, endPoint, steps = 1, data, button, buttons } = options || {};
-  data = data ?? {};
-  button = button ?? MouseButton.Left;
-  buttons = buttons ?? 1 << button;
+  const { startPoint: spOpt, endPoint: epOpt, steps: stepsOpt = 1, data: dataOpt, button: btnOpt, buttons: btnsOpt } = options || {};
+  let startPoint = spOpt;
+  let endPoint = epOpt;
+  const steps = stepsOpt;
+  const data = dataOpt ?? {};
+  const button = btnOpt ?? MouseButton.Left;
+  const buttons = btnsOpt ?? (1 << button);
 
   // Set default start point: use source's center if startPoint is undefined
   if (!startPoint) {
@@ -1445,7 +1453,7 @@ export function createDataTransfer(): DataTransfer {
     },
     clearData: (type?: string) => {
       if (type) {
-        delete data[type];
+        Reflect.deleteProperty(data, type);
       } else {
         data = {};
       }
@@ -1453,4 +1461,3 @@ export function createDataTransfer(): DataTransfer {
     setDragImage: () => { },
   } as unknown as DataTransfer;
 }
-

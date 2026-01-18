@@ -101,11 +101,12 @@ export class CustomEventChannel extends ChannelBase {
 
   private onMessage(ev: Event): void {
     this.logger.debug('onMessage: >>>> ev=', ev);
-    const msg = ev instanceof CustomEvent ? ev.detail : null;
-    if (!MsgUtils.isMessage(msg)) {
-      this.logger.error('Invalid message format: msg:', msg, ' ev:', ev);
+    const msgUnknown: unknown = ev instanceof CustomEvent ? ev.detail : null;
+    if (!MsgUtils.isMessage(msgUnknown)) {
+      this.logger.error('Invalid message format: msg:', msgUnknown, ' ev:', ev);
       return;
     }
+    const msg = msgUnknown as Message;
     this.emit('message', {
       msg: msg,
       sender: this._source === 'content' ? 'MAIN' : 'content',

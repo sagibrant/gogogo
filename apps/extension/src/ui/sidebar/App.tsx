@@ -1184,7 +1184,7 @@ export default function App() {
   );
 
   // Handle step result click
-  const handleStepResultClick = useCallback((_uid: string) => {
+  const handleStepResultClick = useCallback(() => {
     // todo: display results in a better UI
     // setSidebarBottomType('result');
   }, []);
@@ -1195,7 +1195,7 @@ export default function App() {
   }, []);
 
   // Handle drag over
-  const handleDragOver = useCallback((stepUid: string) => {
+  const handleDragOver = useCallback(() => {
     // Prevent default to allow drop
   }, []);
 
@@ -1777,7 +1777,7 @@ export default function App() {
                   onDragOver={e => {
                     e.stopPropagation();
                     e.preventDefault();
-                    handleDragOver(step.uid);
+                    handleDragOver();
                   }}
                   onDrop={e => {
                     e.stopPropagation();
@@ -1815,7 +1815,7 @@ export default function App() {
                     className={`step-status ${step.last_status || 'pending'}`}
                     onClick={e => {
                       e.stopPropagation();
-                      handleStepResultClick(step.uid);
+                      handleStepResultClick();
                     }}
                     title={getStepLastError(step)}
                   >

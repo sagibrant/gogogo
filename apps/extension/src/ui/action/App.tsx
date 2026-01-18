@@ -4,10 +4,8 @@ import { ThemeProvider } from '../components/theme-provider';
 import { Command, CommandList, CommandItem } from '../components/ui/command';
 import { PanelRight, SquareCheck, Store } from 'lucide-react';
 
-interface AppProps {}
-
-export default function App({}: AppProps) {
-  const [isStoreSupported, _setIsStoreSupported] = useState<boolean>(false);
+export default function App() {
+  const [isStoreSupported] = useState<boolean>(false);
 
   const t = (key: string): string => {
     return chrome.i18n.getMessage(key) || key;

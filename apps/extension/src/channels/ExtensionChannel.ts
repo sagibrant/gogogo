@@ -331,7 +331,7 @@ export class ExtensionChannelClient extends ChannelClient {
         setTimeout(reconnectFunc, delay);
       }
     };
-    reconnectFunc().then().catch();
+    void reconnectFunc();
   }
 
   disconnect(_reason?: string): void {
@@ -497,8 +497,8 @@ export class ExtensionChannelHost extends ChannelHost {
     this.logger.debug('Client connected', clientInfo);
     const channel = new ExtensionPortChannel(port);
     channel.once("disconnected", ({ reason }) => {
-      if (this._clientChannels.hasOwnProperty(clientInfo.id)) {
-        delete this._clientChannels[clientInfo.id];
+      if (Object.prototype.hasOwnProperty.call(this._clientChannels, clientInfo.id)) {
+        Reflect.deleteProperty(this._clientChannels, clientInfo.id);
       }
       this.emit('disconnected', { client: clientInfo, channel: channel, reason });
     });
@@ -553,7 +553,7 @@ export class ExtensionChannelHost extends ChannelHost {
       try {
         const knownClientInfo = JSON.parse(port.name) as ExtensionClientInfo;
         // if the knownClientInfo.id is not used, reuse it.
-        if (!this._clientChannels.hasOwnProperty(knownClientInfo.id)) {
+        if (!Object.prototype.hasOwnProperty.call(this._clientChannels, knownClientInfo.id)) {
           connectionId = knownClientInfo.id;
           isReconnected = knownClientInfo.isReconnected;
         }
@@ -564,7 +564,7 @@ export class ExtensionChannelHost extends ChannelHost {
 
     // theoretically it will not happen as tabId and frameId are unique 
     // while (connectionId in this.clients) {
-    while (this._clientChannels.hasOwnProperty(connectionId)) {
+    while (Object.prototype.hasOwnProperty.call(this._clientChannels, connectionId)) {
       connectionId += '-dup';
     }
 

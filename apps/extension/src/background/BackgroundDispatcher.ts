@@ -100,7 +100,7 @@ export class BackgroundDispatcher extends Dispatcher {
  */
   addRoutingChannel(routingKey: ContextType, client: ClientInfo, channel: IChannel): void {
     // init if no routing key
-    if (!this.routingMap.hasOwnProperty(routingKey)) {
+    if (!Object.prototype.hasOwnProperty.call(this.routingMap, routingKey)) {
       this.routingMap[routingKey] = [];
     }
 
@@ -133,7 +133,7 @@ export class BackgroundDispatcher extends Dispatcher {
    * @param channel - the channel 
    */
   removeRoutingChannel(routingKey: ContextType, client: ClientInfo, channel: IChannel): void {
-    if (!this.routingMap.hasOwnProperty(routingKey)) {
+    if (!Object.prototype.hasOwnProperty.call(this.routingMap, routingKey)) {
       this.routingMap[routingKey] = [];
     }
 

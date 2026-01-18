@@ -56,9 +56,10 @@ export class FrameInMAIN {
     window.document.documentElement.removeAttribute(attrName);
     if (!attrValue) return false;
     try {
-      const stateObj = JSON.parse(attrValue);
-      if ('state' in stateObj) {
-        return !!stateObj.state;
+      const stateObjUnknown: unknown = JSON.parse(attrValue);
+      if (stateObjUnknown && typeof stateObjUnknown === 'object' && 'state' in stateObjUnknown) {
+        const stateVal = (stateObjUnknown as { state?: unknown }).state;
+        return !!stateVal;
       }
       return false;
     }
@@ -106,10 +107,11 @@ export class FrameInMAIN {
   }
 
   private async onEvent(event: Event): Promise<void> {
-    const msg = (event as CustomEvent).detail;
-    if (typeof (msg) !== "object") {
+    const msgUnknown: unknown = (event as CustomEvent).detail;
+    if (!msgUnknown || typeof msgUnknown !== "object") {
       return;
     }
+    const msg = msgUnknown as { source?: unknown; funcName?: unknown; params?: unknown; callbackId?: unknown; result?: unknown };
     if (this._source === 'MAIN' && msg.source !== "content") {
       return;
     }
@@ -118,9 +120,9 @@ export class FrameInMAIN {
     }
 
     const funcName = msg.funcName as string;
-    const params = msg.params as unknown[] || [];
-    const callbackId = msg.callbackId as string || undefined;
-    const result = msg.result as unknown || undefined;
+    const params = (msg.params as unknown[]) || [];
+    const callbackId = (msg.callbackId as string) || undefined;
+    const result = msg.result as unknown;
     // callback
     if (callbackId && callbackId in this._callbacks) {
       this._callbacks[callbackId](result);
@@ -175,7 +177,7 @@ export class FrameInMAIN {
         params.push(target);
       }
 
-      const func = (this as unknown as Record<string, unknown>)[funcName] as Function;
+      const func = (this as unknown as Record<string, unknown>)[funcName] as (...args: unknown[]) => unknown | Promise<unknown>;
       const result = await func.apply(this, params);
       if (callbackId) {
         this.send(funcName, params, result, callbackId);

@@ -54,7 +54,9 @@ export class BackgroundUtils {
     try {
       await BackgroundUtils.dispatcher.sendEvent(msgData, timeout);
     }
-    catch { }
+    catch {
+      void 0;
+    }
   }
 
   static async broadcastEvent(msgData: MessageData, timeout?: number): Promise<void> {
@@ -67,7 +69,9 @@ export class BackgroundUtils {
         // some page does not have content MAIN world, ignore errors
         await BackgroundUtils.dispatcher.sendEvent(broadcastMsgData, timeout);
       }
-      catch { }
+      catch {
+        void 0;
+      }
     }
   }
 
