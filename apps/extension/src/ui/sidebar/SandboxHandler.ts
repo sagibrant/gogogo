@@ -60,7 +60,8 @@ export class SandboxHandler extends MsgDataHandlerBase {
           return new Promise(resolve => setTimeout(resolve, timeout));
         }
       };
-      (globalThis as any).gogogo_wait = {
+      (globalThis as any).gogogo = {
+        ...(globalThis as any).gogogo,
         wait: wait
       };
       // reset the page in case the tab is switched before the script execution
