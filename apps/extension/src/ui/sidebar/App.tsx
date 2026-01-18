@@ -4,7 +4,7 @@ import TreeNode from './TreeNode';
 import StepScriptEditor, { StepScriptEditorRef } from './StepScriptEditor';
 import StepAIAgent from './StepAIAgent';
 import { TaskAsset, TaskGroup, Task, Step, TaskResult, StepResult } from '../../execution/Task';
-import { TaskUtils } from '../../execution/TaskUtils';
+import * as TaskUtils from '../../execution/TaskUtils';
 import { BrowserUtils, SettingUtils, Utils } from '@gogogo/shared';
 import { SidebarUtils } from './SidebarUtils';
 import { toast, Toaster } from 'sonner';

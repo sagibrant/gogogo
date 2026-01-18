@@ -48,7 +48,7 @@ export class PostMessageChannel extends ChannelBase {
     this._status = ChannelStatus.CONNECTED;
   }
 
-  startListening() {
+  startListening(): void {
     if (this._listener) {
       return;
     }

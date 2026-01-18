@@ -23,7 +23,7 @@
 import { RtidUtils, Utils, AODesc, AutomationObject, QueryInfo, Rtid, Selector, LocatorUtils, MsgDataHandlerBase, ClickOptions, Point, RectInfo, TextInputOptions } from "@gogogo/shared";
 import { ContentUtils } from "../ContentUtils";
 import { FrameHandler } from "./FrameHandler";
-import { EventSimulator } from "../EventSimulator";
+import * as EventSimulator from "../EventSimulator";
 
 export class NodeHandler extends MsgDataHandlerBase {
   protected readonly _node: Node;

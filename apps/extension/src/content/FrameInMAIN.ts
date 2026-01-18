@@ -21,7 +21,7 @@
  */
 
 import { ClickOptions } from "@gogogo/shared";
-import { EventSimulator } from "./EventSimulator";
+import * as EventSimulator from "./EventSimulator";
 
 export class FrameInMAIN {
 

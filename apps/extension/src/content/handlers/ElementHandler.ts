@@ -22,7 +22,7 @@
 
 import { MsgUtils, RtidUtils, Utils, Rtid, RectInfo } from "@gogogo/shared";
 import { FrameHandler } from "./FrameHandler";
-import { EventSimulator } from "../EventSimulator";
+import * as EventSimulator from "../EventSimulator";
 import { NodeHandler } from "./NodeHandler";
 import { ContentUtils } from "../ContentUtils";
 
