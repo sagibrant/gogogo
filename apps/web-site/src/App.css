@@ -25,10 +25,104 @@ html, body {
 #root {
   width: 100%;
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: 0;
   box-sizing: border-box;
   display: block;
   /* Ensure proper centering with auto margins on container */
+}
+
+/* Modern nav */
+.modern-nav {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: #0b1220;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  z-index: 1000;
+}
+.brand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: #e5eefc;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.brand-btn:hover .brand-name {
+  color: #7cc5ff;
+}
+.brand-icon {
+  width: 28px;
+  height: 28px;
+}
+.brand-name {
+  letter-spacing: 0.2px;
+}
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.menu-link {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.menu-link:hover {
+  color: #ffffff;
+  background: rgba(255,255,255,0.06);
+}
+.menu-link.active {
+  color: #ffffff;
+  background: rgba(124, 197, 255, 0.12);
+}
+
+/* Hero */
+.home-hero {
+  background: linear-gradient(180deg, #0f172a 0%, #111827 70%, #0b1220 100%);
+  color: #e2e8f0;
+  padding: 80px 24px;
+  text-align: center;
+}
+.home-hero h1 {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.home-hero .em {
+  color: #7cc5ff;
+}
+.home-hero p {
+  max-width: 760px;
+  margin: 14px auto 24px;
+  color: #93a3bd;
+  font-size: 18px;
+}
+.cta {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 18px;
+}
+.cta button {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: #1f2937;
+  color: #e2e8f0;
+  font-weight: 700;
+  cursor: pointer;
+}
+.cta button:hover {
+  background: #2a3649;
 }
 
 /* Workflow container */
