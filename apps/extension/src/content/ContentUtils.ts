@@ -25,6 +25,7 @@ import { ObjectRepository } from "./ObjectRepository";
 import { FrameHandler } from "./handlers/FrameHandler";
 
 export class ContentUtils {
+  doNothing(): void { }
 
   /**
    * Recursively traverse a root (document, element, or shadow root) with TreeWalker to find out matched elements
@@ -434,10 +435,10 @@ export class ContentUtils {
     if (aoDesc.queryInfo && aoDesc.queryInfo.primary && aoDesc.queryInfo.primary.length === 1) {
       const primary = aoDesc.queryInfo.primary[0];
       if (primary.name === '#css') {
-        scripts.push(`element('${primary.value}')`);
+        scripts.push(`element('${String(primary.value)}')`);
       }
       else if (primary.name === '#xpath') {
-        scripts.push(`element({ xpath: '${primary.value}'})`);
+        scripts.push(`element({ xpath: '${String(primary.value)}'})`);
       }
       else {
         scripts.push(`element()`);

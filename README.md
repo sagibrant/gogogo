@@ -6,7 +6,7 @@ Gogogo enables reliable end-to-end automation on your machine, with a focus on b
 
 Gogogo extension is a standalone solution for browser automation.
 It is a modern web extension available on Chrome, Edge, Firefox and Safari. 
-It is small, safe, fast, reliable and user friendly with AI assistence.
+It is small, safe, fast, reliable and user friendly with AI assistance.
 It helps you to generate, execute the automation steps on your browser directly without installing any heavy local tools.
 
 ## Key Features
