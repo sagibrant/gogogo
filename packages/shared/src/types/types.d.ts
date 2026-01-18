@@ -30,6 +30,7 @@ export interface LocatorFilterOption {
 }
 
 export interface Expect {
+  not: Expect;
   toBe(expected: unknown): void;
   toEqual(expected: unknown): void;
   toBeTruthy(): void;
@@ -44,6 +45,8 @@ export interface Expect {
   toMatch(expected: RegExp | string): void;
   toThrow(expectedErrorMsg?: string): void;
 }
+
+export function expect(actual: unknown): Expect;
 
 export interface Locator<T> {
   filter(options?: LocatorFilterOption | LocatorFilterOption[]): Locator<T>;
@@ -166,7 +169,7 @@ export interface PageProperties {
 export interface PageMethods {
   activate(): Promise<void>;
   bringToFront(): Promise<void>;
-  sync(timeout: number): Promise<void>;
+  sync(timeout?: number): Promise<void>;
   openNewPage(url?: string): Promise<Page>;
   navigate(url?: string): Promise<void>;
   refresh(bypassCache?: boolean): Promise<void>;
@@ -216,7 +219,7 @@ export interface FrameProperties {
 }
 
 export interface FrameMethods {
-  sync(timeout: number): Promise<void>;
+  sync(timeout?: number): Promise<void>;
   querySelectorAll(selector: string): Promise<Element[]>;
   executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>;
 }
