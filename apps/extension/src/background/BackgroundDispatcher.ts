@@ -69,7 +69,7 @@ export class BackgroundDispatcher extends Dispatcher {
         status: 'OK',
         result: { sender: sender }
       };
-      const response = MsgUtils.createResponse(resData, msg.syncId!, msg.correlationId);
+      const response = MsgUtils.createResponse(resData, msg.syncId || '', msg.correlationId);
       responseCallback(response);
     }
     else {

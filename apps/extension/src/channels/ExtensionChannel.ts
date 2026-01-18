@@ -92,7 +92,7 @@ export class ExtensionPortChannel extends ChannelBase {
         error = chrome.runtime.lastError.message;
       }
       if (error) {
-        this.logger.error(`send: port.postMessage get error: ${error}, msg: ${msg}`);
+        this.logger.error(`send: port.postMessage get error: ${error}, msg: ${JSON.stringify(msg)}`);
       }
     }
   }
@@ -258,7 +258,7 @@ export class ExtensionChannelClient extends ChannelClient {
         break;
       }
       default: {
-        this.logger.warn(`connect: the channel client type[${this._type}] is not supported`);
+        this.logger.warn(`connect: the channel client type[${String(this._type)}] is not supported`);
         return;
       }
     }
@@ -301,7 +301,7 @@ export class ExtensionChannelClient extends ChannelClient {
 
         setTimeout(checkConnection, delay);
       };
-      checkConnection();
+      return checkConnection();
     });
   }
 
@@ -331,7 +331,7 @@ export class ExtensionChannelClient extends ChannelClient {
         setTimeout(reconnectFunc, delay);
       }
     };
-    reconnectFunc();
+    reconnectFunc().then().catch();
   }
 
   disconnect(_reason?: string): void {

@@ -26,6 +26,10 @@ import { BrowserHandler } from "./handlers/BrowserHandler";
 
 export class BackgroundUtils {
 
+  // bypass the lint error
+  // error  Unexpected class with only static properties  @typescript-eslint/no-extraneous-class
+  doNothing(): void { }
+
   static async dispatchEvent(event: 'windowCreated' | 'windowRemoved' |
     'pageCreated' | 'pageDOMContentLoaded' | 'pageRemoved' |
     'dialogOpened' | 'dialogClosed' |
