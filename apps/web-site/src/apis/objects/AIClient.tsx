@@ -2,7 +2,7 @@ import React from 'react';
 import { Section, Paragraph, List } from '../components/Common';
 import type { Entry } from '../components/Common';
 
-export default function AIChat() {
+export default function AIClientDoc() {
   const items: Entry[] = [
     { name: 'init', kind: 'method', signature: '(options?: Record<string, unknown>): this', returns: 'this', desc: 'Initialize client.' },
     { name: 'setModel', kind: 'method', signature: '(model: string): this', returns: 'this', desc: 'Set model name.' },
@@ -19,3 +19,4 @@ export default function AIChat() {
     </Section>
   );
 }
+
