@@ -12,7 +12,7 @@ export default function TextLocatorDoc() {
         <a href="/apis/automation/text" style={{ marginLeft: 6 }}>Text</a>.
       </Paragraph>
       <Paragraph>
-        Source: <a href="file:///Users/sagi/Workspace/src/qagogogo/gogogo/packages/browser-sdk/src/locators/TextLocator.ts">TextLocator.ts</a>
+        Source: <a href="https://github.com/sagibrant/gogogo/blob/main/packages/browser-sdk/src/locators/TextLocator.ts">TextLocator.ts</a>
       </Paragraph>
     </Section>
   );

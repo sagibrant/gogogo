@@ -15,7 +15,7 @@ export default function FrameLocatorDoc() {
         <a href="/apis/automation/frame" style={{ marginLeft: 6 }}>Frame</a>.
       </Paragraph>
       <Paragraph>
-        Source: <a href="file:///Users/sagi/Workspace/src/qagogogo/gogogo/packages/browser-sdk/src/locators/FrameLocator.ts">FrameLocator.ts</a>
+        Source: <a href="https://github.com/sagibrant/gogogo/blob/main/packages/browser-sdk/src/locators/FrameLocator.ts">FrameLocator.ts</a>
       </Paragraph>
     </Section>
   );

@@ -14,7 +14,7 @@ export default function WindowLocatorDoc() {
         <a href="/apis/automation/window" style={{ marginLeft: 6 }}>Window</a>.
       </Paragraph>
       <Paragraph>
-        Source: <a href="file:///Users/sagi/Workspace/src/qagogogo/gogogo/packages/browser-sdk/src/locators/WindowLocator.ts">WindowLocator.ts</a>
+        Source: <a href="https://github.com/sagibrant/gogogo/blob/main/packages/browser-sdk/src/locators/WindowLocator.ts">WindowLocator.ts</a>
       </Paragraph>
     </Section>
   );
