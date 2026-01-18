@@ -37,13 +37,13 @@ export class AIClient extends ChannelBase implements api.AIClient {
   /** ====================================================== methods ===================================================== */
   /** ==================================================================================================================== */
 
-  init(options?: ClientOptions): this {
+  init(options?: Record<string, unknown>): this {
     this._openai = undefined;
     this._model = undefined;
     this._systemPrompt = undefined;
     this._history = [];
     if (options) {
-      this._openai = new OpenAI({ ...options, dangerouslyAllowBrowser: true });
+      this._openai = new OpenAI({ ...(options as ClientOptions), dangerouslyAllowBrowser: true });
     }
     return this;
   }
@@ -58,7 +58,7 @@ export class AIClient extends ChannelBase implements api.AIClient {
     return this;
   }
 
-  async chat(message: string, role: 'user' | 'assistant' | 'system' = 'user'): Promise<string | null> {
+  async chat(message: string): Promise<string | null> {
     const settings = await api.SettingUtils.getSettings().aiSettings;
     if (!this._openai) {
       if (!settings.baseURL) {
@@ -87,7 +87,7 @@ export class AIClient extends ChannelBase implements api.AIClient {
       this._history.push({ content: this._systemPrompt, role: 'system' });
     }
     messages.push(...this._history);
-    const newMessage: ChatCompletionMessageParam = { content: message, role: role };
+    const newMessage: ChatCompletionMessageParam = { content: message, role: 'user' };
     messages.push(newMessage);
     const response = await this._openai.chat.completions.create({
       model: this._model,

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Section, Paragraph, List } from '../components/Common';
 import type { Entry } from '../components/Common';
 
@@ -19,4 +18,3 @@ export default function KeyboardDoc() {
     </Section>
   );
 }
-

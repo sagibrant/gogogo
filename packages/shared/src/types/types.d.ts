@@ -181,7 +181,7 @@ export interface PageMethods {
   captureScreenshot(): Promise<string>;
 
   querySelectorAll(selector: string): Promise<Element[]>;
-  executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>;
+  executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result>;
 }
 
 export interface PageEvents {
@@ -221,7 +221,7 @@ export interface FrameProperties {
 export interface FrameMethods {
   sync(timeout?: number): Promise<void>;
   querySelectorAll(selector: string): Promise<Element[]>;
-  executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>;
+  executeScript<Args extends unknown[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result>;
 }
 
 export interface Frame extends FrameProperties, FrameMethods, FrameLocatorMethods {

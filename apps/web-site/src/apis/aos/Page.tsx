@@ -1,4 +1,3 @@
-import React from 'react';
 import { Section, Paragraph, List } from '../components/Common';
 import type { Entry } from '../components/Common';
 
@@ -31,7 +30,7 @@ export default function PageDoc() {
     { name: 'zoom', kind: 'method', signature: '(factor: number): Promise<void>', returns: 'Promise<void>', desc: 'Zoom.' },
     { name: 'moveToWindow', kind: 'method', signature: '(window: Window, index?: number): Promise<void>', returns: 'Promise<void>', desc: 'Move tab.' },
     { name: 'captureScreenshot', kind: 'method', signature: '(): Promise<string>', returns: 'Promise<string>', desc: 'Screenshot base64.' },
-    { name: 'executeScript', kind: 'method', signature: '<Args extends unknown[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>', returns: 'Promise<Result>', desc: 'Execute script in page.' },
+    { name: 'executeScript', kind: 'method', signature: '<Args extends unknown[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result>', returns: 'Promise<Result>', desc: 'Execute script in page.' },
     { name: 'querySelectorAll', kind: 'method', signature: '(selector: string): Promise<Element[]>', returns: 'Promise<Element[]>', desc: 'Elements in main frame.' },
     { name: 'on', kind: 'event', signature: '(event: "dialog", listener: (dialog: Dialog) => (unknown | Promise<unknown>)): this', returns: 'this', desc: 'Listen to dialog events.' },
     { name: 'on', kind: 'event', signature: '(event: "domcontentloaded" | "close", listener: (page: Page) => (unknown | Promise<unknown>)): this', returns: 'this', desc: 'Listen to page lifecycle events.' },

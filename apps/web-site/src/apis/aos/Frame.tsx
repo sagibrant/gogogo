@@ -1,4 +1,3 @@
-import React from 'react';
 import { Section, Paragraph, List } from '../components/Common';
 import type { Entry } from '../components/Common';
 
@@ -15,7 +14,7 @@ export default function FrameDoc() {
     { name: 'status', kind: 'method', signature: '(): Promise<"BeforeNavigate" | "Committed" | "DOMContentLoaded" | "Completed" | "ErrorOccurred" | "Removed">', returns: 'Promise<"BeforeNavigate" | "Committed" | "DOMContentLoaded" | "Completed" | "ErrorOccurred" | "Removed">', desc: 'Lifecycle status.' },
     { name: 'readyState', kind: 'method', signature: '(): Promise<"loading" | "interactive" | "complete">', returns: 'Promise<"loading" | "interactive" | "complete">', desc: 'DOM readyState.' },
     { name: 'sync', kind: 'method', signature: '(timeout?: number): Promise<void>', returns: 'Promise<void>', desc: 'Wait to complete.' },
-    { name: 'executeScript', kind: 'method', signature: '<Args extends unknown[], Result>(func: (...args: Args) => Result, args: Args): Promise<Result>', returns: 'Promise<Result>', desc: 'Execute script in frame.' },
+    { name: 'executeScript', kind: 'method', signature: '<Args extends unknown[], Result>(func: (...args: Args) => Result, args?: Args): Promise<Result>', returns: 'Promise<Result>', desc: 'Execute script in frame.' },
     { name: 'querySelectorAll', kind: 'method', signature: '(selector: string): Promise<Element[]>', returns: 'Promise<Element[]>', desc: 'Query elements.' },
   ];
   return (

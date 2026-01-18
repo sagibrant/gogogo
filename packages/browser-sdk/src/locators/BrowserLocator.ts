@@ -139,7 +139,9 @@ export class BrowserLocator extends Locator<Browser> implements api.BrowserLocat
     return await browser.close();
   }
 
-  on(event: string, listener: ((window: api.Window) => (unknown | Promise<unknown>)) | ((page: api.Page) => (unknown | Promise<unknown>))): this {
+  on(event: 'window', listener: (window: api.Window) => (unknown | Promise<unknown>)): this;
+  on(event: 'page', listener: (page: api.Page) => (unknown | Promise<unknown>)): this;
+  on(event: 'window' | 'page', listener: ((window: api.Window) => (unknown | Promise<unknown>)) | ((page: api.Page) => (unknown | Promise<unknown>))): this {
     this.get().then((browser) => {
       if (event === 'window') {
         browser.on(event, listener as ((window: api.Window) => (unknown | Promise<unknown>)));
