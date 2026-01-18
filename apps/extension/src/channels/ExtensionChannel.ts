@@ -49,7 +49,7 @@ export class ExtensionPortChannel extends ChannelBase {
     this._status = ChannelStatus.CONNECTED;
   }
 
-  startListening() {
+  startListening(): void {
     if (this._listener) {
       return;
     }
@@ -61,7 +61,7 @@ export class ExtensionPortChannel extends ChannelBase {
     this._port.onDisconnect.addListener(this._listener.onDisconnect);
   }
 
-  stopListening() {
+  stopListening(): void {
     if (Utils.isNullOrUndefined(this._listener)) {
       return;
     }
@@ -275,7 +275,7 @@ export class ExtensionChannelClient extends ChannelClient {
       this.connect();
       const end_time = performance.now() + timeout;
       const delay = timeout / 10;
-      const checkConnection = async () => {
+      const checkConnection = async (): Promise<void> => {
         // if channel exists, connection is established
         if (!Utils.isNullOrUndefined(this._channel)) {
           return resolve();
@@ -309,7 +309,7 @@ export class ExtensionChannelClient extends ChannelClient {
     let count = 1;
     const end_time: number | undefined = timeout > 0 ? performance.now() + timeout : undefined
     let lastExecution: number | undefined = undefined;
-    const reconnectFunc = async () => {
+    const reconnectFunc = async (): Promise<void> => {
       if (end_time && performance.now() >= end_time) {
         this.logger.debug('reconnect timeout', timeout, delay);
         return;

@@ -205,7 +205,7 @@ export class FrameInMAIN {
     }
   }
 
-  protected async clickRuntimeElement(elem: Element, options?: ClickOptions) {
+  protected async clickRuntimeElement(elem: Element, options?: ClickOptions): Promise<void> {
     if (elem && elem instanceof Element) {
       await EventSimulator.simulateClick(elem, options);
     }

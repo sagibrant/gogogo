@@ -82,7 +82,7 @@ export class BackgroundUtils {
   static set dispatcher(dispatcher: Dispatcher) {
     BackgroundUtils._dispatcher = dispatcher;
   }
-  static get dispatcher() {
+  static get dispatcher(): Dispatcher {
     if (Utils.isNullOrUndefined(BackgroundUtils._dispatcher)) {
       throw new Error('The dispatcher is not ready');
     }
@@ -92,7 +92,7 @@ export class BackgroundUtils {
   static set agent(agent: AgentHandler) {
     BackgroundUtils._agent = agent;
   }
-  static get agent() {
+  static get agent(): AgentHandler {
     if (Utils.isNullOrUndefined(BackgroundUtils._agent)) {
       throw new Error('The agent is not ready');
     }
@@ -102,7 +102,7 @@ export class BackgroundUtils {
   static set browser(browser: BrowserHandler) {
     BackgroundUtils._browser = browser;
   }
-  static get browser() {
+  static get browser(): BrowserHandler {
     if (Utils.isNullOrUndefined(BackgroundUtils._browser)) {
       throw new Error('The browser is not ready');
     }

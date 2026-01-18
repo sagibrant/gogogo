@@ -169,7 +169,7 @@ export class EventSimulator {
           && 'createTouch' in document
           && 'createTouchList' in document
         ) {
-          const createTouch = (t: Record<string, unknown> | Touch) => {
+          const createTouch = (t: Record<string, unknown> | Touch): Touch => {
             if (t instanceof Touch)
               return t;
             // createTouch does not accept clientX/clientY, so we have to use pageX/pageY.
@@ -182,7 +182,7 @@ export class EventSimulator {
               pageY = tObj.clientY + (document.scrollingElement?.scrollTop || 0);
             return (document as unknown as LegacyDocument).createTouch(window, tObj.target ?? node, tObj.identifier, pageX!, pageY!, tObj.screenX, tObj.screenY, tObj.radiusX, tObj.radiusY, tObj.rotationAngle, tObj.force);
           };
-          const createTouchList = (touches: unknown) => {
+          const createTouchList = (touches: unknown): TouchList => {
             if (touches instanceof TouchList || !touches)
               return touches as TouchList;
             return (document as unknown as LegacyDocument).createTouchList(...(touches as unknown[]).map((t) => createTouch(t as Record<string, unknown> | Touch)));

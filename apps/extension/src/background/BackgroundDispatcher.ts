@@ -55,7 +55,7 @@ export class BackgroundDispatcher extends Dispatcher {
     this._backgroundToFrameChannel = new BackgroundToFrameChannel();
   }
 
-  async init() {
+  async init(): Promise<void> {
     this._backgroundListeningChannel.startListening(true, true);
   }
 
