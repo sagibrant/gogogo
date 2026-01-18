@@ -38,13 +38,13 @@ export class FrameInMAIN {
   }
 
   init() {
-    window.removeEventListener("_MAIN_To_Content_EVENT_", this._onEventHandler, true);
-    window.removeEventListener("_Content_To_MAIN_EVENT_", this._onEventHandler, true);
+    window.removeEventListener("_MAIN_To_Content_EVENT_", this._onEventHandler as EventListener, true);
+    window.removeEventListener("_Content_To_MAIN_EVENT_", this._onEventHandler as EventListener, true);
     if (this._source === 'content') {
-      window.addEventListener("_MAIN_To_Content_EVENT_", this._onEventHandler, true);
+      window.addEventListener("_MAIN_To_Content_EVENT_", this._onEventHandler as EventListener, true);
     }
     else {
-      window.addEventListener("_Content_To_MAIN_EVENT_", this._onEventHandler, true);
+      window.addEventListener("_Content_To_MAIN_EVENT_", this._onEventHandler as EventListener, true);
     }
   }
 
@@ -105,8 +105,8 @@ export class FrameInMAIN {
     }
   }
 
-  private async onEvent(event: CustomEvent) {
-    const msg = event.detail;
+  private async onEvent(event: Event) {
+    const msg = (event as CustomEvent).detail;
     if (typeof (msg) !== "object") {
       return;
     }
@@ -137,7 +137,7 @@ export class FrameInMAIN {
             target = path[0];
           }
         }
-        if (!target || target.nodeType !== Node.ELEMENT_NODE) {
+        if (!target || (target as Node).nodeType !== Node.ELEMENT_NODE) {
           console.warn(`${funcName}: the target is invalid`, target);
           return;
         }
@@ -167,7 +167,7 @@ export class FrameInMAIN {
             target = path[0];
           }
         }
-        if (!target || target.nodeType !== Node.ELEMENT_NODE) {
+        if (!target || (target as Node).nodeType !== Node.ELEMENT_NODE) {
           console.warn(`${funcName}: the target is invalid`, target);
           return;
         }
