@@ -127,7 +127,7 @@ export interface WindowMethods {
   minimize(): Promise<void>;
   maximize(): Promise<void>;
   restore(): Promise<void>;
-  fullscreen(toggle: boolean): Promise<void>;
+  fullscreen(toggle?: boolean): Promise<void>;
 }
 
 export interface WindowEvents {

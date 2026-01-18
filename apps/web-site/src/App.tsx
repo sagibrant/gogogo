@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import Demo from './demo';
 import Docs from './docs/Docs';
-import APIs from './apis/APIs';
+import APIs from './apis/index';
 import NavBar from './components/NavBar';
 
 function App() {
