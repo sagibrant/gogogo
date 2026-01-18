@@ -46,6 +46,7 @@
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.26.2",
   "dependencies": {
+    "@gogogo/shared": "workspace:*",
     "openai": "^6.4.0"
   },
   "devDependencies": {
