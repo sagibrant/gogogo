@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { BrowserUtils, SettingUtils } from "@gogogo/shared";
+import { BrowserUtils, SettingUtils } from '@gogogo/shared';
 import { ThemeProvider } from '../components/theme-provider';
 import { Command, CommandList, CommandItem } from '../components/ui/command';
 import { PanelRight, SquareCheck, Store } from 'lucide-react';
 
-interface AppProps {
-}
+interface AppProps {}
 
-export default function App({ }: AppProps) {
+export default function App({}: AppProps) {
   const [isStoreSupported, _setIsStoreSupported] = useState<boolean>(false);
 
   const t = (key: string): string => {
@@ -39,7 +38,7 @@ export default function App({ }: AppProps) {
       }
       const [currentTab] = await chrome.tabs.query({
         active: true,
-        lastFocusedWindow: true
+        lastFocusedWindow: true,
       });
 
       if (currentTab?.id) {
@@ -71,13 +70,13 @@ export default function App({ }: AppProps) {
       iconUrl: chrome.runtime.getURL('assets/icons/icon_48x48.png'),
       title: t('action_error'),
       message,
-      priority: 2
+      priority: 2,
     });
   };
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <Command className="action-container text-sm font-sans">
+      <Command className="action-container font-sans text-sm">
         <CommandList>
           <CommandItem onSelect={openStore} disabled={!isStoreSupported}>
             <Store size={16} className="text-popover-foreground" />
@@ -95,4 +94,4 @@ export default function App({ }: AppProps) {
       </Command>
     </ThemeProvider>
   );
-};
+}

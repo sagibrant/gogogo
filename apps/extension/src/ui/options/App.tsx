@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Utils, Settings, SettingUtils, CryptoUtil } from "@gogogo/shared";
+import { Utils, Settings, SettingUtils, CryptoUtil } from '@gogogo/shared';
 import { ThemeProvider } from '../components/theme-provider';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -112,9 +112,7 @@ export default function App() {
     try {
       if (!jsonString.trim()) return null;
       const settings = JSON.parse(jsonString);
-      const check = [
-        typeof settings.recordNavigation === 'boolean',
-      ];
+      const check = [typeof settings.recordNavigation === 'boolean'];
       if (check.some(c => !c)) {
         return null;
       }
@@ -134,8 +132,8 @@ export default function App() {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <div className="settings-container text-sm font-sans">
-        <Toaster position="bottom-right" className="text-sm p-2 max-w-xs" />
+      <div className="settings-container font-sans text-sm">
+        <Toaster position="bottom-right" className="max-w-xs p-2 text-sm" />
         <h1>{t('options_label_settings')}</h1>
 
         <form onSubmit={saveSettings}>
@@ -147,7 +145,7 @@ export default function App() {
               <Input
                 id="storeURL"
                 value={settings.storeURL}
-                onChange={(e) => setSettings(prev => ({ ...prev, storeURL: e.target.value }))}
+                onChange={e => setSettings(prev => ({ ...prev, storeURL: e.target.value }))}
                 type="url"
                 className="w-full"
                 placeholder={t('options_placeholder_storeURL')}
@@ -163,10 +161,12 @@ export default function App() {
               <Input
                 id="ai_baseURL"
                 value={settings.aiSettings.baseURL}
-                onChange={(e) => setSettings(prev => ({
-                  ...prev,
-                  aiSettings: { ...prev.aiSettings, baseURL: e.target.value }
-                }))}
+                onChange={e =>
+                  setSettings(prev => ({
+                    ...prev,
+                    aiSettings: { ...prev.aiSettings, baseURL: e.target.value },
+                  }))
+                }
                 type="url"
                 className="w-full"
                 placeholder={t('options_placeholder_ai_baseURL')}
@@ -182,10 +182,12 @@ export default function App() {
               <Input
                 id="ai_models"
                 value={settings.aiSettings.models}
-                onChange={(e) => setSettings(prev => ({
-                  ...prev,
-                  aiSettings: { ...prev.aiSettings, models: e.target.value }
-                }))}
+                onChange={e =>
+                  setSettings(prev => ({
+                    ...prev,
+                    aiSettings: { ...prev.aiSettings, models: e.target.value },
+                  }))
+                }
                 type="text"
                 className="w-full"
                 placeholder={t('options_placeholder_ai_models')}
@@ -201,10 +203,12 @@ export default function App() {
               <Input
                 id="ai_apiKey"
                 value={settings.aiSettings.apiKey}
-                onChange={(e) => setSettings(prev => ({
-                  ...prev,
-                  aiSettings: { ...prev.aiSettings, apiKey: e.target.value }
-                }))}
+                onChange={e =>
+                  setSettings(prev => ({
+                    ...prev,
+                    aiSettings: { ...prev.aiSettings, apiKey: e.target.value },
+                  }))
+                }
                 type="password"
                 className="w-full"
                 placeholder={t('options_placeholder_ai_apiKey')}
@@ -219,7 +223,7 @@ export default function App() {
             <div className="select-container">
               <Select
                 value={settings.logLevel}
-                onValueChange={(value) => setSettings(prev => ({ ...prev, logLevel: value as any }))}
+                onValueChange={value => setSettings(prev => ({ ...prev, logLevel: value as any }))}
               >
                 <SelectTrigger className="w-full" id="logLevel">
                   <SelectValue placeholder="Select log level" />
@@ -244,7 +248,7 @@ export default function App() {
               <Textarea
                 id="replaySettings"
                 value={replaySettings}
-                onChange={(e) => setReplaySettings(e.target.value)}
+                onChange={e => setReplaySettings(e.target.value)}
                 rows={5}
                 placeholder={t('options_placeholder_json')}
                 className="w-full"
@@ -260,7 +264,7 @@ export default function App() {
               <Textarea
                 id="recordSettings"
                 value={recordSettings}
-                onChange={(e) => setRecordSettings(e.target.value)}
+                onChange={e => setRecordSettings(e.target.value)}
                 rows={5}
                 placeholder={t('options_placeholder_json')}
                 className="w-full"
@@ -269,9 +273,7 @@ export default function App() {
           </div>
 
           <div className="settings-actions">
-            <Button type="submit">
-              {t('options_btn_label_apply')}
-            </Button>
+            <Button type="submit">{t('options_btn_label_apply')}</Button>
             <Button type="button" variant="outline" onClick={resetSettings}>
               {t('options_btn_label_reset')}
             </Button>
@@ -280,4 +282,4 @@ export default function App() {
       </div>
     </ThemeProvider>
   );
-};
+}
