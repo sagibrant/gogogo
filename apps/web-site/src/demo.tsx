@@ -9,10 +9,11 @@ import Gogogo from './components/WorkflowSteps/Gogogo';
 import ModeToggle from './components/ModeToggle';
 import { ToastTypes } from './utils/shared';
 import type { ToastType } from './utils/shared';
+import { GogogoUtils } from './utils/GogogoUtils';
 
 function Demo() {
-  const [url, setUrl] = useState('');
-  const [scriptContent, setScriptContent] = useState('');
+  const [url, setUrl] = useState(GogogoUtils.getDemoScriptWebSite());
+  const [scriptContent, setScriptContent] = useState(GogogoUtils.getDemoScript());
   const [promptContent, setPromptContent] = useState('');
   const [isAIMode, setIsAIMode] = useState(false);
   const [isDark, setIsDark] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
