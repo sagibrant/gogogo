@@ -58,8 +58,8 @@ await clean();
 
 console.log('page =>');
 console.log('current page', page);
-const url_mouse = 'file:///Users/sagi/Workspace/src/sagibrant/gogogo/tests/aut/mouse.html';
-const url_keyboard = 'file:///Users/sagi/Workspace/src/sagibrant/gogogo/tests/aut/keyboard.html';
+const url_mouse = 'https://sagibrant.github.io/gogogo/aut/mouse.html';
+const url_keyboard = 'https://sagibrant.github.io/gogogo/aut/keyboard.html';
 const url_cn_bing = 'https://cn.bing.com/';
 
 const checkPageUrl = async url => {
