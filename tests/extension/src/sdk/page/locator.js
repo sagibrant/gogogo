@@ -26,8 +26,8 @@ expect(wait).not.toBeNullOrUndefined();
 
 console.log('page locator =>');
 console.log('current page', page);
-const url_mouse = 'file:///Users/sagi/Workspace/src/sagibrant/gogogo/tests/aut/mouse.html';
-const url_keyboard = 'file:///Users/sagi/Workspace/src/sagibrant/gogogo/tests/aut/keyboard.html';
+const url_mouse = 'https://sagibrant.github.io/gogogo/aut/mouse.html';
+const url_keyboard = 'https://sagibrant.github.io/gogogo/aut/keyboard.html';
 await page.navigate(url_mouse);
 await page.sync();
 

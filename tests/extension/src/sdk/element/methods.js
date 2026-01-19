@@ -57,7 +57,7 @@ await clean();
 
 console.log('element methods ==>');
 console.log('current page', page);
-const url_mouse = 'file:///Users/sagi/Workspace/src/sagibrant/gogogo/tests/aut/mouse.html';
+const url_mouse = 'https://sagibrant.github.io/gogogo/aut/mouse.html';
 await page.navigate(url_mouse);
 await page.sync();
 const elements = await page.querySelectorAll('#btn_start_monitor');
@@ -349,7 +349,7 @@ if (elem_tables) {
   }
 }
 
-const url_frame = 'file:///Users/sagi/Workspace/src/sagibrant/gogogo/tests/aut/index.html';
+const url_frame = 'https://sagibrant.github.io/gogogo/aut/index.html';
 await page.navigate(url_frame);
 console.log('await page.navigate(url_frame);');
 await page.sync();
