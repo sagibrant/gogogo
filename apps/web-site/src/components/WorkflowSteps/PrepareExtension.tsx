@@ -1,10 +1,30 @@
 import React from 'react';
+import { GogogoUtils } from '../../utils/GogogoUtils';
 
 interface PrepareExtensionProps {
   stepNumber: number;
 }
 
 const PrepareExtension: React.FC<PrepareExtensionProps> = ({ stepNumber }) => {
+  const [isInstalled, setIsInstalled] = React.useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const checkIsInstalled = async () => {
+      const installed = await GogogoUtils.isExtensionInstalled();
+      if (!cancelled) {
+        setIsInstalled(installed);
+      }
+    };
+
+    void checkIsInstalled();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Handle install extension button click
   const handleInstallExtension = () => {
     // Detect browser type
@@ -33,8 +53,8 @@ const PrepareExtension: React.FC<PrepareExtensionProps> = ({ stepNumber }) => {
         <h2 className="step-title">Prepare</h2>
       </div>
       <div className="step-content">
-        <button className="install-btn" onClick={handleInstallExtension}>
-          Install extension
+        <button className="install-btn" onClick={handleInstallExtension} disabled={isInstalled === true}>
+          {isInstalled === true ? 'Extension installed' : 'Install extension'}
         </button>
         <p className="step-description">Click the button above to install the required browser extension.</p>
       </div>
