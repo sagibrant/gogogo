@@ -23,7 +23,7 @@
 import { EventEmitter, BrowserUtils, Utils } from "@gogogo/shared";
 import { Debuggee, DebuggerSession, CDPDebuggerSession, TargetInfo, CDPTargetInfo, CDPExecutionContextInfo, CDPFrameInfo, CDPJavascriptDialog, CDPTabInfo, CDPEmulationSettings, CDPFrameTree } from "./CDPTypes";
 
-interface CDPEvents {
+interface CDPEvents extends Record<string, unknown> {
   javascriptDialogOpening: { source: DebuggerSession, method: string, params: unknown };
   javascriptDialogClosed: { source: DebuggerSession, method: string, params: unknown };
   inspectNodeRequested: { source: DebuggerSession, method: string, params: unknown };

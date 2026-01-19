@@ -27,7 +27,7 @@ import { EventEmitter } from "@gogogo/shared";
  * Aggregates all non-deprecated events from the chrome.tabs API into a TypeScript interface, 
  * intended for event emission in web extensions.
  */
-export interface TabAPIEvents {
+export interface TabAPIEvents extends Record<string, unknown> {
   /**
    * Fired when a new tab is created. Note: The tab's URL may not be set yet.
    * @property tab - Details of the newly created tab.
@@ -241,7 +241,7 @@ export class ChromeTabAPI extends EventEmitter<TabAPIEvents> {
   async capturePage(tabId: number): Promise<string> {
     let tab = await this.get(tabId);
     return new Promise((resolve, reject) => {
-      chrome.tabs.captureVisibleTab(tab.windowId, {format: 'jpeg', quality: 80}, (dataUrl) => {
+      chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 80 }, (dataUrl) => {
         const error = chrome.runtime.lastError;
         if (error) {
           reject(new Error(`tabs.captureVisibleTab failed: ${error.message}`));

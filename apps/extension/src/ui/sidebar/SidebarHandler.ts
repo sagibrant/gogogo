@@ -23,7 +23,7 @@
 import { MsgUtils, RtidUtils, MsgDataHandlerBase, AODesc, AutomationObject, InvokeAction, RecordedStep, ElementInfo } from "@gogogo/shared";
 import { SidebarUtils } from "./SidebarUtils";
 
-interface SidebarEvents {
+interface SidebarEvents extends Record<string, unknown> {
   nodeInspected: { details: ElementInfo };
   stepRecorded: { step: RecordedStep };
 }

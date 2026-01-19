@@ -22,7 +22,7 @@
 
 import { MsgUtils, RtidUtils, Utils, AODesc, AutomationObject, QueryInfo, Rtid, Selector, LocatorUtils, MsgDataHandlerBase, RectInfo, ElementInfo } from "@gogogo/shared";
 import { ContentUtils } from "../ContentUtils";
-import { CoordinateUtils } from "../CoordinateUtils";
+import * as CoordinateUtils from "../CoordinateUtils";
 import { FrameInfo } from "../../background/api/BrowserWrapperTypes";
 import { Recorder } from "../Recorder";
 import { FrameInMAIN } from "../FrameInMAIN";

@@ -27,7 +27,7 @@ import { EventEmitter } from "@gogogo/shared";
  * Aggregates all non-deprecated events from the chrome.window API into a TypeScript interface, 
  * intended for event emission in web extensions.
  */
-export interface WindowAPIEvents {
+export interface WindowAPIEvents extends Record<string, unknown> {
   /**
    * Fired when a window is created.
    * @property window - Details of the newly created window.
