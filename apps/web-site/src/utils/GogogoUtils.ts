@@ -1,6 +1,17 @@
 import { expect, BrowserLocator, RuntimeUtils, AIClient } from "@gogogo/browser-sdk";
 
 export class GogogoUtils {
+  static async isExtensionInstalled(): Promise<boolean> {
+    try {
+      const browserLocator = new BrowserLocator();
+      const browser = await browserLocator.get();
+      await browser.lastActivePage();
+      return true;
+    }
+    catch {
+      return false;
+    }
+  }
   static async runScript(script: string, url?: string): Promise<any> {
     try {
       console.debug('runScript: ==> ', script, 'url:', url);
