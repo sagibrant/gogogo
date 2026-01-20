@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { Utils, Dispatcher } from "@gogogo/shared";
+import { Utils, Dispatcher } from "@mimic-sdk/core";
 import { StepEngine } from "./StepEngine";
 import { SidebarHandler } from "./SidebarHandler";
 

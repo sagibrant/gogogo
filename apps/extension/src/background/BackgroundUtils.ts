@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { MsgUtils, RtidUtils, Utils, Dispatcher, InvokeAction, MessageData, Rtid } from "@gogogo/shared";
+import { MsgUtils, RtidUtils, Utils, Dispatcher, InvokeAction, MessageData, Rtid } from "@mimic-sdk/core";
 import { AgentHandler } from "./handlers/AgentHandler";
 import { BrowserHandler } from "./handlers/BrowserHandler";
 
@@ -46,7 +46,7 @@ export class BackgroundUtils {
     } as InvokeAction);
     // event to sidebar
     await BackgroundUtils.sendEvent(msgData);
-    // event to all content MAIN worlds in case @gogogo/browser-sdk is used there
+    // event to all content MAIN worlds in case mimic-sdk is used there
     await BackgroundUtils.broadcastEvent(msgData);
   }
 

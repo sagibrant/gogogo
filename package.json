@@ -1,8 +1,8 @@
 {
-  "name": "gogogo-internal",
+  "name": "mimic-internal",
   "private": true,
   "version": "0.1.0",
-  "description": "Gogogo enables reliable end-to-end automation on your browser.",
+  "description": "Mimic enables reliable end-to-end automation on your browser.",
   "type": "module",
   "directories": {
     "doc": "docs",
@@ -25,15 +25,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qagogogo/gogogo.git"
+    "url": "git+https://github.com/sagibrant/mimic.git"
   },
   "keywords": [],
   "author": "Sagi",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/qagogogo/gogogo/issues"
+    "url": "https://github.com/sagibrant/mimic/issues"
   },
-  "homepage": "https://github.com/qagogogo/gogogo#readme",
+  "homepage": "https://github.com/sagibrant/mimic#readme",
   "packageManager": "pnpm@10.26.2",
   "engines": {
     "node": ">=23.11.0",

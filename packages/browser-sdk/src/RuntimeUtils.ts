@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { Utils, Dispatcher } from "@gogogo/shared";
+import { Utils, Dispatcher } from "@mimic-sdk/core";
 import { ObjectRepository } from "./ObjectRepository";
 import { MainToContentDispatcher } from "./Dispatcher";
 

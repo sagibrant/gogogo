@@ -95,10 +95,10 @@ importers:
       '@codemirror/view':
         specifier: ^6.39.6
         version: 6.39.11
-      '@gogogo/browser-sdk':
+      'mimic-sdk':
         specifier: workspace:*
         version: link:../../packages/browser-sdk
-      '@gogogo/shared':
+      '@mimic-sdk/core':
         specifier: workspace:*
         version: link:../../packages/shared
       '@langchain/core':
@@ -294,10 +294,10 @@ importers:
       '@codemirror/view':
         specifier: ^6.39.8
         version: 6.39.11
-      '@gogogo/browser-sdk':
+      'mimic-sdk':
         specifier: workspace:*
         version: link:../../packages/browser-sdk
-      '@gogogo/shared':
+      '@mimic-sdk/core':
         specifier: workspace:*
         version: link:../../packages/shared
       jshint:
@@ -361,7 +361,7 @@ importers:
 
   packages/browser-sdk:
     dependencies:
-      '@gogogo/shared':
+      '@mimic-sdk/core':
         specifier: workspace:*
         version: link:../shared
       openai:

@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { BrowserUtils, Utils, RectInfo } from "@gogogo/shared";
+import { BrowserUtils, Utils, RectInfo } from "@mimic-sdk/core";
 
 
 /** the page's window offset x */

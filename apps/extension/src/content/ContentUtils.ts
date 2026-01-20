@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { Utils, LocatorUtils, RectInfo, MessageData, Selector, Dispatcher, DOMElementDescription, AODesc, MsgUtils, AO, RtidUtils, DOMPathUtils, ElementInfo } from "@gogogo/shared";
+import { Utils, LocatorUtils, RectInfo, MessageData, Selector, Dispatcher, DOMElementDescription, AODesc, MsgUtils, AO, RtidUtils, DOMPathUtils, ElementInfo } from "@mimic-sdk/core";
 import { ObjectRepository } from "./ObjectRepository";
 import { FrameHandler } from "./handlers/FrameHandler";
 
