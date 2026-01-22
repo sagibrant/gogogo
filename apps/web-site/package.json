@@ -21,10 +21,12 @@
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.8",
     "@mimic-sdk/core": "workspace:*",
-    "mimic-sdk": "workspace:*",
     "jshint": "^2.13.6",
+    "mimic-sdk": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "thememirror": "^2.0.1"
   },

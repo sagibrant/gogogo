@@ -1,10 +1,21 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const repoRoot = path.resolve(__dirname, '../..')
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/mimic/',
   plugins: [react()],
+  server: {
+    fs: {
+      allow: [repoRoot],
+    },
+  },
   resolve: {
     alias: {
       // Polyfill Node.js built-in modules for browser compatibility

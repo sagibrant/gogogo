@@ -1,53 +1,56 @@
-import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Section, Paragraph } from './components/Common';
-import Browser from './aos/Browser';
-import WindowDoc from './aos/Window';
-import PageDoc from './aos/Page';
-import ElementDoc from './aos/Element';
-import FrameDoc from './aos/Frame';
-import TextDoc from './aos/Text';
-import AIClientDoc from './objects/AIClient';
-import KeyboardDoc from './objects/Keyboard';
-import MouseDoc from './objects/Mouse';
-import DialogDoc from './objects/Dialog';
-import LocatorBaseDoc from './locators/Locator';
-import BrowserLocatorDoc from './locators/BrowserLocator';
-import WindowLocatorDoc from './locators/WindowLocator';
-import PageLocatorDoc from './locators/PageLocator';
-import FrameLocatorDoc from './locators/FrameLocator';
-import ElementLocatorDoc from './locators/ElementLocator';
-import TextLocatorDoc from './locators/TextLocator';
-import ExpectDoc from './assertions/Expect';
-import TypesDoc from './types';
+import MarkdownDoc from './components/MarkdownDoc';
 
 type DocItem = {
   slug: string;
   title: string;
   category: 'AutomationObjects' | 'GeneralObjects' | 'Locators' | 'Assertions' | 'Misc';
-  Component: () => ReactElement;
+  markdown: string;
 };
 
-const docs: DocItem[] = [
-  { slug: 'automation/browser', title: 'Browser', category: 'AutomationObjects', Component: Browser },
-  { slug: 'automation/window', title: 'Window', category: 'AutomationObjects', Component: WindowDoc },
-  { slug: 'automation/page', title: 'Page', category: 'AutomationObjects', Component: PageDoc },
-  { slug: 'automation/frame', title: 'Frame', category: 'AutomationObjects', Component: FrameDoc },
-  { slug: 'automation/element', title: 'Element', category: 'AutomationObjects', Component: ElementDoc },
-  { slug: 'automation/text', title: 'Text', category: 'AutomationObjects', Component: TextDoc },
-  { slug: 'objects/ai-client', title: 'AIClient', category: 'GeneralObjects', Component: AIClientDoc },
-  { slug: 'objects/mouse', title: 'Mouse', category: 'GeneralObjects', Component: MouseDoc },
-  { slug: 'objects/keyboard', title: 'Keyboard', category: 'GeneralObjects', Component: KeyboardDoc },
-  { slug: 'objects/dialog', title: 'Dialog', category: 'GeneralObjects', Component: DialogDoc },
-  { slug: 'locators/browser-locator', title: 'BrowserLocator', category: 'Locators', Component: BrowserLocatorDoc },
-  { slug: 'locators/window-locator', title: 'WindowLocator', category: 'Locators', Component: WindowLocatorDoc },
-  { slug: 'locators/page-locator', title: 'PageLocator', category: 'Locators', Component: PageLocatorDoc },
-  { slug: 'locators/frame-locator', title: 'FrameLocator', category: 'Locators', Component: FrameLocatorDoc },
-  { slug: 'locators/element-locator', title: 'ElementLocator', category: 'Locators', Component: ElementLocatorDoc },
-  { slug: 'locators/text-locator', title: 'TextLocator', category: 'Locators', Component: TextLocatorDoc },
-  { slug: 'locators/locator', title: 'Locator (Base)', category: 'Locators', Component: LocatorBaseDoc },
-  { slug: 'assertions/expect', title: 'Expect', category: 'Assertions', Component: ExpectDoc },
-  { slug: 'types', title: 'Types', category: 'Misc', Component: TypesDoc },
-];
+const toKebabCase = (value: string) => {
+  return value
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .toLowerCase();
+};
+
+const titleFromMarkdown = (md: string) => {
+  const match = md.match(/^#\s+(.+)$/m);
+  return match?.[1]?.trim() ?? '';
+};
+
+const markdownFiles = import.meta.glob('../../../../docs/apis/**/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+
+const docs: DocItem[] = Object.entries(markdownFiles)
+  .map(([filePath, markdown]) => {
+    const normalizedPath = filePath.replaceAll('\\', '/');
+    const idx = normalizedPath.lastIndexOf('/docs/apis/');
+    const rel = idx >= 0 ? normalizedPath.slice(idx + '/docs/apis/'.length) : normalizedPath;
+    if (rel === 'STYLE.md') return null;
+
+    const parts = rel.split('/').filter(Boolean);
+    const fileName = parts[parts.length - 1] ?? '';
+    const baseName = fileName.replace(/\.md$/i, '');
+    const topTitle = titleFromMarkdown(markdown) || baseName;
+
+    if (rel === 'types.md') {
+      return { slug: 'types', title: topTitle, category: 'Misc', markdown };
+    }
+
+    const dir = parts[0] ?? '';
+    const kebab = toKebabCase(baseName);
+
+    if (dir === 'aos') return { slug: `automation/${kebab}`, title: topTitle, category: 'AutomationObjects', markdown };
+    if (dir === 'objects') return { slug: `objects/${kebab}`, title: topTitle, category: 'GeneralObjects', markdown };
+    if (dir === 'locators') return { slug: `locators/${kebab}`, title: topTitle, category: 'Locators', markdown };
+    if (dir === 'assertions') return { slug: `assertions/${kebab}`, title: topTitle, category: 'Assertions', markdown };
+
+    return null;
+  })
+  .filter((d): d is DocItem => d !== null)
+  .sort((a, b) => a.slug.localeCompare(b.slug));
 
 export default function APIs() {
   const [path, setPath] = useState(window.location.pathname);
@@ -116,7 +119,7 @@ export default function APIs() {
                 Browse Automation Objects, Other Objects, Locators, Assertions, and Types using the sidebar.
               </Paragraph>
               <Paragraph>Quick Start:</Paragraph>
-              <pre style={{ background: '#0f172a', color: '#e2e8f0', padding: '16px', borderRadius: 8, overflowX: 'auto' }}>
+              <pre style={{ background: 'var(--mimic-codeblock-bg)', color: 'var(--mimic-codeblock-fg)', border: '1px solid var(--mimic-codeblock-border)', padding: '16px', borderRadius: 8, overflowX: 'auto' }}>
                 <code>{`import { BrowserLocator } from 'mimic-sdk';
 import { AIClient } from 'mimic-sdk';
 
@@ -128,7 +131,7 @@ const ai = new AIClient(); // get ai client`}</code>
             </Section>
           </>
         )}
-        {active && <active.Component />}
+        {active && <MarkdownDoc source={active.markdown} />}
       </div>
     </div>
   );

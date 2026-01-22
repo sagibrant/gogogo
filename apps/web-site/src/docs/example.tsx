@@ -13,7 +13,16 @@ export default function Example() {
       <Paragraph>
         You can paste and run it in the extension sidebar script editor. The runtime provides globals like page, browser, ai, expect, and wait.
       </Paragraph>
-      <pre style={{ background: '#0f172a', color: '#e2e8f0', padding: 16, borderRadius: 8, overflowX: 'auto' }}>
+      <pre
+        style={{
+          background: 'var(--mimic-codeblock-bg)',
+          color: 'var(--mimic-codeblock-fg)',
+          border: '1px solid var(--mimic-codeblock-border)',
+          padding: 16,
+          borderRadius: 8,
+          overflowX: 'auto',
+        }}
+      >
         <code>{script}</code>
       </pre>
     </Section>

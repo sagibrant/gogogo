@@ -2,10 +2,35 @@
 
 Assertion helper returned by `expect(actual)`.
 
+## Properties
+
+---
+### not
+
+`not: Expect`
+
+Negates the next assertion.
+
+#### Usage
+
+```js
+expect(await page.closed()).not.toBeTruthy();
+```
+
+#### Arguments
+
+- None
+
+#### Returns
+
+- `Expect`
+
 ## Methods
 
 ---
-### expect(actual)
+### expect
+
+`expect(actual: unknown): Expect`
 
 Creates an `Expect` object for the given `actual` value.
 
@@ -19,25 +44,6 @@ expect('hello world').toMatch(/world/);
 #### Arguments
 
 - `actual` `<unknown>`: actual value to assert on.
-
-#### Returns
-
-- `Expect`
-
----
-### not
-
-Negates the next assertion.
-
-#### Usage
-
-```js
-expect(await page.closed()).not.toBeTruthy();
-```
-
-#### Arguments
-
-- None
 
 #### Returns
 
