@@ -8,6 +8,7 @@ type DocItem = {
   title: string;
   category: 'AutomationObjects' | 'GeneralObjects' | 'Locators' | 'Assertions' | 'Misc';
   markdown: string;
+  relPath: string;
 };
 
 const toKebabCase = (value: string) => {
@@ -37,16 +38,16 @@ const docs: DocItem[] = Object.entries(markdownFiles)
     const topTitle = titleFromMarkdown(markdown) || baseName;
 
     if (rel === 'types.md') {
-      return { slug: 'types', title: topTitle, category: 'Misc', markdown };
+      return { slug: 'types', title: topTitle, category: 'Misc', markdown, relPath: rel };
     }
 
     const dir = parts[0] ?? '';
     const kebab = toKebabCase(baseName);
 
-    if (dir === 'aos') return { slug: `automation/${kebab}`, title: topTitle, category: 'AutomationObjects', markdown };
-    if (dir === 'objects') return { slug: `objects/${kebab}`, title: topTitle, category: 'GeneralObjects', markdown };
-    if (dir === 'locators') return { slug: `locators/${kebab}`, title: topTitle, category: 'Locators', markdown };
-    if (dir === 'assertions') return { slug: `assertions/${kebab}`, title: topTitle, category: 'Assertions', markdown };
+    if (dir === 'aos') return { slug: `automation/${kebab}`, title: topTitle, category: 'AutomationObjects', markdown, relPath: rel };
+    if (dir === 'objects') return { slug: `objects/${kebab}`, title: topTitle, category: 'GeneralObjects', markdown, relPath: rel };
+    if (dir === 'locators') return { slug: `locators/${kebab}`, title: topTitle, category: 'Locators', markdown, relPath: rel };
+    if (dir === 'assertions') return { slug: `assertions/${kebab}`, title: topTitle, category: 'Assertions', markdown, relPath: rel };
 
     return null;
   })
@@ -116,7 +117,7 @@ const ai = new AIClient(); // get ai client`}
             </Section>
           </>
         )}
-        {active && <MarkdownDoc source={active.markdown} />}
+        {active && <MarkdownDoc source={active.markdown} docRelPath={active.relPath} />}
       </div>
     </div>
   );

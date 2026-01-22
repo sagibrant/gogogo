@@ -1,9 +1,70 @@
 import { isValidElement } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Link } from 'react-router';
 import { CodeBlock } from './Common';
 
-export default function MarkdownDoc({ source }: { source: string }) {
+const toKebabCase = (value: string) => {
+  return value
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .toLowerCase();
+};
+
+const normalizePosixPath = (value: string) => {
+  const parts = value.split('/').filter(Boolean);
+  const out: string[] = [];
+  for (const part of parts) {
+    if (part === '.') continue;
+    if (part === '..') {
+      if (out.length > 0 && out[out.length - 1] !== '..') {
+        out.pop();
+      } else {
+        out.push('..');
+      }
+      continue;
+    }
+    out.push(part);
+  }
+  return out.join('/');
+};
+
+const resolveMarkdownHref = (href: string, docRelPath?: string) => {
+  if (!href) return null;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) return null;
+  if (href.startsWith('/apis/')) return href;
+
+  const [pathPartRaw, hashPartRaw] = href.split('#', 2);
+  const pathPart = pathPartRaw ?? '';
+  const hash = hashPartRaw ? `#${hashPartRaw}` : '';
+
+  if (pathPart === '' && hash) return href;
+  if (!pathPart.toLowerCase().endsWith('.md')) return null;
+
+  const currentDir = docRelPath ? docRelPath.split('/').slice(0, -1).join('/') : '';
+  const resolved = normalizePosixPath([currentDir, pathPart].filter(Boolean).join('/'));
+
+  if (resolved.toLowerCase() === 'types.md') return `/apis/types${hash}`;
+
+  const segments = resolved.split('/').filter(Boolean);
+  const dir = segments[0] ?? '';
+  const fileName = segments[segments.length - 1] ?? '';
+  const baseName = fileName.replace(/\.md$/i, '');
+
+  const dirToPrefix: Record<string, string> = {
+    aos: 'automation',
+    objects: 'objects',
+    locators: 'locators',
+    assertions: 'assertions',
+  };
+
+  const prefix = dirToPrefix[dir];
+  if (!prefix) return null;
+
+  return `/apis/${prefix}/${toKebabCase(baseName)}${hash}`;
+};
+
+export default function MarkdownDoc({ source, docRelPath }: { source: string; docRelPath?: string }) {
   return (
     <section style={{ maxWidth: 960, margin: '0 auto', padding: '2rem 1rem' }}>
       <ReactMarkdown
@@ -88,11 +149,32 @@ export default function MarkdownDoc({ source }: { source: string }) {
               </code>
             );
           },
-          a: ({ children, ...props }) => (
-            <a {...props} style={{ color: '#2563eb', textDecoration: 'none' }}>
-              {children}
-            </a>
-          ),
+          a: ({ children, ...props }) => {
+            const href = typeof props.href === 'string' ? props.href : '';
+            const resolved = resolveMarkdownHref(href, docRelPath);
+            if (resolved) {
+              return (
+                <Link to={resolved} style={{ color: '#2563eb', textDecoration: 'none' }}>
+                  {children}
+                </Link>
+              );
+            }
+
+            const isExternal = /^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//');
+            if (isExternal) {
+              return (
+                <a {...props} href={href} target="_blank" rel="noreferrer" style={{ color: '#2563eb', textDecoration: 'none' }}>
+                  {children}
+                </a>
+              );
+            }
+
+            return (
+              <a {...props} style={{ color: '#2563eb', textDecoration: 'none' }}>
+                {children}
+              </a>
+            );
+          },
           table: ({ children, ...props }) => (
             <table {...props} style={{ borderCollapse: 'collapse', marginBottom: '1rem', width: '100%' }}>
               {children}
