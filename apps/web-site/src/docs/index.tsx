@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { ReactElement } from 'react';
 import { Paragraph, Section } from '../apis/components/Common';
 import Installation from './installation';
 import QuickStart from './quickstart';
 import Example from './example';
+import { Link, useParams } from 'react-router';
 
 type DocItem = {
   slug: string;
@@ -30,30 +31,9 @@ const docs: DocItem[] = [
   { slug: 'example', title: 'Example', Component: Example },
 ];
 
-const navigate = (to: string) => {
-  if (to === window.location.pathname) return;
-  history.pushState({}, '', to);
-  try {
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  }
-  catch {
-    window.dispatchEvent(new Event('popstate'));
-  }
-};
-
 export default function Docs() {
-  const [path, setPath] = useState(window.location.pathname);
-  useEffect(() => {
-    const onPopState = () => setPath(window.location.pathname);
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
-
-  const slug = useMemo(() => {
-    const parts = path.split('/').filter(Boolean);
-    if (parts[0] !== 'docs') return '';
-    return parts[1] || '';
-  }, [path]);
+  const params = useParams();
+  const slug = useMemo(() => (params['*'] ?? '').split('/')[0] ?? '', [params]);
 
   const active = docs.find(d => d.slug === slug) ?? docs[0];
 
@@ -64,28 +44,16 @@ export default function Docs() {
         <div style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '0.75rem' }}>Getting Started</div>
         {docs.map(d => (
           <div key={d.slug || 'root'} style={{ marginBottom: '0.5rem' }}>
-            <a
-              href={d.slug ? `/docs/${d.slug}` : '/docs'}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(d.slug ? `/docs/${d.slug}` : '/docs');
-              }}
-            >
+            <Link to={d.slug ? `/docs/${d.slug}` : '/docs'}>
               {d.title}
-            </a>
+            </Link>
           </div>
         ))}
         <div style={{ fontSize: '0.9rem', color: '#64748b', margin: '1rem 0 0.5rem' }}>Reference</div>
         <div style={{ marginBottom: '0.5rem' }}>
-          <a
-            href="/apis"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate('/apis');
-            }}
-          >
+          <Link to="/apis">
             APIs
-          </a>
+          </Link>
         </div>
       </aside>
       <div>{active && <active.Component />}</div>

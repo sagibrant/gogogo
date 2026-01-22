@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Section, Paragraph } from './components/Common';
 import MarkdownDoc from './components/MarkdownDoc';
+import { Link, useParams } from 'react-router';
 
 type DocItem = {
   slug: string;
@@ -53,26 +54,10 @@ const docs: DocItem[] = Object.entries(markdownFiles)
   .sort((a, b) => a.slug.localeCompare(b.slug));
 
 export default function APIs() {
-  const [path, setPath] = useState(window.location.pathname);
-  useEffect(() => {
-    const onPopState = () => setPath(window.location.pathname);
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
-
-  const slug = useMemo(() => {
-    const parts = path.split('/').filter(Boolean);
-    if (parts[0] !== 'apis') return '';
-    return parts.slice(1).join('/');
-  }, [path]);
+  const params = useParams();
+  const slug = useMemo(() => params['*'] ?? '', [params]);
 
   const active = docs.find(d => d.slug === slug);
-
-  const navigate = (to: string) => {
-    if (to === path) return;
-    history.pushState({}, '', to);
-    setPath(to);
-  };
   const byCategory = (category: DocItem['category']) => docs.filter(d => d.category === category);
 
   return (
@@ -82,31 +67,31 @@ export default function APIs() {
         <div style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '0.5rem' }}>Automation Objects</div>
         {byCategory('AutomationObjects').map(d => (
           <div key={d.slug} style={{ marginBottom: '0.5rem' }}>
-            <a href={`/apis/${d.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/apis/${d.slug}`); }}>{d.title}</a>
+            <Link to={`/apis/${d.slug}`}>{d.title}</Link>
           </div>
         ))}
         <div style={{ fontSize: '0.9rem', color: '#64748b', margin: '1rem 0 0.5rem' }}>Other Objects</div>
         {byCategory('GeneralObjects').map(d => (
           <div key={d.slug} style={{ marginBottom: '0.5rem' }}>
-            <a href={`/apis/${d.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/apis/${d.slug}`); }}>{d.title}</a>
+            <Link to={`/apis/${d.slug}`}>{d.title}</Link>
           </div>
         ))}
         <div style={{ fontSize: '0.9rem', color: '#64748b', margin: '1rem 0 0.5rem' }}>Locators</div>
         {byCategory('Locators').map(d => (
           <div key={d.slug} style={{ marginBottom: '0.5rem' }}>
-            <a href={`/apis/${d.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/apis/${d.slug}`); }}>{d.title}</a>
+            <Link to={`/apis/${d.slug}`}>{d.title}</Link>
           </div>
         ))}
         <div style={{ fontSize: '0.9rem', color: '#64748b', margin: '1rem 0 0.5rem' }}>Assertions</div>
         {byCategory('Assertions').map(d => (
           <div key={d.slug} style={{ marginBottom: '0.5rem' }}>
-            <a href={`/apis/${d.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/apis/${d.slug}`); }}>{d.title}</a>
+            <Link to={`/apis/${d.slug}`}>{d.title}</Link>
           </div>
         ))}
         <div style={{ fontSize: '0.9rem', color: '#64748b', margin: '1rem 0 0.5rem' }}>Misc</div>
         {byCategory('Misc').map(d => (
           <div key={d.slug} style={{ marginBottom: '0.5rem' }}>
-            <a href={`/apis/${d.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/apis/${d.slug}`); }}>{d.title}</a>
+            <Link to={`/apis/${d.slug}`}>{d.title}</Link>
           </div>
         ))}
       </aside>
