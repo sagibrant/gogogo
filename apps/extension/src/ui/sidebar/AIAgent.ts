@@ -527,7 +527,7 @@ await ${locatorScript}.fill('abcde', {mode: 'cdp'});
         },
         temperature: type === 'vision' ? 0 : 0.3, // Lower temperature for vision tasks for more consistent results
         topP: 0.8,
-        maxTokens: 10240,
+        // maxTokens: 8192,
         streaming: type === 'general', // Enable streaming only for general chat model, keep vision model with full response
       });
     } catch (error) {

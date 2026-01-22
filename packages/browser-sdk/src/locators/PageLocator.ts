@@ -248,6 +248,20 @@ export class PageLocator extends Locator<Page> implements api.PageLocator {
     });
     return this;
   }
+  off(event: string, listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((dialog: api.Dialog) => (unknown | Promise<unknown>))): this {
+    this.get().then((page) => {
+      if (event === 'close') {
+        page.off(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
+      } else if (event === 'dialog') {
+        page.off(event, listener as ((dialog: api.Dialog) => (unknown | Promise<unknown>)));
+      } else if (event === 'domcontentloaded') {
+        page.off(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
+      }
+    }).catch(error => {
+      this.logger.error(error);
+    });
+    return this;
+  }
 
   /** ==================================================================================================================== */
   /** ==================================================== DOM Object ==================================================== */

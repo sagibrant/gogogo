@@ -1410,7 +1410,6 @@ export default function App() {
   useEffect(() => {
     const init = async () => {
       try {
-        console.log('useEffect ==> init');
         // Load last asset from storage
         const result = await chrome.storage.local.get(['lastAsset']);
         const content = result.lastAsset || '';
@@ -1428,6 +1427,9 @@ export default function App() {
           } catch (error) {
             console.warn('Failed to parse lastAsset:', error);
           }
+        }
+        else {
+          refreshActiveTaskStep(taskAsset.root);
         }
 
         // Check if debugger is attached

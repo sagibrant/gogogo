@@ -192,6 +192,11 @@ export class Browser extends AutomationObject implements api.Browser {
   on(event: 'window' | 'page', listener: ((window: api.Window) => (unknown | Promise<unknown>)) | ((page: api.Page) => (unknown | Promise<unknown>))): this {
     return super.on(event, listener as (arg: unknown) => (unknown | Promise<unknown>));
   }
+  off(event: 'window', listener: (window: api.Window) => (unknown | Promise<unknown>)): this;
+  off(event: 'page', listener: (page: api.Page) => (unknown | Promise<unknown>)): this;
+  off(event: 'window' | 'page', listener: ((window: api.Window) => (unknown | Promise<unknown>)) | ((page: api.Page) => (unknown | Promise<unknown>))): this {
+    return super.off(event, listener as (arg: unknown) => (unknown | Promise<unknown>));
+  }
   emit(event: 'window' | 'page', data?: unknown): void {
     if (event === 'window') {
       const windowInfo = data as WindowInfo;

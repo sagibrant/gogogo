@@ -11,6 +11,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --mimic-codeblock-bg: #111827;
+  --mimic-codeblock-fg: #e2e8f0;
+  --mimic-codeblock-border: rgba(148, 163, 184, 0.25);
+  --mimic-inline-code-bg: rgba(148, 163, 184, 0.18);
+  --mimic-inline-code-fg: #e2e8f0;
 }
 
 a {
@@ -58,6 +64,12 @@ button:focus-visible {
   :root {
     color: #213547;
     background-color: #ffffff;
+
+    --mimic-codeblock-bg: #f8fafc;
+    --mimic-codeblock-fg: #0f172a;
+    --mimic-codeblock-border: rgba(15, 23, 42, 0.10);
+    --mimic-inline-code-bg: rgba(15, 23, 42, 0.06);
+    --mimic-inline-code-fg: #0f172a;
   }
   a:hover {
     color: #747bff;

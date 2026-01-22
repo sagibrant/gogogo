@@ -94,6 +94,8 @@ export interface BrowserMethods {
 export interface BrowserEvents {
   on(event: 'window', listener: (window: Window) => (unknown | Promise<unknown>)): this;
   on(event: 'page', listener: (page: Page) => (unknown | Promise<unknown>)): this;
+  off(event: 'window', listener: (window: Window) => (unknown | Promise<unknown>)): this;
+  off(event: 'page', listener: (page: Page) => (unknown | Promise<unknown>)): this;
 }
 
 export interface Browser extends BrowserProperties, BrowserMethods, BrowserLocatorMethods, BrowserEvents {
@@ -133,6 +135,8 @@ export interface WindowMethods {
 export interface WindowEvents {
   on(event: 'page', listener: (page: Page) => (unknown | Promise<unknown>)): this;
   on(event: 'close', listener: (window: Window) => (unknown | Promise<unknown>)): this;
+  off(event: 'page', listener: (page: Page) => (unknown | Promise<unknown>)): this;
+  off(event: 'close', listener: (window: Window) => (unknown | Promise<unknown>)): this;
 }
 
 export interface Window extends WindowProperties, WindowMethods, WindowLocatorMethods, WindowEvents {
@@ -187,6 +191,8 @@ export interface PageMethods {
 export interface PageEvents {
   on(event: 'dialog', listener: (dialog: Dialog) => (unknown | Promise<unknown>)): this;
   on(event: 'domcontentloaded' | 'close', listener: (page: Page) => (unknown | Promise<unknown>)): this;
+  off(event: 'dialog', listener: (dialog: Dialog) => (unknown | Promise<unknown>)): this;
+  off(event: 'domcontentloaded' | 'close', listener: (page: Page) => (unknown | Promise<unknown>)): this;
 }
 
 export interface Page extends PageProperties, PageMethods, PageLocatorMethods, PageEvents {
