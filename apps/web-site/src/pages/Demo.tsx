@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import './App.css';
+import '../App.css';
 import { toast, Toaster } from 'sonner';
-import PrepareExtension from './components/WorkflowSteps/PrepareExtension';
-import PrepareURL from './components/WorkflowSteps/PrepareURL';
-import PrepareScripts from './components/WorkflowSteps/PrepareScripts';
-import PreparePrompt from './components/WorkflowSteps/PreparePrompt';
-import Mimic from './components/WorkflowSteps/Mimic';
-import ModeToggle from './components/ModeToggle';
-import { ToastTypes } from './utils/shared';
-import type { ToastType } from './utils/shared';
-import { MimicUtils } from './utils/MimicUtils';
+import PrepareExtension from '../features/demo/components/WorkflowSteps/PrepareExtension';
+import PrepareURL from '../features/demo/components/WorkflowSteps/PrepareURL';
+import PrepareScripts from '../features/demo/components/WorkflowSteps/PrepareScripts';
+import PreparePrompt from '../features/demo/components/WorkflowSteps/PreparePrompt';
+import Mimic from '../features/demo/components/WorkflowSteps/Mimic';
+import ModeToggle from '../features/demo/components/ModeToggle';
+import { ToastTypes } from '../features/demo/utils/shared';
+import type { ToastType } from '../features/demo/utils/shared';
+import { MimicUtils } from '../features/demo/utils/MimicUtils';
 
 function Demo() {
   const [url, setUrl] = useState(MimicUtils.getDemoScriptWebSite());

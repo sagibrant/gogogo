@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import type { ReactElement } from 'react';
-import { Paragraph, Section } from '../apis/components/Common';
-import Installation from './installation';
-import QuickStart from './quickstart';
-import Example from './example';
+import { Paragraph, Section } from '../shared/components/Common';
+import Installation from '../features/docs/installation';
+import QuickStart from '../features/docs/quickstart';
+import Example from '../features/docs/example';
 import { Link, useParams } from 'react-router';
 
 type DocItem = {

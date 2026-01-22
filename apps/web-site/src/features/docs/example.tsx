@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Paragraph, Section } from '../apis/components/Common';
-import { MimicUtils } from '../utils/MimicUtils';
+import { Paragraph, Section } from '../../shared/components/Common';
+import { MimicUtils } from '../demo/utils/MimicUtils';
 
 export default function Example() {
   const script = useMemo(() => MimicUtils.getDemoScript(), []);

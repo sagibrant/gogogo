@@ -1,9 +1,9 @@
 import { Navigate, createBrowserRouter } from 'react-router';
 import App from './App';
-import APIs from './apis';
-import Demo from './demo';
-import Docs from './docs';
-import Home from './views/Home';
+import APIs from '../pages/APIs';
+import Demo from '../pages/Demo';
+import Docs from '../pages/Docs';
+import Home from '../pages/Home';
 
 const routerBasename = import.meta.env.BASE_URL?.replace(/\/$/, '') || '/';
 
@@ -23,4 +23,3 @@ export const router = createBrowserRouter(
   ],
   { basename: routerBasename },
 );
-

@@ -1,4 +1,4 @@
-import { Paragraph, Section } from '../apis/components/Common';
+import { Paragraph, Section } from '../../shared/components/Common';
 
 export default function Installation() {
   return (

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Section, Paragraph } from './components/Common';
-import MarkdownDoc from './components/MarkdownDoc';
+import { Section, Paragraph } from '../shared/components/Common';
+import MarkdownDoc from '../shared/components/MarkdownDoc';
 import { Link, useParams } from 'react-router';
 
 type DocItem = {

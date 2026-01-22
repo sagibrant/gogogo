@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import * as Utils from "./Utils";
+import * as Utils from "../../../utils/Utils";
 
 export interface MethodDefinition {
   name: string;
