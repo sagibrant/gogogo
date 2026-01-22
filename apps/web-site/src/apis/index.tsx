@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { Section, Paragraph } from './components/Common';
 import Browser from './aos/Browser';
 import WindowDoc from './aos/Window';
@@ -24,7 +24,7 @@ type DocItem = {
   slug: string;
   title: string;
   category: 'AutomationObjects' | 'GeneralObjects' | 'Locators' | 'Assertions' | 'Misc';
-  Component: () => React.ReactElement;
+  Component: () => ReactElement;
 };
 
 const docs: DocItem[] = [

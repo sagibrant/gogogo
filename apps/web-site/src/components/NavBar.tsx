@@ -1,11 +1,10 @@
-import React from 'react';
 
 type Props = {
   path: string;
   onNavigate: (to: string) => void;
 };
 
-const NavBar: React.FC<Props> = ({ path, onNavigate }) => {
+export default function NavBar({ path, onNavigate }: Props) {
   const isActive = (to: string) => path.startsWith(to) || (to === '/' && path === '/');
   const baseUrl = import.meta.env.BASE_URL;
   return (
@@ -45,4 +44,3 @@ const NavBar: React.FC<Props> = ({ path, onNavigate }) => {
   );
 };
 
-export default NavBar;

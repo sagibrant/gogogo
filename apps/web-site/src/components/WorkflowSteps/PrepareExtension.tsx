@@ -1,14 +1,14 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { MimicUtils } from '../../utils/MimicUtils';
 
 interface PrepareExtensionProps {
   stepNumber: number;
 }
 
-const PrepareExtension: React.FC<PrepareExtensionProps> = ({ stepNumber }) => {
-  const [isInstalled, setIsInstalled] = React.useState<boolean>(false);
+export default function PrepareExtension({ stepNumber }: PrepareExtensionProps) {
+  const [isInstalled, setIsInstalled] = useState<boolean>(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkIsInstalled = async () => {
       const installed = await MimicUtils.isExtensionInstalled();
       setIsInstalled(installed);
@@ -69,4 +69,3 @@ const PrepareExtension: React.FC<PrepareExtensionProps> = ({ stepNumber }) => {
   );
 };
 
-export default PrepareExtension;

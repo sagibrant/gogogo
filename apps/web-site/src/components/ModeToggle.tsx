@@ -1,11 +1,10 @@
-import React from 'react';
 
 interface ModeToggleProps {
   isAIMode: boolean;
   onToggle: () => void;
 }
 
-const ModeToggle: React.FC<ModeToggleProps> = ({ isAIMode, onToggle }) => {
+export default function ModeToggle({ isAIMode, onToggle }: ModeToggleProps) {
   return (
     <div className="mode-toggle-container">
       <div className="mode-toggle-label">
@@ -27,5 +26,3 @@ const ModeToggle: React.FC<ModeToggleProps> = ({ isAIMode, onToggle }) => {
     </div>
   );
 };
-
-export default ModeToggle;

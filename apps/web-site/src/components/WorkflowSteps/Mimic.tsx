@@ -1,4 +1,3 @@
-import React from 'react';
 import { MimicUtils } from '../../utils/MimicUtils';
 import { ToastTypes } from '../../utils/shared';
 import type { ToastType } from '../../utils/shared';
@@ -12,14 +11,14 @@ interface MimicProps {
   showToast: (type: ToastType, message: string, description?: string) => void;
 }
 
-const Mimic: React.FC<MimicProps> = ({
+export default function Mimic({
   isAIMode,
   scriptContent,
   promptContent,
   url,
   stepNumber,
   showToast
-}) => {
+}: MimicProps) {
 
   // Handle script execution
   const handleRunScript = async () => {
@@ -112,4 +111,3 @@ const Mimic: React.FC<MimicProps> = ({
   );
 };
 
-export default Mimic;

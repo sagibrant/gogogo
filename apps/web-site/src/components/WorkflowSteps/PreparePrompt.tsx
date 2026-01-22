@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface PreparePromptProps {
   promptContent: string;
@@ -6,11 +5,11 @@ interface PreparePromptProps {
   stepNumber: number;
 }
 
-const PreparePrompt: React.FC<PreparePromptProps> = ({ 
+export default function PreparePrompt({ 
   promptContent, 
   onPromptChange, 
   stepNumber 
-}) => {
+}: PreparePromptProps) {
   return (
     <div className="workflow-step">
       <div className="step-header">
@@ -35,5 +34,3 @@ const PreparePrompt: React.FC<PreparePromptProps> = ({
     </div>
   );
 };
-
-export default PreparePrompt;

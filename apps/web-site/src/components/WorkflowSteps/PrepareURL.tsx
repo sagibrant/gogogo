@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface PrepareURLProps {
   url: string;
@@ -6,7 +5,7 @@ interface PrepareURLProps {
   stepNumber: number;
 }
 
-const PrepareURL: React.FC<PrepareURLProps> = ({ url, onUrlChange, stepNumber }) => {
+export default function PrepareURL({ url, onUrlChange, stepNumber }: PrepareURLProps) {
   return (
     <div className="workflow-step">
       <div className="step-header">
@@ -29,5 +28,3 @@ const PrepareURL: React.FC<PrepareURLProps> = ({ url, onUrlChange, stepNumber })
     </div>
   );
 };
-
-export default PrepareURL;

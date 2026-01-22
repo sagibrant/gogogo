@@ -16,7 +16,7 @@ export class MimicUtils {
       return false;
     }
   }
-  static async runScript(script: string, url?: string): Promise<any> {
+  static async runScript(script: string, url?: string): Promise<unknown> {
     try {
       console.debug('runScript: ==> ', script, 'url:', url);
       // clear the cached objects
@@ -28,7 +28,7 @@ export class MimicUtils {
       const ai = new AIClient();
 
       // eval/new Function are only allowed in sandbox in extension mv3 for CSP issues
-      let result: any = undefined;
+      let result: unknown = undefined;
       const funcScript = `return (async () => { ${script} })()`;
       console.debug('runScript: === ', funcScript);
       const wait = async (timeout: number): Promise<void> => {

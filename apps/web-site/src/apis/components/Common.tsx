@@ -1,4 +1,4 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 
 export type Entry = {
   name: string;
@@ -17,7 +17,7 @@ export const Section = ({ title, children }: { title: string; children: React.Re
   </section>
 );
 
-export const Paragraph = ({ children }: { children: React.ReactNode }) => (
+export const Paragraph = ({ children }: { children: ReactNode }) => (
   <p style={{ marginBottom: '1rem', color: '#334155' }}>{children}</p>
 );
 
