@@ -2,6 +2,29 @@
 
 Frame automation object.
 
+## Getting Started
+
+### Usage
+
+```js
+const frame = await page.frame({ url: /example/ }).get();
+```
+
+### Arguments
+
+- None
+
+### Returns
+
+- `Frame` (via `FrameLocator.get()`)
+
+### Notes
+
+In most cases, you do not need to explicitly use the `Frame` object for the main frame because:
+
+- `page.element(...)` queries under `page.mainFrame()`.
+- `page.text(...)` queries under `page.mainFrame()`.
+
 ## Properties
 
 ---

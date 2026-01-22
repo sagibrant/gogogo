@@ -2,6 +2,28 @@
 
 Browser automation object.
 
+## Getting Started
+
+### Usage
+
+```js
+const browser = await new BrowserLocator().get();
+```
+
+### Arguments
+
+- None
+
+### Returns
+
+- `Browser` (via `BrowserLocator.get()`)
+
+### Notes
+
+In Mimic extension sidebar, a global variable is available:
+
+- `browser: Browser`, which represents the current browser.
+
 ## Properties
 
 ---

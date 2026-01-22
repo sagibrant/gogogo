@@ -2,6 +2,28 @@
 
 Page (tab) automation object.
 
+## Getting Started
+
+### Usage
+
+```js
+const page = await browser.lastActivePage();
+```
+
+### Arguments
+
+- None
+
+### Returns
+
+- `Page` (via `PageLocator.get()`)
+
+### Notes
+
+In Mimic extension sidebar, a global variable is available:
+
+- `page: Page`, which represents the current page.
+
 ## Properties
 
 ---

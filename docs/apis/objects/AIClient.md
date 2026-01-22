@@ -2,6 +2,12 @@
 
 AI client interface.
 
+## Getting Started
+
+In Mimic extension sidebar, a global variable is available:
+
+- `ai: AIClient`, which represents the AIClient object and auto loads the AI Setting from extension.
+
 ## Methods
 
 ---

@@ -2,6 +2,22 @@
 
 Window automation object.
 
+## Getting Started
+
+### Usage
+
+```js
+const window = await browser.lastFocusedWindow();
+```
+
+### Arguments
+
+- None
+
+### Returns
+
+- `Window` (via `WindowLocator.get()`)
+
 ## Properties
 
 ---

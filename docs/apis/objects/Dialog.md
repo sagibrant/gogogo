@@ -2,6 +2,23 @@
 
 Represents the dialog on a page (`alert/confirm/prompt/beforeunload`).
 
+## Getting Started
+
+This Dialog Event approach is the suggested solution rather than `page.dialog()`.
+
+```js
+await browser.attachDebugger();
+
+const onDialog = async (dialog) => {
+  expect(await dialog.opened()).toBeTruthy();
+  await dialog.accept();
+  page.off('dialog', onDialog);
+};
+
+page.on('dialog', onDialog);
+await page.element('#alert_button').click({ mode: 'cdp' });
+```
+
 ## Methods
 
 ---
@@ -155,18 +172,3 @@ await page.dialog().dismiss();
 #### Returns
 
 - `Promise<void>`
-
-## Example (Dialog Event)
-
-```js
-await browser.attachDebugger();
-
-const onDialog = async (dialog) => {
-  expect(await dialog.opened()).toBeTruthy();
-  await dialog.accept();
-  page.off('dialog', onDialog);
-};
-
-page.on('dialog', onDialog);
-await page.element('#alert_button').click({ mode: 'cdp' });
-```
