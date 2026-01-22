@@ -159,4 +159,16 @@ export class WindowLocator extends Locator<Window> implements api.WindowLocator 
     });
     return this;
   }
+  off(event: string, listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((window: api.Window) => (unknown | Promise<unknown>))): this {
+    this.get().then((window) => {
+      if (event === 'page') {
+        window.off(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
+      } else if (event === 'close') {
+        window.off(event, listener as ((window: api.Window) => (unknown | Promise<unknown>)));
+      }
+    }).catch(error => {
+      this.logger.error(error);
+    });
+    return this;
+  }
 }

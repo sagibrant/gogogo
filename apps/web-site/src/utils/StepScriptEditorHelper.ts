@@ -227,7 +227,9 @@ export class StepScriptEditorHelper {
     BrowserEvents: {
       methods: [
         { name: "on", params: ["event: 'window'", "listener: (window: Window) => (unknown | Promise<unknown>)"], returnType: "Browser" },
-        { name: "on", params: ["event: 'page'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Browser" }
+        { name: "on", params: ["event: 'page'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Browser" },
+        { name: "off", params: ["event: 'window'", "listener: (window: Window) => (unknown | Promise<unknown>)"], returnType: "Browser" },
+        { name: "off", params: ["event: 'page'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Browser" },
       ]
     },
 
@@ -276,7 +278,9 @@ export class StepScriptEditorHelper {
     WindowEvents: {
       methods: [
         { name: "on", params: ["event: 'page'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Window" },
-        { name: "on", params: ["event: 'close'", "listener: (window: Window) => (unknown | Promise<unknown>)"], returnType: "Window" }
+        { name: "on", params: ["event: 'close'", "listener: (window: Window) => (unknown | Promise<unknown>)"], returnType: "Window" },
+        { name: "off", params: ["event: 'page'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Window" },
+        { name: "off", params: ["event: 'close'", "listener: (window: Window) => (unknown | Promise<unknown>)"], returnType: "Window" },
       ]
     },
 
@@ -335,7 +339,9 @@ export class StepScriptEditorHelper {
     PageEvents: {
       methods: [
         { name: "on", params: ["event: 'dialog'", "listener: (dialog: Dialog) => (unknown | Promise<unknown>)"], returnType: "Page" },
-        { name: "on", params: ["event: 'domcontentloaded' | 'close'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Page" }
+        { name: "on", params: ["event: 'domcontentloaded' | 'close'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Page" },
+        { name: "off", params: ["event: 'dialog'", "listener: (dialog: Dialog) => (unknown | Promise<unknown>)"], returnType: "Page" },
+        { name: "off", params: ["event: 'domcontentloaded' | 'close'", "listener: (page: Page) => (unknown | Promise<unknown>)"], returnType: "Page" },
       ]
     },
 

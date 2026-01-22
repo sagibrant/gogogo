@@ -153,4 +153,18 @@ export class BrowserLocator extends Locator<Browser> implements api.BrowserLocat
     });
     return this;
   }
+  off(event: 'window', listener: (window: api.Window) => (unknown | Promise<unknown>)): this;
+  off(event: 'page', listener: (page: api.Page) => (unknown | Promise<unknown>)): this;
+  off(event: 'window' | 'page', listener: ((window: api.Window) => (unknown | Promise<unknown>)) | ((page: api.Page) => (unknown | Promise<unknown>))): this {
+    this.get().then((browser) => {
+      if (event === 'window') {
+        browser.off(event, listener as ((window: api.Window) => (unknown | Promise<unknown>)));
+      } else if (event === 'page') {
+        browser.off(event, listener as ((page: api.Page) => (unknown | Promise<unknown>)));
+      }
+    }).catch(error => {
+      this.logger.error(error);
+    });
+    return this;
+  }
 }

@@ -274,6 +274,11 @@ export class Page extends AutomationObject implements api.Page {
   on(event: 'dialog' | 'domcontentloaded' | 'close', listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((dialog: api.Dialog) => (unknown | Promise<unknown>))): this {
     return super.on(event, listener as (arg: unknown) => (unknown | Promise<unknown>));
   }
+  off(event: 'domcontentloaded' | 'close', listener: (page: api.Page) => (unknown | Promise<unknown>)): this;
+  off(event: 'dialog', listener: (dialog: api.Dialog) => (unknown | Promise<unknown>)): this;
+  off(event: 'dialog' | 'domcontentloaded' | 'close', listener: ((page: api.Page) => (unknown | Promise<unknown>)) | ((dialog: api.Dialog) => (unknown | Promise<unknown>))): this {
+    return super.off(event, listener as (arg: unknown) => (unknown | Promise<unknown>));
+  }
   emit(event: 'close' | 'dialog' | 'domcontentloaded', _data?: unknown): void {
     if (event === 'close') {
       super.emit('close', this);
