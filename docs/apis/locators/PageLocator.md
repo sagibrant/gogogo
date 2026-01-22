@@ -2,7 +2,7 @@
 
 Locator for pages.
 
-This type is both `Locator<Page>` and `Page`.
+This type extends `Locator<Page>` and `Page`.
 
 ## Methods
 

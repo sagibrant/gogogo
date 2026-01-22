@@ -2,7 +2,7 @@
 
 Locator for the current browser.
 
-This type is both `Locator<Browser>` and `Browser`.
+This type extends `Locator<Browser>` and `Browser`.
 
 ## Methods
 

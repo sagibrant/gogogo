@@ -2,7 +2,7 @@
 
 Locator for frames.
 
-This type is both `Locator<Frame>` and `Frame`.
+This type extends `Locator<Frame>` and `Frame`.
 
 ## Methods
 

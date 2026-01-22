@@ -1,6 +1,6 @@
 # Dialog
 
-Represents the most recent dialog on a page (`alert/confirm/prompt/beforeunload`).
+Represents the dialog on a page (`alert/confirm/prompt/beforeunload`).
 
 ## Methods
 

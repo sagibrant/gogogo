@@ -2,7 +2,7 @@
 
 Locator for windows.
 
-This type is both `Locator<Window>` and `Window`.
+This type extends `Locator<Window>` and `Window`.
 
 ## Methods
 

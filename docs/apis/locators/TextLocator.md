@@ -2,7 +2,7 @@
 
 Locator for text nodes.
 
-This type is both `Locator<Text>` and `Text`.
+This type extends `Locator<Text>` and `Text`.
 
 ## Getting Started
 

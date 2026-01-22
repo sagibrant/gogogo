@@ -2,7 +2,7 @@
 
 Locator for elements.
 
-This type is both `Locator<Element>` and `Element`.
+This type extends `Locator<Element>` and `Element`.
 
 ## Methods
 
