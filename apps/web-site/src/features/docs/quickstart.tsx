@@ -9,7 +9,7 @@ export default function QuickStart() {
       <Paragraph>
         For a guided walkthrough, watch the playlist:{' '}
         <a href="https://www.youtube.com/playlist?list=PLvU_JUL1nukuMO1qCllN19VDgO2t9pd9x">
-          https://www.youtube.com/playlist?list=PLvU_JUL1nukuMO1qCllN19VDgO2t9pd9x
+          Mimic Tutorials
         </a>
       </Paragraph>
     </Section>
