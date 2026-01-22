@@ -2,6 +2,10 @@
 
 Mimic automation SDK for browser environments. This package targets front-end browser environments (including front-end bundlers like Vite/Webpack), and currently does not support Node.js server-side or SSR usage.
 
+## Prerequisites
+
+To use this SDK, you must have the **Mimic extension** installed and enabled in your browser. The SDK will communicate with the Mimic extension to support the browser automation.
+
 ## Installation
 
 ```bash
