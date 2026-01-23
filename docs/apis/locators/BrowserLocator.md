@@ -6,8 +6,6 @@ This type extends `Locator<Browser>` and `Browser`.
 
 ## Getting Started
 
-Currently, it only targets the browser session that hosts the Mimic extension.
-
 ### Usage
 
 ```js
@@ -25,6 +23,10 @@ await page.bringToFront();
 ### Returns
 
 - `Browser` (via `BrowserLocator.get()`)
+
+### Notes
+
+Currently, it only targets the browser session that hosts the Mimic extension.
 
 ## Methods
 
