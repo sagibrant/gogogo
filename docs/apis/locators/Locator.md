@@ -58,6 +58,29 @@ await button.click();
 - `Locator<T>`
 
 ---
+### exists
+
+`exists(timeout?: number): Promise<boolean>`
+
+Checks if the locator resolves to **exactly one** match within the timeout.
+
+#### Usage
+
+```js
+if (await page.element('#dialog').exists(500)) {
+  // handle dialog
+}
+```
+
+#### Arguments
+
+- `timeout?` `<number>`: maximum time to wait in milliseconds. Defaults to locator timeout settings.
+
+#### Returns
+
+- `Promise<boolean>`: `true` if exactly one match is found, `false` otherwise.
+
+---
 ### get
 
 `get(): Promise<T>`
